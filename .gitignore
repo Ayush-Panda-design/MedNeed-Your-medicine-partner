@@ -15,11 +15,12 @@ next-env.d.ts
 *.key
 
 # local data (dev database, uploads, prescriptions, backups)
-.data
-_to_delete*
-pglite
-uploads
-prescriptions
+# (anchored with / so they never match source folders such as src/server/prescriptions)
+/.data
+/_to_delete*
+/pglite
+/uploads
+/prescriptions
 *.sql
 *.sql.gz
 *.dump
