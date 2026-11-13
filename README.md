@@ -43,7 +43,11 @@ To test the catalog at realistic size (30,000 medicines) without publishing anyt
 Every row is loaded as an **unverified draft** in the hidden "Uncategorised" category, with the prescription schedule **"Rx? unconfirmed"**. The database refuses to verify or publish an item until a pharmacist chooses its schedule. The price in the file is used as both MRP and selling price and must be replaced. Before launch, replace this data with the wholesaler's item master or a licensed database, using Import CSV.
 
 ## Production checklist
-Set `AUTH_SECRET`, `APP_URL`, `DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (the app refuses to start without them), choose an SMS driver (`twilio`), and optionally the Google keys. Run `npm run build` then `npm start`.
+Set `AUTH_SECRET`, `APP_URL`, `DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (the app refuses to start without them), choose an SMS driver (`twilio`), and optionally the Google keys. Run `npm run build` then `npm start`, or use the Docker image.
+
+**Deploying (staging and production): see [DEPLOY.md](DEPLOY.md)** for the Docker image, the one-server Compose setup with HTTPS, managed-platform steps, the staging password gate, backups and CI.
+
+Development database: leave `PGLITE_DIR` unset. The default (`~/.medneed/pglite`) is outside the project on purpose; a database folder inside a OneDrive/Dropbox-synced project gets corrupted.
 
 ## Inventory (Phase 4)
 
@@ -104,5 +108,3 @@ Switch channels on or off in Shop settings. A channel also needs its provider co
 4. **WhatsApp**: create one Meta-approved *utility* template per event named `mn_<event>` (for example `mn_order_confirmed`) whose body variables are, in order: customer first name, order number, then the event's extra value(s) (see `params` in `templates.ts`).
 
 The SMS and WhatsApp senders were checked against test servers only. Try each once with your real account before relying on it.
-#   M e d N e e d - Y o u r - m e d i c i n e - p a r t n e r  
- 

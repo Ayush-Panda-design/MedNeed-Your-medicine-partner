@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.github
+*.log
+.env
+.env.*
+!.env.example
+tsconfig.tsbuildinfo
+_to_delete*
+.data
+Dockerfile
+docker-compose*.yml

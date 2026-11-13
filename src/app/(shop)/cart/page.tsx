@@ -128,9 +128,9 @@ export default function CartPage() {
           {cart.hasRx && (
             <div className="mc-in flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
               <p className="flex items-start gap-2"><ShieldAlert className="mt-0.5 h-5 w-5 shrink-0" /> Your cart has prescription medicines. A valid prescription is needed before we can dispatch them.</p>
-              <button disabled className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-amber-200 px-4 py-2 font-semibold text-amber-900/60">
-                <Upload className="h-4 w-4" /> Upload (coming soon)
-              </button>
+              <Link href="/account/prescriptions/new" className="inline-flex items-center gap-2 rounded-lg bg-amber-200 px-4 py-2 font-semibold text-amber-950 transition-colors hover:bg-amber-300">
+                <Upload className="h-4 w-4" /> Upload prescription
+              </Link>
             </div>
           )}
         </section>

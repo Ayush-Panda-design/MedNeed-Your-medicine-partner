@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { googleConfig } from "@/server/env";
+import { captchaSiteKey } from "@/server/security/captcha";
 import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = { title: "Sign in" };
@@ -7,5 +8,5 @@ export const metadata: Metadata = { title: "Sign in" };
 export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
-  return <LoginForm googleEnabled={Boolean(googleConfig())} />;
+  return <LoginForm googleEnabled={Boolean(googleConfig())} captchaSiteKey={captchaSiteKey()} />;
 }

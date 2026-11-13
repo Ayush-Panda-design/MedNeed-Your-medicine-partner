@@ -806,4 +806,34 @@ create table product_embeddings (
 );
 `,
   },
+  {
+    id: "0014_email_tokens",
+    sql: `
+-- Single-use links sent by email: verify an address, or reset a forgotten password.
+-- Only a SHA-256 of the token is stored, so a database leak cannot be turned into working links.
+create table email_tokens (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references users(id) on delete cascade,
+  purpose text not null check (purpose in ('verify_email', 'reset_password')),
+  token_hash text not null unique,
+  email text not null,
+  expires_at timestamptz not null,
+  used_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create index email_tokens_user_idx on email_tokens (user_id, purpose, created_at desc);
+`,
+  },
+  {
+    id: "0015_carts",
+    sql: `
+-- The signed-in customer's cart, so it follows them across devices and survives sign-out.
+-- Only slugs and quantities are stored; prices and stock are always re-read from the catalogue.
+create table carts (
+  user_id uuid primary key references users(id) on delete cascade,
+  items jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now()
+);
+`,
+  },
 ];

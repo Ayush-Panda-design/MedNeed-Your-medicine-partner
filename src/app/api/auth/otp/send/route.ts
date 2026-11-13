@@ -2,12 +2,13 @@ import { z } from "zod";
 import { clientIp, handle, ok, readJson, ApiError } from "@/server/http";
 import { requireApiUser } from "@/server/auth/session";
 import { sendOtp } from "@/server/auth/otp";
+import { requireCaptcha } from "@/server/security/captcha";
 import { getUserById, getUserByPhone, normalizePhone } from "@/server/auth/users";
 
-const schema = z.object({ phone: z.string().min(1), purpose: z.enum(["login", "link"]).default("login") });
+const schema = z.object({ phone: z.string().min(1), purpose: z.enum(["login", "link"]).default("login"), captcha: z.string().max(4096).optional() });
 
 export const POST = handle(async (req) => {
-  const { phone: raw, purpose } = await readJson(req, schema);
+  const { phone: raw, purpose, captcha } = await readJson(req, schema);
   const phone = normalizePhone(raw);
   if (!phone) throw new ApiError(400, "Enter a valid 10-digit mobile number.", "invalid_phone");
 
@@ -19,6 +20,8 @@ export const POST = handle(async (req) => {
     if (await getUserByPhone(phone)) throw new ApiError(409, "That number is already used by another account.");
   }
 
+  // Signed-in users linking a number are already rate limited per account; the bot check guards anonymous sign-in SMS.
+  if (purpose === "login") await requireCaptcha(captcha, clientIp(req));
   const result = await sendOtp(phone, purpose, clientIp(req));
   return ok({ ok: true, ...result });
 });

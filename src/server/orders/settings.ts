@@ -3,6 +3,7 @@ import { audit } from "../auth/users";
 import { query } from "../db";
 
 const money = z.number().min(0).max(1_000_000);
+const optEmail = z.string().trim().max(254).refine((v) => v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Enter a valid email address, or leave blank");
 const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use the format HH:MM");
 
 export const settingsSchema = z
@@ -52,6 +53,18 @@ export const settingsSchema = z
       state: z.string().trim().min(2).max(40),
       footerNote: z.string().trim().max(300),
     }),
+    /** Business details shown on the website footer and the policy pages (Contact, Privacy, Terms, Refunds, Shipping). */
+    legal: z.object({
+      supportEmail: optEmail,
+      /** Registered pharmacist in charge (name and State Pharmacy Council registration number). */
+      pharmacistName: z.string().trim().max(120),
+      pharmacistRegNo: z.string().trim().max(80),
+      /** Grievance Officer required by the IT Rules / DPDP Act. */
+      grievanceName: z.string().trim().max(120),
+      grievanceEmail: optEmail,
+      /** Tick once a lawyer has approved the policy pages; until then they carry a "being finalised" notice. */
+      policiesReviewed: z.boolean(),
+    }),
   })
   .superRefine((s, ctx) => {
     if (s.delivery.maxRadiusKm < s.delivery.freeRadiusKm) ctx.addIssue({ code: "custom", path: ["delivery", "maxRadiusKm"], message: "The maximum distance cannot be less than the base delivery distance." });
@@ -82,6 +95,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
     legalName: "MED NEED", gstin: "", drugLicense: "", defaultGstPercent: 5, deliveryGstPercent: 18, state: "Odisha",
     footerNote: "Medicines are dispensed against a valid prescription where required. Goods once sold are not returnable unless damaged or wrongly supplied.",
   },
+  legal: { supportEmail: "medneed.services@gmail.com", pharmacistName: "", pharmacistRegNo: "", grievanceName: "", grievanceEmail: "", policiesReviewed: false },
 };
 
 type Q = typeof query;
@@ -125,3 +139,36 @@ export const publicSettings = (s: StoreSettings) => ({
   hours: s.hours,
   slots: s.slots,
 });
+
+const ampm = (hhmm: string) => {
+  const [h, m] = hhmm.split(":").map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+};
+
+/** Business details for the footer and policy pages. Blank values are shown as "to be added" only on the pages that need them. */
+export async function businessInfo() {
+  const s = await getSettings();
+  return {
+    name: s.shop.name,
+    legalName: s.invoice.legalName,
+    address: s.shop.address,
+    phone: s.shop.phone,
+    email: s.legal.supportEmail,
+    hours: s.hours,
+    /** "7:00 AM to 10:00 PM" */
+    hoursLabel: `${ampm(s.hours.open)} to ${ampm(s.hours.close)}`,
+    gstin: s.invoice.gstin,
+    drugLicense: s.invoice.drugLicense,
+    state: s.invoice.state,
+    pharmacistName: s.legal.pharmacistName,
+    pharmacistRegNo: s.legal.pharmacistRegNo,
+    grievanceName: s.legal.grievanceName,
+    grievanceEmail: s.legal.grievanceEmail || s.legal.supportEmail,
+    reviewed: s.legal.policiesReviewed,
+    delivery: { enabled: s.delivery.enabled, minOrder: s.delivery.minOrder, feeBands: s.delivery.feeBands, freeRadiusKm: s.delivery.freeRadiusKm, perKmRate: s.delivery.perKmRate, maxRadiusKm: s.delivery.maxRadiusKm, slots: s.slots },
+    pickup: s.pickup.enabled,
+    cod: { enabled: s.payments.codEnabled, max: s.payments.codMax },
+    rxValidityDays: s.prescriptions.validityDays,
+  };
+}
+export type BusinessInfo = Awaited<ReturnType<typeof businessInfo>>;

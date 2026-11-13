@@ -17,6 +17,14 @@ export async function listCategories(): Promise<Category[]> {
   return rows.map((r) => ({ slug: r.slug, name: r.name, icon: r.icon, blurb: r.blurb }));
 }
 
+/** Number of products customers can see in each category (live + catalogue-only), for the homepage. */
+export async function categoryCounts(): Promise<Record<string, number>> {
+  const rows = await query<{ slug: string; n: string }>(
+    `select c.slug, count(m.id) as n from categories c join medicines m on m.category_id = c.id and m.status in ('active','catalog') where c.is_active group by c.slug`,
+  );
+  return Object.fromEntries(rows.map((r) => [r.slug, Number(r.n)]));
+}
+
 export async function getCategory(slug: string): Promise<Category | null> {
   const rows = await query<Row>(`select slug, name, icon, blurb from categories where slug = $1 and is_active`, [slug]);
   return rows[0] ? { slug: rows[0].slug, name: rows[0].name, icon: rows[0].icon, blurb: rows[0].blurb } : null;

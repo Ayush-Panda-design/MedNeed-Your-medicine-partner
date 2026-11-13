@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Category } from "@/lib/catalog";
-import { CATEGORY_UI, FALLBACK_UI, FEATURED_SLUGS, FILTERS, SHOW_STATIC_COUNTS } from "@/lib/categoryShowcase";
+import { CATEGORY_UI, FALLBACK_UI, FEATURED_SLUGS, FILTERS } from "@/lib/categoryShowcase";
 import { CategoryIcon } from "./CategoryIcon";
 import { SectionHead } from "./SectionHead";
 import "./category/showcase.css";
@@ -17,7 +17,7 @@ const reducedMotion = () => typeof window !== "undefined" && !!window.matchMedia
  * Homepage "Shop by category": a bento grid (large featured cards + compact cards), a type filter that reflows
  * the grid, and a snap-scrolling row on phones. Links, names and descriptions are exactly what the database holds.
  */
-export function CategoryShowcase({ categories }: { categories: Category[] }) {
+export function CategoryShowcase({ categories, counts = {} }: { categories: Category[]; counts?: Record<string, number> }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [ready, setReady] = useState(false);
   const [shown, setShown] = useState(false);
@@ -95,7 +95,7 @@ export function CategoryShowcase({ categories }: { categories: Category[] }) {
       <p className="sr-only" role="status" aria-live="polite">Showing {visible.length} {visible.length === 1 ? "category" : "categories"}</p>
 
       <ul ref={gridRef} className={gridClass}>
-        {visible.map((c, i) => <CategoryTile key={c.slug} category={c} index={i} featured={FEATURED_SLUGS.includes(c.slug)} />)}
+        {visible.map((c, i) => <CategoryTile key={c.slug} category={c} index={i} featured={FEATURED_SLUGS.includes(c.slug)} count={counts[c.slug] ?? 0} />)}
         <li data-key="__all" style={{ ["--i" as string]: Math.min(visible.length, 12) }} className="max-md:w-[70vw] max-md:max-w-[260px] max-md:shrink-0 max-md:snap-start lg:col-span-2">
           <Link href="/medicines" className="cs-card cs-viewall min-h-[88px] font-semibold text-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
             <span className="inline-flex items-center gap-1.5">View all medicines <ArrowRight className="h-4 w-4" /></span>
@@ -111,7 +111,7 @@ export function CategoryShowcase({ categories }: { categories: Category[] }) {
   );
 }
 
-function CategoryTile({ category: c, index, featured }: { category: Category; index: number; featured: boolean }) {
+function CategoryTile({ category: c, index, featured, count }: { category: Category; index: number; featured: boolean; count: number }) {
   const ui = uiFor(c.slug);
   const chips = featured ? ui.popular ?? [] : [];
   return (
@@ -143,8 +143,7 @@ function CategoryTile({ category: c, index, featured }: { category: Category; in
             )}
             <div className="flex items-center justify-between text-xs">
               <span aria-hidden className="inline-flex items-center gap-1 font-bold" style={{ color: "var(--t-fg)" }}>Explore <ArrowRight className="h-3.5 w-3.5" /></span>
-              {/* TODO: placeholder count. Replace with the real number of products in this category. */}
-              {SHOW_STATIC_COUNTS && ui.count && <span className="font-medium text-ink-2">{ui.count}</span>}
+              {count > 0 && <span className="font-medium text-ink-2">{count.toLocaleString("en-IN")} {count === 1 ? "product" : "products"}</span>}
             </div>
           </div>
         )}

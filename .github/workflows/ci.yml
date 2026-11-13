@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Type-check
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
+      - name: Dependency audit (production packages, high and critical)
+        run: npm audit --omit=dev --audit-level=high
+
+  smoke:
+    # Builds the Docker image, starts it against a real Postgres and checks the app boots, migrates and serves pages.
+    runs-on: ubuntu-latest
+    needs: check
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: medneed
+          POSTGRES_USER: medneed
+          POSTGRES_PASSWORD: ci-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U medneed" --health-interval 5s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t medneed:ci .
+      - name: Start app
+        run: |
+          docker run -d --name app --network host \
+            -e PORT=3000 \
+            -e DATABASE_URL=postgresql://medneed:ci-password@127.0.0.1:5432/medneed \
+            -e APP_URL=http://127.0.0.1:3000 \
+            -e AUTH_SECRET=ci-only-secret-ci-only-secret-ci-only-secret \
+            -e ADMIN_EMAIL=ci-admin@example.com -e ADMIN_PASSWORD='Ci-Admin-Password-123!' \
+            -e PRESCRIPTION_ENC_KEY=$(openssl rand -hex 32) \
+            -e MEDNEED_DEMO_DATA=1 \
+            medneed:ci
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/api/health; then exit 0; fi
+            sleep 2
+          done
+          docker logs app; exit 1
+      - name: Smoke-test pages and headers
+        run: |
+          set -e
+          for p in / /medicines /cart /login /admin/login /sitemap.xml /robots.txt; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3000$p")
+            echo "$p -> $code"; [ "$code" = "200" ]
+          done
+          curl -sI http://127.0.0.1:3000/ | grep -i "content-security-policy"
+          curl -sI http://127.0.0.1:3000/ | grep -i "strict-transport-security"
+      - name: App logs
+        if: always()
+        run: docker logs app 2>&1 | tail -100

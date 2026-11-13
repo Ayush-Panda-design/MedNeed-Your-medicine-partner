@@ -7,6 +7,7 @@ import { AlertCircle, ArrowLeft, BadgeCheck, Eye, EyeOff, Loader2, Mail, Package
 import { Logo } from "@/components/Logo";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/providers";
+import { useTurnstile } from "@/components/auth/Turnstile";
 
 const OTP_LEN = 6;
 const RESEND_SECONDS = 30;
@@ -18,15 +19,15 @@ const ERRORS: Record<string, string> = {
   account_disabled: "This account has been disabled. Contact support.",
 };
 
-export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
+export function LoginForm({ googleEnabled, captchaSiteKey = null }: { googleEnabled: boolean; captchaSiteKey?: string | null }) {
   return (
     <Suspense>
-      <LoginInner googleEnabled={googleEnabled} />
+      <LoginInner googleEnabled={googleEnabled} captchaSiteKey={captchaSiteKey} />
     </Suspense>
   );
 }
 
-function LoginInner({ googleEnabled }: { googleEnabled: boolean }) {
+function LoginInner({ googleEnabled, captchaSiteKey }: { googleEnabled: boolean; captchaSiteKey: string | null }) {
   const params = useSearchParams();
   const rawNext = params.get("next") ?? "/";
   const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
@@ -80,7 +81,7 @@ function LoginInner({ googleEnabled }: { googleEnabled: boolean }) {
             ))}
           </div>
 
-          <div className="mt-6">{tab === "phone" ? <PhoneFlow next={next} /> : <EmailFlow next={next} />}</div>
+          <div className="mt-6">{tab === "phone" ? <PhoneFlow next={next} captchaSiteKey={captchaSiteKey} /> : <EmailFlow next={next} />}</div>
 
           <div className="my-6 flex items-center gap-3 text-xs text-slate-400">
             <span className="h-px flex-1 bg-slate-200" /> OR <span className="h-px flex-1 bg-slate-200" />
@@ -99,7 +100,7 @@ function LoginInner({ googleEnabled }: { googleEnabled: boolean }) {
             </p>
           )}
 
-          <p className="mt-6 text-center text-xs leading-relaxed text-slate-500">By continuing you agree to our Terms of Use and Privacy Policy.</p>
+          <p className="mt-6 text-center text-xs leading-relaxed text-slate-500">By continuing you agree to our <Link href="/terms" className="underline hover:text-slate-700">Terms of Use</Link> and <Link href="/privacy" className="underline hover:text-slate-700">Privacy Policy</Link>.</p>
           <p className="mt-6 text-center text-sm text-slate-500">
             <Link href="/" className="font-medium text-teal-700 hover:underline">Continue browsing without signing in</Link>
           </p>
@@ -135,8 +136,9 @@ function Submit({ busy, children }: { busy: boolean; children: React.ReactNode }
 
 /* ---------------- Mobile OTP ---------------- */
 
-function PhoneFlow({ next }: { next: string }) {
+function PhoneFlow({ next, captchaSiteKey }: { next: string; captchaSiteKey: string | null }) {
   const finish = useFinish(next);
+  const captcha = useTurnstile(captchaSiteKey);
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
   const [digits, setDigits] = useState<string[]>(Array(OTP_LEN).fill(""));
@@ -157,7 +159,12 @@ function PhoneFlow({ next }: { next: string }) {
     if (!/^[6-9]\d{9}$/.test(phone)) return setError("Enter a valid 10-digit mobile number.");
     setError("");
     setBusy(true);
-    const res = await api<{ devOtp?: string }>("/api/auth/otp/send", { body: { phone, purpose: "login" } });
+    if (captcha.enabled && !captcha.token) {
+      setBusy(false);
+      return setError("Please wait a moment for the security check, then try again.");
+    }
+    const res = await api<{ devOtp?: string }>("/api/auth/otp/send", { body: { phone, purpose: "login", ...(captcha.enabled ? { captcha: captcha.token } : {}) } });
+    captcha.reset();
     setBusy(false);
     if (!res.ok) return setError(res.error);
     setDevOtp(res.data.devOtp);
@@ -194,8 +201,8 @@ function PhoneFlow({ next }: { next: string }) {
     refs.current[Math.min(i + clean.length, OTP_LEN - 1)]?.focus();
   }
 
-  if (step === "phone") {
-    return (
+  // The bot-check widget sits outside both steps so it stays mounted for "Resend code".
+  const body = step === "phone" ? (
       <form onSubmit={sendOtp} noValidate>
         <label htmlFor="phone" className="block text-sm font-medium">Mobile number</label>
         <div className={`mt-2 flex items-center rounded-xl border bg-white focus-within:ring-2 ${error ? "border-rose-500 focus-within:ring-rose-100" : "border-slate-300 focus-within:border-teal-600 focus-within:ring-teal-100"}`}>
@@ -216,10 +223,7 @@ function PhoneFlow({ next }: { next: string }) {
         <ErrorText id="phone-error">{error}</ErrorText>
         <Submit busy={busy}>Get OTP</Submit>
       </form>
-    );
-  }
-
-  return (
+  ) : (
     <form onSubmit={verify} noValidate>
       <button type="button" onClick={() => { setStep("phone"); setError(""); }} className="mb-4 flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-900">
         <ArrowLeft className="h-4 w-4" /> Change number
@@ -261,6 +265,13 @@ function PhoneFlow({ next }: { next: string }) {
         </p>
       )}
     </form>
+  );
+
+  return (
+    <>
+      {body}
+      {captcha.widget}
+    </>
   );
 }
 
@@ -308,7 +319,14 @@ function EmailFlow({ next }: { next: string }) {
         <input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} placeholder="you@example.com" />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium">Password</label>
+        <div className="flex items-baseline justify-between gap-3">
+          <label htmlFor="password" className="block text-sm font-medium">Password</label>
+          {mode === "signin" && (
+            <Link href={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ""}`} className="text-sm font-medium text-teal-700 hover:underline">
+              Forgot password?
+            </Link>
+          )}
+        </div>
         <div className="relative">
           <input
             id="password"

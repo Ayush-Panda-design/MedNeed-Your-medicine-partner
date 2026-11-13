@@ -1,0 +1,49 @@
+# Staging on one server: Postgres + MedNeed (+ the scheduled job). Usage, see DEPLOY.md:
+#   cp .env.staging.example .env.staging   (fill it in)
+#   docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
+# Put Caddy/Nginx (or the host's load balancer) in front for HTTPS; the app listens on 127.0.0.1:3000 only.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medneed
+      POSTGRES_USER: medneed
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.staging}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medneed -d medneed"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env.staging
+    environment:
+      DATABASE_URL: postgresql://medneed:${POSTGRES_PASSWORD}@db:5432/medneed
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - appdata:/data
+
+  # Runs the order-expiry / message-retry / refund-retry job every 3 minutes.
+  cron:
+    image: curlimages/curl:8.11.1
+    restart: unless-stopped
+    env_file: .env.staging
+    depends_on:
+      - app
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - 'while true; do curl -fsS -m 60 -X POST http://app:3000/api/internal/expire-orders -H "x-cron-secret: $$CRON_SECRET" > /dev/null || echo "cron call failed"; sleep 180; done'
+
+volumes:
+  pgdata:
+  appdata:

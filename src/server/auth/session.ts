@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { query } from "../db";
 import { isProd } from "../env";
-import { ApiError } from "../http";
+import { ApiError, ipFromHeaders } from "../http";
 import { randomToken, sha256 } from "../security/crypto";
 import { ACCESS_TTL_SECONDS, signAccess, verifyAccess, type Claims } from "./tokens";
 import { audit, getRoles, getUserById, STAFF_ROLES, type Role, type UserRecord } from "./users";
@@ -28,7 +28,7 @@ export async function clearAuthCookies() {
 
 async function requestMeta() {
   const h = await headers();
-  const ip = h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? null;
+  const ip = ipFromHeaders(h);
   return { ip, userAgent: h.get("user-agent")?.slice(0, 300) ?? null };
 }
 

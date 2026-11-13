@@ -130,6 +130,23 @@ export function SettingsForm({ initial, locationConfigured }: { initial: StoreSe
         <p className="mt-2 text-xs text-slate-500">A medicine with its own rate (set on its Inventory page) uses that instead of the default.</p>
       </section>
 
+      <section className={card}>
+        <h2 className="font-bold">Business and legal details (shown on the website)</h2>
+        <p className="mt-1 text-sm text-slate-500">Used in the footer and on the Contact, Privacy, Terms, Refund and Shipping pages. The licence number and GSTIN come from the invoice section above.</p>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <div><label htmlFor="lg-email" className="mb-1 block text-sm font-medium">Customer support email</label><input id="lg-email" type="email" className={f} value={s.legal.supportEmail} onChange={(e) => up("legal", { supportEmail: e.target.value })} /></div>
+          <div className="hidden sm:block" />
+          <div><label htmlFor="lg-ph" className="mb-1 block text-sm font-medium">Registered pharmacist (name)</label><input id="lg-ph" className={f} value={s.legal.pharmacistName} onChange={(e) => up("legal", { pharmacistName: e.target.value })} /></div>
+          <div><label htmlFor="lg-phr" className="mb-1 block text-sm font-medium">Pharmacist registration no.</label><input id="lg-phr" className={f} value={s.legal.pharmacistRegNo} onChange={(e) => up("legal", { pharmacistRegNo: e.target.value })} /></div>
+          <div><label htmlFor="lg-gn" className="mb-1 block text-sm font-medium">Grievance Officer (name)</label><input id="lg-gn" className={f} value={s.legal.grievanceName} onChange={(e) => up("legal", { grievanceName: e.target.value })} /></div>
+          <div><label htmlFor="lg-ge" className="mb-1 block text-sm font-medium">Grievance Officer email</label><input id="lg-ge" type="email" className={f} value={s.legal.grievanceEmail} onChange={(e) => up("legal", { grievanceEmail: e.target.value })} placeholder="Defaults to the support email" /></div>
+        </div>
+        <label className="mt-4 flex items-start gap-2 text-sm">
+          <input type="checkbox" className="mt-0.5 h-4 w-4" checked={s.legal.policiesReviewed} onChange={(e) => up("legal", { policiesReviewed: e.target.checked })} />
+          <span>A lawyer has reviewed the policy pages. <span className="text-slate-500">Until this is ticked, those pages show a &ldquo;being finalised&rdquo; notice.</span></span>
+        </label>
+      </section>
+
       <button disabled={busy} className="rounded-xl bg-teal-600 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60">{busy ? "Saving…" : "Save settings"}</button>
     </form>
   );

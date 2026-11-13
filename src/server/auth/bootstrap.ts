@@ -26,6 +26,7 @@ export async function bootstrapAdmin(db: Db) {
         else id = (await t.query<{ id: string }>(`insert into users (name, email, email_verified, password_hash) values ('Administrator', $1, true, $2) returning id`, [e, h]))[0].id;
         await t.query(`insert into user_roles (user_id, role) values ($1, 'admin'), ($1, 'customer') on conflict do nothing`, [id]);
       });
+      await db.query(`delete from rate_limits where key like 'admin-login:%' or key like 'login:%'`); // clear sign-in lockouts
       console.log(`[auth] ADMIN_RESET: ${e} is now an admin with the password from ADMIN_PASSWORD. Remove ADMIN_RESET from .env.local.`);
     }
   }

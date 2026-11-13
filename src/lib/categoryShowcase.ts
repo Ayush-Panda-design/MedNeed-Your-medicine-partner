@@ -10,27 +10,24 @@ export type CategoryUi = {
   tint: Tint;             // pastel card tint + matching accent (see showcase.css)
   meta: string;           // tiny label on the card
   popular?: string[];     // "Popular" chips on featured cards; each links to a search
-  count?: string;         // TODO: placeholder text. Replace with a real product count from the database.
 };
 
 /** Categories shown large (2 columns x 2 rows). Change this list to feature others. */
 export const FEATURED_SLUGS: string[] = ["cold-cough", "vitamins"];
 
-/** Set to false to hide the placeholder product counts until real numbers are wired in. */
-export const SHOW_STATIC_COUNTS = true;
 
 export const FALLBACK_UI: CategoryUi = { type: "wellness", tint: "teal", meta: "Wellness" };
 
 export const CATEGORY_UI: Record<string, CategoryUi> = {
-  "pain-relief": { type: "otc", tint: "rose", meta: "Rx & OTC", popular: ["Paracetamol", "Ibuprofen", "Pain relief gel"], count: "120+ products" },
-  "cold-cough": { type: "otc", tint: "sky", meta: "Rx & OTC", popular: ["Cetirizine", "Cough syrup", "Nasal spray"], count: "120+ products" },
+  "pain-relief": { type: "otc", tint: "rose", meta: "Rx & OTC", popular: ["Paracetamol", "Ibuprofen", "Pain relief gel"] },
+  "cold-cough": { type: "otc", tint: "sky", meta: "Rx & OTC", popular: ["Cetirizine", "Cough syrup", "Nasal spray"] },
   "infection-care": { type: "prescription", tint: "amber", meta: "Rx" },
   "respiratory-care": { type: "prescription", tint: "violet", meta: "Rx" },
-  "diabetes-care": { type: "prescription", tint: "green", meta: "Rx & devices", popular: ["Metformin", "Glucometer", "Test strips"], count: "120+ products" },
+  "diabetes-care": { type: "prescription", tint: "green", meta: "Rx & devices", popular: ["Metformin", "Glucometer", "Test strips"] },
   "heart-care": { type: "prescription", tint: "red", meta: "Rx" },
-  "vitamins": { type: "wellness", tint: "pink", meta: "Wellness", popular: ["Vitamin D3", "Multivitamin", "Omega-3"], count: "120+ products" },
+  "vitamins": { type: "wellness", tint: "pink", meta: "Wellness", popular: ["Vitamin D3", "Multivitamin", "Omega-3"] },
   "brain-nerve": { type: "prescription", tint: "indigo", meta: "Rx" },
-  "digestive-care": { type: "otc", tint: "orange", meta: "Rx & OTC", popular: ["Antacid", "ORS", "Probiotic"], count: "120+ products" },
+  "digestive-care": { type: "otc", tint: "orange", meta: "Rx & OTC", popular: ["Antacid", "ORS", "Probiotic"] },
   "eye-ear": { type: "otc", tint: "blue", meta: "Rx & OTC" },
   "skin-care": { type: "wellness", tint: "lime", meta: "Wellness" },
   "baby-care": { type: "wellness", tint: "cyan", meta: "Wellness" },

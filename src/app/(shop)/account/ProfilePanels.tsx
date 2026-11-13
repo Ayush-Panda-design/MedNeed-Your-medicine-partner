@@ -81,6 +81,7 @@ function ProfileForm({ user }: { user: PublicUser }) {
         Email {user.email && (user.emailVerified ? <span className="ml-1 inline-flex items-center gap-1 text-xs font-normal text-emerald-700"><BadgeCheck className="h-3.5 w-3.5" /> verified</span> : <span className="ml-1 text-xs font-normal text-amber-700">not verified yet</span>)}
       </label>
       <input id="p-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={Boolean(user.email)} placeholder="you@example.com" autoComplete="email" className={input} />
+      {user.email && !user.emailVerified && <VerifyEmailLink />}
       {user.email && <p className="mt-1 text-xs text-slate-500">To change your email address, contact support.</p>}
       <div className="mt-5"><button type="submit" disabled={busy} className={primary}>{busy && <Loader2 className="h-4 w-4 animate-spin" />} Save changes</button></div>
       <Notice kind={msg?.kind ?? "ok"}>{msg?.text}</Notice>
@@ -218,6 +219,38 @@ function SessionsCard() {
       >
         Sign out of all devices
       </button>
+    </div>
+  );
+}
+
+/** Sends the confirmation link for an unverified email. */
+function VerifyEmailLink() {
+  const [state, setState] = useState<"idle" | "busy" | "sent" | "error">("idle");
+  const [text, setText] = useState("");
+  const [devLink, setDevLink] = useState("");
+  async function send() {
+    setState("busy");
+    const res = await api<{ sent?: boolean; alreadyVerified?: boolean; devLink?: string }>("/api/auth/email/verify", { body: {} });
+    if (!res.ok) {
+      setState("error");
+      return setText(res.error);
+    }
+    setDevLink(res.data.devLink ?? "");
+    setState("sent");
+    setText(res.data.alreadyVerified ? "Your email is already confirmed. Refresh the page." : "Confirmation link sent. Check your inbox (and spam).");
+  }
+  return (
+    <div className="mt-2 text-sm" aria-live="polite">
+      {state === "sent" || state === "error" ? (
+        <p className={state === "error" ? "text-rose-700" : "text-emerald-700"}>
+          {text}
+          {devLink && <> <a href={devLink} className="font-semibold underline" data-testid="dev-verify-link">Open it (development)</a></>}
+        </p>
+      ) : (
+        <button type="button" onClick={send} disabled={state === "busy"} className="font-semibold text-teal-700 hover:underline disabled:opacity-60">
+          {state === "busy" ? "Sending…" : "Send confirmation link"}
+        </button>
+      )}
     </div>
   );
 }

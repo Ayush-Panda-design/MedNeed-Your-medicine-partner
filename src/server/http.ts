@@ -11,10 +11,26 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * The caller's IP for rate limits and session records.
+ * X-Forwarded-For is "client, proxy1, proxy2": each proxy appends the address it received the request from, so the
+ * left-most entries are whatever the client chose to send. TRUSTED_PROXY_HOPS (default 1: one load balancer or
+ * reverse proxy in front of the app) says how many entries from the right were written by our own infrastructure;
+ * the entry at that position is the real client. Set 0 when the app is reached directly with no proxy.
+ */
+export function ipFromHeaders(h: Headers): string | null {
+  const hops = Math.max(0, Number.parseInt(process.env.TRUSTED_PROXY_HOPS ?? "1", 10) || 0);
+  if (hops > 0) {
+    const chain = (h.get("x-forwarded-for") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    if (chain.length) return chain[Math.max(0, chain.length - hops)];
+    const real = h.get("x-real-ip")?.trim();
+    if (real) return real;
+  }
+  return null;
+}
+
 export function clientIp(req: Request) {
-  const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
-  return req.headers.get("x-real-ip") ?? "unknown";
+  return ipFromHeaders(req.headers) ?? "unknown";
 }
 
 /** CSRF defence in depth on top of SameSite=Lax cookies: browser POSTs must come from our own origin. */

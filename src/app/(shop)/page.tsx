@@ -23,10 +23,10 @@ import { ProductCard } from "@/components/ProductCard";
 import { CategoryShowcase } from "@/components/CategoryShowcase";
 import { healthConcerns } from "@/lib/catalog";
 import { faqs } from "@/lib/faq";
-import { listCategories, listDeals, listNewest } from "@/server/catalog/queries";
+import { categoryCounts, listCategories, listDeals, listNewest } from "@/server/catalog/queries";
 
 export default async function Home() {
-  const [categories, deals, newest] = await Promise.all([listCategories(), listDeals(4), listNewest(8)]);
+  const [categories, deals, newest, counts] = await Promise.all([listCategories(), listDeals(4), listNewest(8), categoryCounts()]);
   return (
     <main>
       <RevealOnScroll />
@@ -44,7 +44,7 @@ export default async function Home() {
 
       {/* Categories */}
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
-        <CategoryShowcase categories={categories} />
+        <CategoryShowcase categories={categories} counts={counts} />
       </section>
 
       {/* Upload prescription */}

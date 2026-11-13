@@ -1,8 +1,18 @@
 import Link from "next/link";
 import type { Category } from "@/lib/catalog";
+import type { BusinessInfo } from "@/server/orders/settings";
 import { Logo } from "./Logo";
 
-export function Footer({ categories }: { categories: Category[] }) {
+type FooterBusiness = Pick<BusinessInfo, "legalName" | "phone" | "email" | "hoursLabel" | "drugLicense" | "gstin" | "pharmacistName" | "pharmacistRegNo">;
+
+export function Footer({ categories, business: b }: { categories: Category[]; business: FooterBusiness }) {
+  const tel = b.phone.replace(/[^\d+]/g, "");
+  const legal = [
+    { href: "/privacy", label: "Privacy policy" },
+    { href: "/terms", label: "Terms of use" },
+    { href: "/refunds", label: "Cancellation & refunds" },
+    { href: "/shipping", label: "Shipping & delivery" },
+  ];
   return (
     <footer className="mt-20 bg-slate-900 text-slate-300">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
@@ -31,20 +41,26 @@ export function Footer({ categories }: { categories: Category[] }) {
             <li><Link href="/medicines" className="hover:text-white">All medicines</Link></li>
             <li><Link href="/login" className="hover:text-white">Sign in</Link></li>
             <li><Link href="/cart" className="hover:text-white">Cart</Link></li>
-            <li><span className="text-slate-500">About us (coming soon)</span></li>
-            <li><a href="tel:+919437545411" className="hover:text-white">Call +91 94375 45411</a></li>
-            <li><a href="mailto:medneed.services@gmail.com" className="break-all hover:text-white">medneed.services@gmail.com</a></li>
-            <li className="text-slate-400">Open daily, 7:00 AM to 10:00 PM</li>
+            <li><Link href="/about" className="hover:text-white">About us</Link></li>
+            <li><Link href="/contact" className="hover:text-white">Contact us</Link></li>
+            {b.phone && <li><a href={`tel:${tel.startsWith("+") ? tel : `+91${tel}`}`} className="hover:text-white">Call {b.phone}</a></li>}
+            {b.email && <li><a href={`mailto:${b.email}`} className="break-all hover:text-white">{b.email}</a></li>}
+            <li className="text-slate-400">Open daily, {b.hoursLabel}</li>
           </ul>
         </div>
         <div>
           <h3 className="mb-3 text-sm font-semibold text-white">Legal</h3>
-          <ul className="space-y-2 text-sm text-slate-500">
-            <li>Privacy policy (coming soon)</li>
-            <li>Terms of use (coming soon)</li>
-            <li>Refund &amp; return policy (coming soon)</li>
+          <ul className="space-y-2 text-sm">
+            {legal.map((l) => (
+              <li key={l.href}><Link href={l.href} className="hover:text-white">{l.label}</Link></li>
+            ))}
           </ul>
-          <p className="mt-4 text-xs text-slate-500">Drug licence no.: [to be added before launch]</p>
+          <dl className="mt-4 space-y-1 text-xs text-slate-500">
+            <div>{b.legalName}</div>
+            <div>Drug licence no.: {b.drugLicense || "to be added"}</div>
+            {b.gstin && <div>GSTIN: {b.gstin}</div>}
+            {b.pharmacistName && <div>Pharmacist: {b.pharmacistName}{b.pharmacistRegNo ? ` (Reg. ${b.pharmacistRegNo})` : ""}</div>}
+          </dl>
         </div>
       </div>
       <div className="border-t border-slate-800">

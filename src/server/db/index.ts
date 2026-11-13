@@ -92,8 +92,10 @@ async function init(): Promise<Db> {
   await migrate(db);
   const { bootstrapAdmin } = await import("../auth/bootstrap");
   await bootstrapAdmin(db);
-  // Fictional sample products so the storefront is not empty during development. Never in production.
-  if (!isProd() && process.env.MEDNEED_NO_SAMPLE_DATA !== "1") {
+  // Fictional sample products so the storefront is not empty during development. In production only when a
+  // staging/demo deployment opts in with MEDNEED_DEMO_DATA=1 (never set this on the live site).
+  const demo = isProd() ? process.env.MEDNEED_DEMO_DATA === "1" : process.env.MEDNEED_NO_SAMPLE_DATA !== "1";
+  if (demo) {
     const { seedSampleCatalogIfEmpty } = await import("../catalog/seed");
     await seedSampleCatalogIfEmpty(db);
   }

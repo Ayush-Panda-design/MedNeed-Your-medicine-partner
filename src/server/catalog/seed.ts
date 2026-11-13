@@ -100,5 +100,5 @@ export async function seedSampleCatalogIfEmpty(db: Db) {
       if (s.inStock ?? true) await addOpeningStock(t, created.id, { batchNo: "SAMPLE-OPENING", qty: 50, mrp: s.mrp, purchaseRate: Math.round(s.mrp * 70) / 100, expiryInDays: 540, source: "sample", note: "Sample development stock" });
     }
   });
-  console.log(`[catalog] Loaded ${seeds.length} fictional sample medicines (development only).`);
+  console.log(`[catalog] Loaded ${seeds.length} fictional sample medicines (sample data, never for the live site).`);
 }

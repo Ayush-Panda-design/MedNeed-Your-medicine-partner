@@ -50,6 +50,22 @@ const CartContext = createContext<CartCtx | null>(null);
 const AuthContext = createContext<AuthCtx | null>(null);
 
 const CART_KEY = "medneed_cart_v1";
+/** Whose cart is in this browser: a user id, or "" for a guest cart. */
+const OWNER_KEY = "medneed_cart_owner_v1";
+
+/** Combine two carts: one line per product, keeping the larger quantity (so re-merging never doubles a cart). */
+function mergeLines(a: CartLine[], b: CartLine[]): CartLine[] {
+  const m = new Map<string, number>();
+  for (const l of [...a, ...b]) m.set(l.slug, Math.min(10, Math.max(m.get(l.slug) ?? 0, l.qty)));
+  return Array.from(m, ([slug, qty]) => ({ slug, qty })).slice(0, 50);
+}
+
+const sameLines = (a: CartLine[], b: CartLine[]) => a.length === b.length && a.every((l, i) => l.slug === b[i].slug && l.qty === b[i].qty);
+
+async function putCart(items: CartLine[], keepalive = false) {
+  const res = await fetch("/api/cart", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items }), keepalive });
+  if (!res.ok) throw new Error(`cart save failed (${res.status})`);
+}
 
 function readStorage<T>(key: string, fallback: T): T {
   try {
@@ -77,6 +93,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [loadFailed, setLoadFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const known = useRef<Record<string, Product>>({});
+  const rawRef = useRef<CartLine[]>([]);
+  rawRef.current = raw;
+  /** The user whose saved cart has been merged into this browser's cart; changes are saved for them. */
+  const syncedFor = useRef<string | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -101,6 +122,75 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (cartReady) writeStorage(CART_KEY, raw);
   }, [raw, cartReady]);
+
+  /*
+   * Guest vs account cart.
+   * - Guests keep a cart in this browser only.
+   * - On sign-in, the guest cart is merged into the account's saved cart, so it follows the user to other devices.
+   *   A cart left in the browser by a *different* account is never merged into this one.
+   * - On sign-out (or when the session has ended), the account's cart is removed from this browser; it stays saved
+   *   on the account. So the next person using the device never sees someone else's medicines.
+   */
+  const userId = user?.id ?? null;
+  useEffect(() => {
+    if (!ready || !cartReady) return;
+    const owner = readStorage<string>(OWNER_KEY, "");
+    if (!userId) {
+      syncedFor.current = null;
+      if (owner) {
+        setRaw([]);
+        writeStorage(OWNER_KEY, "");
+      }
+      return;
+    }
+    if (syncedFor.current === userId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/cart", { cache: "no-store" });
+        if (!res.ok) throw new Error(`cart load failed (${res.status})`);
+        const saved = ((await res.json()) as { items: CartLine[] }).items ?? [];
+        if (cancelled) return;
+        const local = owner && owner !== userId ? [] : rawRef.current;
+        const merged = mergeLines(saved, local);
+        writeStorage(OWNER_KEY, userId);
+        syncedFor.current = userId;
+        setRaw(merged);
+        if (!sameLines(merged, saved)) await putCart(merged).catch(() => {});
+      } catch {
+        // Offline or server error: keep the browser cart; the merge is retried on the next sign-in or page load.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, cartReady, userId]);
+
+  // Save the signed-in user's cart after each change (debounced).
+  useEffect(() => {
+    if (!userId || syncedFor.current !== userId) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      saveTimer.current = null;
+      void putCart(rawRef.current).catch(() => {});
+    }, 600);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [raw, userId]);
+
+  // Leaving the page with a save still pending: send it anyway.
+  useEffect(() => {
+    const flush = () => {
+      if (saveTimer.current && syncedFor.current) {
+        clearTimeout(saveTimer.current);
+        saveTimer.current = null;
+        void putCart(rawRef.current, true).catch(() => {});
+      }
+    };
+    window.addEventListener("pagehide", flush);
+    return () => window.removeEventListener("pagehide", flush);
+  }, []);
 
   // Current prices and availability come from the server, never from what was saved in the browser.
   const slugKey = useMemo(() => raw.map((l) => l.slug).sort().join(","), [raw]);
@@ -181,8 +271,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
+      // Save any pending cart change to the account before the session ends.
+      if (saveTimer.current && syncedFor.current) {
+        clearTimeout(saveTimer.current);
+        saveTimer.current = null;
+        await putCart(rawRef.current).catch(() => {});
+      }
       await fetch("/api/auth/logout", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
     } finally {
+      syncedFor.current = null;
+      setRaw([]);
+      writeStorage(OWNER_KEY, "");
       setUser(null);
     }
   }, []);
