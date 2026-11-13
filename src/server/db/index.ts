@@ -10,6 +10,8 @@ export interface Db {
   query: Q;
   exec: (sql: string) => Promise<void>;
   tx: <T>(fn: (t: Tx) => Promise<T>) => Promise<T>;
+  /** Run fn while holding a database-wide lock, so only one server instance at a time does start-up work. */
+  exclusive: <T>(fn: () => Promise<T>) => Promise<T>;
 }
 
 // Production: node-postgres against DATABASE_URL.
@@ -20,8 +22,20 @@ async function connect(): Promise<Db> {
   if (url) {
     const mod: any = await import("pg");
     const Pool = mod.Pool ?? mod.default.Pool;
-    const pool = new Pool({ connectionString: url, max: 10 });
+    const pool = new Pool({ connectionString: url, max: Number(process.env.DATABASE_POOL_MAX) || 10 });
     return {
+      exclusive: async (fn) => {
+        // Session-level advisory lock on one dedicated connection. Several instances starting together
+        // (serverless cold starts, rolling deploys) then migrate and seed one after another, never at once.
+        const client = await pool.connect();
+        try {
+          await client.query(`select pg_advisory_lock(727001)`);
+          return await fn();
+        } finally {
+          await client.query(`select pg_advisory_unlock(727001)`).catch(() => {});
+          client.release();
+        }
+      },
       query: async (sql, params) => (await pool.query(sql, params as any[])).rows,
       exec: async (sql) => {
         await pool.query(sql);
@@ -58,6 +72,7 @@ async function connect(): Promise<Db> {
   await lite.waitReady;
   console.log(`[db] Using local development database (PGlite) at ${dir}`);
   return {
+    exclusive: (fn) => fn(), // single process in development
     query: async (sql, params) => (await lite.query(sql, params)).rows,
     exec: async (sql) => {
       await lite.exec(sql);
@@ -89,6 +104,11 @@ async function migrate(db: Db) {
 
 async function init(): Promise<Db> {
   const db = await connect();
+  await db.exclusive(() => startup(db));
+  return db;
+}
+
+async function startup(db: Db) {
   await migrate(db);
   const { bootstrapAdmin } = await import("../auth/bootstrap");
   await bootstrapAdmin(db);
@@ -104,7 +124,6 @@ async function init(): Promise<Db> {
     const { loadDataset } = await import("../catalog/dataset");
     await loadDataset(db, process.env.MEDNEED_DATASET, Number(process.env.MEDNEED_DATASET_LIMIT) || 30000);
   }
-  return db;
 }
 
 const g = globalThis as unknown as { __medneedDb?: Promise<Db> };
