@@ -62,7 +62,7 @@ async function connect(): Promise<Db> {
     };
   }
 
-  if (isProd()) throw new Error("DATABASE_URL must be set in production.");
+  if (isProd()) throw new Error("No database configured: set DATABASE_URL (or POSTGRES_URL) for this environment and redeploy.");
 
   const { PGlite } = await import("@electric-sql/pglite");
   const { pg_trgm } = await import("@electric-sql/pglite/contrib/pg_trgm");

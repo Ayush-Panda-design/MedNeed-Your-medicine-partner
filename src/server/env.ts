@@ -20,7 +20,11 @@ export function authSecret(): string {
 }
 
 export const appUrl = () => (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
-export const databaseUrl = () => process.env.DATABASE_URL || undefined;
+/**
+ * Postgres connection string. DATABASE_URL is the standard name; POSTGRES_URL is what some hosting integrations
+ * (Vercel Postgres, Supabase) set instead, so either works.
+ */
+export const databaseUrl = () => process.env.DATABASE_URL || process.env.POSTGRES_URL || undefined;
 
 // Dev database lives outside the project so OneDrive does not sync live database files.
 export const pgliteDir = () => process.env.PGLITE_DIR || path.join(os.homedir(), ".medneed", "pglite");
