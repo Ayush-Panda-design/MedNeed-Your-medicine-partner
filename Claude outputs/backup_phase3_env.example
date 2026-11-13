@@ -1,0 +1,44 @@
+# Copy to .env.local and fill in. Never commit real secrets.
+
+# Public URL of the site (used for Google OAuth redirect and CSRF origin checks).
+APP_URL=http://localhost:3000
+
+# REQUIRED IN PRODUCTION: long random string (32+ chars). Generate: openssl rand -base64 48
+# Signs sessions and encrypts 2FA secrets. Changing it signs everyone out and breaks stored 2FA.
+AUTH_SECRET=
+
+# Postgres. Leave empty in development to use the built-in local database (PGlite, stored in ~/.medneed/pglite).
+# DATABASE_URL=postgresql://user:password@localhost:5432/medneed
+# PGLITE_DIR=
+
+# First admin, created on first start. Required in production; in development defaults to
+# admin@medneed.local / Admin@12345. 2FA setup is forced at first sign-in.
+# ADMIN_EMAIL=
+# ADMIN_PASSWORD=
+
+# Sign in with Google (optional). Redirect URI to register: {APP_URL}/api/auth/google/callback
+# GOOGLE_CLIENT_ID=
+# GOOGLE_CLIENT_SECRET=
+
+# SMS for OTP: "console" (development, prints the code) or "twilio"
+SMS_DRIVER=console
+# TWILIO_ACCOUNT_SID=
+# TWILIO_AUTH_TOKEN=
+# TWILIO_FROM=
+
+# Catalog images. In development files go to ~/.medneed/uploads (or UPLOAD_DIR).
+# In production set S3_* (any S3-compatible store) or point UPLOAD_DIR at a persistent disk.
+# UPLOAD_DIR=
+# S3_BUCKET=
+# S3_REGION=ap-south-1
+# S3_ENDPOINT=            # only for non-AWS stores (R2, MinIO, ...)
+# S3_ACCESS_KEY_ID=
+# S3_SECRET_ACCESS_KEY=
+# S3_PUBLIC_URL=          # public base URL the bucket is served from
+
+# Set to 1 to skip loading the fictional sample medicines in development.
+# MEDNEED_NO_SAMPLE_DATA=1
+
+# Development only: stage a CSV dataset as unverified drafts (see README, "Staging a large dataset").
+# MEDNEED_DATASET=C:\\path\\to\\indian_medicine_data.csv
+# MEDNEED_DATASET_LIMIT=30000

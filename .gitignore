@@ -1,0 +1,35 @@
+@'
+# dependencies / build output
+node_modules
+.next
+out
+build
+*.tsbuildinfo
+next-env.d.ts
+
+# secrets: every env file except the templates
+.env
+.env.*
+!.env.example
+!.env.staging.example
+*.pem
+*.key
+
+# local data (dev database, uploads, prescriptions, datasets, backups)
+.data
+_to_delete*
+pglite
+uploads
+prescriptions
+*.csv
+*.xlsx
+*.zip
+*.sql
+*.sql.gz
+*.dump
+
+# misc
+*.log
+.DS_Store
+coverage
+'@ | Set-Content -Encoding utf8 .gitignore

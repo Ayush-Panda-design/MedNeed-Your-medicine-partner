@@ -1,0 +1,100 @@
+/* Category bento grid. Tints are CSS variables so each one has a light and a dark version; brand green is untouched. */
+.cs-t-rose { --t-bg: #FFF1F3; --t-bg-h: #FFE4E8; --t-tile: #FFD9DF; --t-fg: #BE123C; }
+html.dark .cs-t-rose { --t-bg: rgba(244,63,94,.10); --t-bg-h: rgba(244,63,94,.17); --t-tile: rgba(244,63,94,.22); --t-fg: #FDA4AF; }
+.cs-t-sky { --t-bg: #EFF8FF; --t-bg-h: #DFF1FF; --t-tile: #CFE8FD; --t-fg: #0369A1; }
+html.dark .cs-t-sky { --t-bg: rgba(14,165,233,.10); --t-bg-h: rgba(14,165,233,.17); --t-tile: rgba(14,165,233,.22); --t-fg: #7DD3FC; }
+.cs-t-amber { --t-bg: #FFF8E6; --t-bg-h: #FFEFC7; --t-tile: #FDE5A8; --t-fg: #92400E; }
+html.dark .cs-t-amber { --t-bg: rgba(245,158,11,.10); --t-bg-h: rgba(245,158,11,.17); --t-tile: rgba(245,158,11,.22); --t-fg: #FCD34D; }
+.cs-t-violet { --t-bg: #F5F1FF; --t-bg-h: #EBE3FF; --t-tile: #DED3FD; --t-fg: #6D28D9; }
+html.dark .cs-t-violet { --t-bg: rgba(139,92,246,.10); --t-bg-h: rgba(139,92,246,.17); --t-tile: rgba(139,92,246,.22); --t-fg: #C4B5FD; }
+.cs-t-green { --t-bg: #EFFAF1; --t-bg-h: #DDF3E2; --t-tile: #CBEBD3; --t-fg: #166534; }
+html.dark .cs-t-green { --t-bg: rgba(34,197,94,.10); --t-bg-h: rgba(34,197,94,.17); --t-tile: rgba(34,197,94,.22); --t-fg: #86EFAC; }
+.cs-t-red { --t-bg: #FEF0F0; --t-bg-h: #FDE0E0; --t-tile: #FBCFCF; --t-fg: #B91C1C; }
+html.dark .cs-t-red { --t-bg: rgba(239,68,68,.10); --t-bg-h: rgba(239,68,68,.17); --t-tile: rgba(239,68,68,.22); --t-fg: #FCA5A5; }
+.cs-t-pink { --t-bg: #FFF0F8; --t-bg-h: #FFE0F1; --t-tile: #FCCFE7; --t-fg: #BE185D; }
+html.dark .cs-t-pink { --t-bg: rgba(236,72,153,.10); --t-bg-h: rgba(236,72,153,.17); --t-tile: rgba(236,72,153,.22); --t-fg: #F9A8D4; }
+.cs-t-indigo { --t-bg: #EEF1FF; --t-bg-h: #E0E5FF; --t-tile: #D0D8FD; --t-fg: #4338CA; }
+html.dark .cs-t-indigo { --t-bg: rgba(99,102,241,.10); --t-bg-h: rgba(99,102,241,.17); --t-tile: rgba(99,102,241,.22); --t-fg: #A5B4FC; }
+.cs-t-orange { --t-bg: #FFF3EA; --t-bg-h: #FFE6D2; --t-tile: #FED8BA; --t-fg: #C2410C; }
+html.dark .cs-t-orange { --t-bg: rgba(249,115,22,.10); --t-bg-h: rgba(249,115,22,.17); --t-tile: rgba(249,115,22,.22); --t-fg: #FDBA74; }
+.cs-t-blue { --t-bg: #EEF4FF; --t-bg-h: #DDE8FF; --t-tile: #CBDCFD; --t-fg: #1D4ED8; }
+html.dark .cs-t-blue { --t-bg: rgba(59,130,246,.10); --t-bg-h: rgba(59,130,246,.17); --t-tile: rgba(59,130,246,.22); --t-fg: #93C5FD; }
+.cs-t-lime { --t-bg: #F6FBE9; --t-bg-h: #EAF5CF; --t-tile: #DDEEB5; --t-fg: #4D7C0F; }
+html.dark .cs-t-lime { --t-bg: rgba(132,204,22,.10); --t-bg-h: rgba(132,204,22,.17); --t-tile: rgba(132,204,22,.22); --t-fg: #BEF264; }
+.cs-t-cyan { --t-bg: #ECFAFC; --t-bg-h: #D8F3F7; --t-tile: #C5EBF1; --t-fg: #0E7490; }
+html.dark .cs-t-cyan { --t-bg: rgba(6,182,212,.10); --t-bg-h: rgba(6,182,212,.17); --t-tile: rgba(6,182,212,.22); --t-fg: #67E8F9; }
+.cs-t-fuchsia { --t-bg: #FDF1FD; --t-bg-h: #FAE3FA; --t-tile: #F5D2F5; --t-fg: #A21CAF; }
+html.dark .cs-t-fuchsia { --t-bg: rgba(217,70,239,.10); --t-bg-h: rgba(217,70,239,.17); --t-tile: rgba(217,70,239,.22); --t-fg: #F0ABFC; }
+.cs-t-teal { --t-bg: #EAF7F4; --t-bg-h: #D7F0EA; --t-tile: #C4E8E0; --t-fg: #0F766E; }
+html.dark .cs-t-teal { --t-bg: rgba(20,184,166,.10); --t-bg-h: rgba(20,184,166,.17); --t-tile: rgba(20,184,166,.22); --t-fg: #5EEAD4; }
+.cs-t-slate { --t-bg: #F1F5F4; --t-bg-h: #E5ECEA; --t-tile: #D6E0DD; --t-fg: #334155; }
+html.dark .cs-t-slate { --t-bg: rgba(148,163,184,.10); --t-bg-h: rgba(148,163,184,.17); --t-tile: rgba(148,163,184,.22); --t-fg: #CBD5E1; }
+
+.cs-card { position: relative; display: flex; flex-direction: column; height: 100%; border-radius: 20px; border: 1px solid var(--border); background: var(--t-bg); color: var(--text-primary); padding: 16px 18px; box-shadow: var(--shadow-card); transition: transform .25s cubic-bezier(.22, 1, .36, 1), background-color .25s ease-out, box-shadow .25s ease-out; }
+html.dark .cs-card { box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, .06); }
+.cs-card:hover { transform: translateY(-3px); background: var(--t-bg-h); box-shadow: var(--shadow-hover); }
+html.dark .cs-card:hover { box-shadow: var(--shadow-hover), inset 0 1px 0 rgba(255, 255, 255, .08); }
+.cs-card:active { transform: translateY(-1px) scale(.98); transition-duration: .1s; }
+
+/* Watermark icon, cropped by the card (its own clipping layer, so the focus ring is never cut off). */
+.cs-clip { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.cs-mark { position: absolute; right: -18px; bottom: -22px; width: 112px; height: 112px; color: var(--t-fg); opacity: .12; transition: transform .3s cubic-bezier(.22, 1, .36, 1); }
+.cs-mark svg { width: 100%; height: 100%; stroke-width: 1.25; }
+.cs-featured .cs-mark { right: -30px; bottom: -34px; width: 190px; height: 190px; }
+.cs-card:hover .cs-mark { transform: scale(1.08) rotate(6deg); }
+
+.cs-tile { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; background: var(--t-tile); color: var(--t-fg); }
+.cs-meta { display: inline-block; margin-top: 4px; padding: 1px 8px; border-radius: 999px; background: rgba(255, 255, 255, .6); color: var(--t-fg); font-size: 10px; font-weight: 700; letter-spacing: .02em; line-height: 16px; }
+html.dark .cs-meta { background: rgba(255, 255, 255, .08); }
+
+/* Whole card is the link: the name link stretches over the card; chips sit above it as separate links. */
+.cs-main { color: var(--text-primary); font-weight: 600; }
+.cs-main::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 20px; }
+.cs-main:focus-visible { outline: none; }
+.cs-main:focus-visible::after { outline: 2px solid var(--green-600); outline-offset: 2px; }
+
+.cs-arrow { margin-left: auto; flex-shrink: 0; color: var(--t-fg); opacity: 0; transform: translateX(-4px); transition: opacity .2s ease-out, transform .25s ease-out; }
+.cs-card:hover .cs-arrow, .cs-card:has(.cs-main:focus-visible) .cs-arrow { opacity: 1; transform: none; }
+
+.cs-chip { position: relative; z-index: 2; display: inline-block; padding: 3px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--t-fg) 22%, transparent); background: rgba(255, 255, 255, .55); color: var(--t-fg); font-size: 12px; font-weight: 600; transition: opacity .25s ease-out, transform .25s ease-out, background-color .2s; }
+html.dark .cs-chip { background: rgba(255, 255, 255, .06); }
+.cs-chip:hover { background: var(--t-tile); }
+.cs-chip:focus-visible { outline: 2px solid var(--green-600); outline-offset: 2px; }
+@media (hover: hover) {
+  .cs-popular .cs-chip { opacity: .72; transform: translateY(6px); }
+  .cs-card:hover .cs-popular .cs-chip, .cs-card:focus-within .cs-popular .cs-chip { opacity: 1; transform: none; }
+  .cs-popular .cs-chip:nth-of-type(2) { transition-delay: 40ms; }
+  .cs-popular .cs-chip:nth-of-type(3) { transition-delay: 80ms; }
+}
+@media (hover: none) { .cs-arrow { opacity: 1; transform: none; } }
+
+/* Filter chips */
+.cs-filter { border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-secondary); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: background-color .2s, color .2s, border-color .2s, transform .15s; }
+.cs-filter:hover { border-color: var(--green-500); color: var(--text-primary); }
+.cs-filter:active { transform: scale(.97); }
+.cs-filter[aria-pressed="true"] { background: var(--green-600); border-color: var(--green-600); color: #fff; }
+.cs-filter:focus-visible { outline: 2px solid var(--green-600); outline-offset: 2px; }
+
+/* "View all" tile */
+.cs-viewall { background: var(--bg-surface); border-style: dashed; border-color: var(--border-strong); align-items: center; justify-content: center; text-align: center; gap: 2px; }
+.cs-viewall:hover { background: var(--bg-subtle); }
+
+/* Scroll-in stagger (JS adds cs-pre before reveal, cs-show on reveal; with no JS everything is simply visible) */
+@keyframes cs-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.cs-pre:not(.cs-show) > li { opacity: 0; }
+.cs-show > li { animation: cs-in .32s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: calc(var(--i, 0) * 40ms); }
+.cs-grid > li.cs-leaving { opacity: 0; transform: scale(.96); transition: opacity .15s ease-out, transform .15s ease-out; }
+
+.cs-scroll { scrollbar-width: none; }
+.cs-scroll::-webkit-scrollbar { display: none; }
+
+@media (min-width: 1024px) { .cs-featured .cs-tile { width: 48px; height: 48px; border-radius: 14px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-card, .cs-card:hover, .cs-card:active, .cs-mark, .cs-arrow, .cs-chip, .cs-filter { transition: none !important; transform: none !important; }
+  .cs-card:hover .cs-mark { transform: none !important; }
+  .cs-show > li { animation: none !important; }
+  .cs-pre:not(.cs-show) > li { opacity: 1; }
+  .cs-popular .cs-chip { opacity: 1 !important; }
+}
+

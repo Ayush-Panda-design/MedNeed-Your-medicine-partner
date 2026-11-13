@@ -1,0 +1,53 @@
+/* Cart page motion + surface tokens. Everything is prefixed mc- and only uses transform/opacity for animation. */
+.mc-root {
+  --mc-ease: cubic-bezier(.22, 1, .36, 1);
+  --mc-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --mc-shadow-1: var(--shadow-card);
+  --mc-shadow-2: var(--shadow-hover);
+  --mc-shadow-3: var(--shadow-card);
+}
+
+/* Staggered entrance (delay is set inline per element). */
+@keyframes mc-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.mc-in { animation: mc-rise .38s var(--mc-ease) both; }
+
+/* Item card: hover lift + exit. */
+.mc-card { box-shadow: var(--mc-shadow-1); transition: box-shadow .2s var(--mc-ease), transform .2s var(--mc-ease), opacity .25s ease; }
+.mc-card:hover { box-shadow: var(--mc-shadow-2); transform: translateY(-1px); }
+.mc-card[data-leaving="true"] { opacity: 0; transform: translateX(28px) scale(.98); pointer-events: none; }
+
+/* Quantity number rolls up when it changes (the element is re-keyed on every change). */
+@keyframes mc-roll { from { opacity: 0; transform: translateY(70%); } to { opacity: 1; transform: none; } }
+.mc-roll { display: inline-block; animation: mc-roll .22s var(--mc-ease); }
+
+/* Free-delivery progress bar. */
+.mc-bar-fill { transform-origin: left center; transition: transform .6s var(--mc-ease); will-change: transform; }
+@keyframes mc-pulse { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.18); opacity: 1; } 100% { transform: scale(1); } }
+.mc-check { animation: mc-pulse .5s var(--mc-spring) both; }
+
+/* Small confetti burst when free delivery unlocks. */
+@keyframes mc-confetti { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.4) rotate(var(--rot)); } }
+.mc-confetti i { position: absolute; left: 1.6rem; top: 50%; width: 6px; height: 10px; border-radius: 2px; opacity: 0; animation: mc-confetti .9s var(--mc-ease) forwards; }
+
+/* Primary call-to-action: gentle shimmer sweep (transform only). */
+@keyframes mc-sweep { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(320%) skewX(-18deg); } }
+.mc-cta { position: relative; overflow: hidden; isolation: isolate; box-shadow: 0 8px 20px -8px rgba(17, 99, 41, .55); transition: transform .15s var(--mc-ease), box-shadow .2s var(--mc-ease), filter .2s ease; }
+.mc-cta:hover { box-shadow: 0 12px 24px -8px rgba(17, 99, 41, .6); filter: brightness(1.04); }
+.mc-cta:active { transform: scale(.98); }
+.mc-cta::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 34%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .28), transparent); animation: mc-sweep 3.2s ease-in-out 1.2s infinite; pointer-events: none; z-index: -1; }
+.mc-cta[aria-disabled="true"]::after { display: none; }
+
+/* Undo bar slides up. */
+@keyframes mc-undo-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.mc-undo { animation: mc-undo-in .28s var(--mc-spring); }
+@keyframes mc-countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.mc-countdown { transform-origin: left center; animation: mc-countdown 6s linear forwards; }
+
+/* Skeleton uses the global .mn-skeleton shimmer; this just reserves space so nothing shifts. */
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-in, .mc-roll, .mc-check, .mc-confetti i, .mc-cta::after, .mc-undo, .mc-countdown { animation: none !important; }
+  .mc-confetti { display: none; }
+  .mc-card, .mc-card:hover, .mc-card[data-leaving="true"], .mc-bar-fill, .mc-cta { transition: none !important; transform: none; }
+  .mc-card[data-leaving="true"] { opacity: 0; }
+}
