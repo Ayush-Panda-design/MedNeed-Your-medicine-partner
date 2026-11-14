@@ -20,7 +20,7 @@ import { FaqHelp } from "@/components/FaqHelp";
 import { RevealOnScroll } from "@/components/motion/RevealOnScroll";
 import { CountUp } from "@/components/motion/CountUp";
 import { ProductCard } from "@/components/ProductCard";
-import { CategoryShowcase } from "@/components/CategoryShowcase";
+import { CategoryTiles } from "@/components/category/CategoryTiles";
 import { healthConcerns } from "@/lib/catalog";
 import { faqs } from "@/lib/faq";
 import { categoryCounts, listCategories, listDeals, listNewest } from "@/server/catalog/queries";
@@ -44,7 +44,7 @@ export default async function Home() {
 
       {/* Categories */}
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
-        <CategoryShowcase categories={categories} counts={counts} />
+        <CategoryTiles categories={categories} counts={counts} />
       </section>
 
       {/* Upload prescription */}
