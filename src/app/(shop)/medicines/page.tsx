@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, SearchX   , Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, SearchX, Sparkles } from "lucide-react";
 import { CatalogFilters, SortSelect } from "@/components/CatalogControls";
 import { CatalogResults, CatalogStateProvider } from "@/components/CatalogState";
 import { ProductCard } from "@/components/ProductCard";
 import { SORT_KEYS, type SortKey } from "@/lib/catalog";
-import { getCategory, listBrands, listCategories, searchProducts } from "@/server/catalog/queries";
+import { getCategory, listBrands, listCategories, needsConfirmedPrice, searchProducts } from "@/server/catalog/queries";
 import { hybridSearch } from "@/server/ai/hybrid-search";
 
 type SP = Record<string, string | string[] | undefined>;
@@ -63,6 +63,21 @@ export default async function MedicinesPage({ searchParams }: { searchParams: Pr
   const page = Math.min(Math.max(pageRaw, 1), totalPages);
   if (page !== Math.max(pageRaw, 1)) ({ items: visible, total } = await searchProducts({ ...query, page }));
 
+  // Price and stock filters only show products with a confirmed price; say how many others match, so the list
+  // never looks mysteriously short, and offer a one-click way to see them.
+  const hiddenByPriceFilters = needsConfirmedPrice(query)
+    ? Math.max(0, (await searchProducts({ ...query, maxPrice: undefined, inStockOnly: false, sort: "relevance", page: 1, pageSize: 1 })).total - total)
+    : 0;
+  const withoutPriceFilters = (() => {
+    const p = new URLSearchParams();
+    Object.entries(sp).forEach(([k, v]) => {
+      if (k === "page" || k === "max" || k === "stock") return;
+      all(v).forEach((x) => p.append(k, x));
+    });
+    const qs = p.toString();
+    return qs ? `/medicines?${qs}` : "/medicines";
+  })();
+
   const pageHref = (n: number) => {
     const p = new URLSearchParams();
     Object.entries(sp).forEach(([k, v]) => {
@@ -99,6 +114,18 @@ export default async function MedicinesPage({ searchParams }: { searchParams: Pr
         <CatalogFilters categories={categories} brands={brands} />
 
         <CatalogResults className="min-w-0 flex-1">
+          {hiddenByPriceFilters > 0 && (
+            <p className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-900 ring-1 ring-amber-100" role="status">
+              <Info className="h-4 w-4 shrink-0 text-amber-600" aria-hidden />
+              <span>
+                Showing products with a confirmed price{query.inStockOnly ? " in stock" : ""}. {hiddenByPriceFilters.toLocaleString("en-IN")} more{" "}
+                {hiddenByPriceFilters === 1 ? "matches" : "match"} your other filters (most are listed without a price and available on request).
+              </span>
+              <Link href={withoutPriceFilters} scroll={false} className="font-semibold underline underline-offset-2 hover:text-amber-700">
+                Show all
+              </Link>
+            </p>
+          )}
           {visible.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
               <SearchX className="mx-auto h-10 w-10 text-slate-400" />

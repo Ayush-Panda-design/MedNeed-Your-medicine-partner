@@ -115,13 +115,15 @@ export async function searchProducts(c: CatalogQuery): Promise<{ items: Product[
  * Used by hybrid (semantic) search to keep vector candidates consistent with the active filters.
  * Returns a map keyed by id so the caller can order results however it likes (e.g. by similarity).
  */
+/** Filters that only make sense for products with a confirmed price and stock (catalog-only items have neither). */
+export const needsConfirmedPrice = (c: Partial<CatalogQuery>) => Boolean(c.maxPrice || c.inStockOnly);
+
 export async function productsByIds(ids: string[], c: Partial<CatalogQuery> = {}): Promise<Map<string, Product>> {
   const out = new Map<string, Product>();
   if (!ids.length) return out;
   const params: unknown[] = [];
   const add = (v: unknown) => { params.push(v); return `$${params.length}`; };
-  const needsPrice = Boolean(c.maxPrice || c.inStockOnly || c.sort === "price-asc" || c.sort === "price-desc" || c.sort === "discount");
-  const where: string[] = [needsPrice ? `m.status = 'active'` : `m.status in ('active','catalog')`];
+  const where: string[] = [needsConfirmedPrice(c) ? `m.status = 'active'` : `m.status in ('active','catalog')`];
   where.push(`m.id = any(${add(ids)}::uuid[])`);
   if (c.category) where.push(`c.slug = ${add(c.category)}`);
   if (c.brands?.length) where.push(`mf.name in (${c.brands.map((b) => add(b)).join(",")})`);
@@ -142,9 +144,9 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Prod
     params.push(v);
     return `$${params.length}`;
   };
-  // Catalog-only items have no confirmed price or stock, so any filter or sort that depends on those leaves them out.
-  const needsPrice = Boolean(c.maxPrice || c.inStockOnly || c.sort === "price-asc" || c.sort === "price-desc" || c.sort === "discount");
-  const where: string[] = [needsPrice ? `m.status = 'active'` : `m.status in ('active','catalog')`];
+  // Catalog-only items have no confirmed price or stock, so the price and stock *filters* leave them out.
+  // Sorting never removes anything: it only changes the order (see below).
+  const where: string[] = [needsConfirmedPrice(c) ? `m.status = 'active'` : `m.status in ('active','catalog')`];
 
   if (c.category) where.push(`c.slug = ${add(c.category)}`);
   if (c.brands?.length) where.push(`mf.name in (${c.brands.map((b) => add(b)).join(",")})`);
@@ -168,9 +170,12 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Prod
   const clause = `where ${where.join(" and ")}`;
 
   let order = `(m.status = 'active') desc, ${inStockSql()} desc, m.name`;
-  if (c.sort === "price-asc") order = "m.price asc, m.name";
-  else if (c.sort === "price-desc") order = "m.price desc, m.name";
-  else if (c.sort === "discount") order = "(m.mrp - m.price) / m.mrp desc, m.name";
+  // Price/discount sorts: products with a confirmed price first, in the chosen order; catalog-only products (whose
+  // reference price is not shown to customers) follow, by name.
+  const priced = `(m.status = 'active') desc`;
+  if (c.sort === "price-asc") order = `${priced}, (case when m.status = 'active' then m.price end) asc nulls last, m.name`;
+  else if (c.sort === "price-desc") order = `${priced}, (case when m.status = 'active' then m.price end) desc nulls last, m.name`;
+  else if (c.sort === "discount") order = `${priced}, (case when m.status = 'active' then (m.mrp - m.price) / m.mrp end) desc nulls last, m.name`;
   else if (tokens.length) {
     const scores = tokens.map((t, i) => `greatest(word_similarity(${add(t)}, lower(m.name)), (case when m.search_text like ${likes[i]} then 0.5 else 0 end))`);
     const prefix = add(`${escapeLike(tokens.join(" "))}%`);
