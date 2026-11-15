@@ -4,13 +4,18 @@ import { useId } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { Category } from "@/lib/catalog";
+import { useCatalogState } from "./CatalogState";
 
 function useUpdate() {
+  const shared = useCatalogState();
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  if (shared) return shared;
+  // Fallback when used outside CatalogStateProvider: navigate directly (previous behaviour).
   return {
     params,
+    pending: false,
     update(mutate: (p: URLSearchParams) => void) {
       const next = new URLSearchParams(params.toString());
       mutate(next);

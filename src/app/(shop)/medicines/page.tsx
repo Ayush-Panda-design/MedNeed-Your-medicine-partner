@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, SearchX   , Sparkles } from "lucide-react";
 import { CatalogFilters, SortSelect } from "@/components/CatalogControls";
+import { CatalogResults, CatalogStateProvider } from "@/components/CatalogState";
 import { ProductCard } from "@/components/ProductCard";
 import { SORT_KEYS, type SortKey } from "@/lib/catalog";
 import { getCategory, listBrands, listCategories, searchProducts } from "@/server/catalog/queries";
@@ -78,6 +79,7 @@ export default async function MedicinesPage({ searchParams }: { searchParams: Pr
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <CatalogStateProvider>
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-slate-500">
         <Link href="/" className="hover:text-teal-700">Home</Link> / <span className="text-slate-900">{heading}</span>
       </nav>
@@ -96,7 +98,7 @@ export default async function MedicinesPage({ searchParams }: { searchParams: Pr
       <div className="flex flex-col gap-6 lg:flex-row">
         <CatalogFilters categories={categories} brands={brands} />
 
-        <section className="min-w-0 flex-1" aria-label="Product results">
+        <CatalogResults className="min-w-0 flex-1">
           {visible.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
               <SearchX className="mx-auto h-10 w-10 text-slate-400" />
@@ -149,8 +151,9 @@ export default async function MedicinesPage({ searchParams }: { searchParams: Pr
               )}
             </>
           )}
-        </section>
+        </CatalogResults>
       </div>
+      </CatalogStateProvider>
     </main>
   );
 }
