@@ -65,8 +65,8 @@ export function SupportChat() {
 
       {/* Panel */}
       {open && (
-        <div className="mn-chat-panel fixed bottom-24 right-5 z-50 flex h-[32rem] max-h-[75vh] w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-          <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-teal-600 to-lime-500 px-4 py-3 text-white">
+        <div className="mn-chat-panel fixed bottom-24 right-5 z-50 flex h-[32rem] max-h-[75vh] w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-line bg-surface text-ink shadow-2xl">
+          <div className="flex items-center gap-3 border-b border-line bg-gradient-to-r from-teal-600 to-lime-500 px-4 py-3 text-white">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-white/20">
               <MessageCircle className="h-4 w-4" />
             </span>
@@ -76,12 +76,12 @@ export function SupportChat() {
             </div>
           </div>
 
-          <div ref={scroller} className="flex-1 space-y-3 overflow-y-auto bg-slate-50/60 p-4">
+          <div ref={scroller} className="flex-1 space-y-3 overflow-y-auto bg-page p-4">
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                 <div
                   className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm ${
-                    m.role === "user" ? "rounded-br-sm bg-teal-600 text-white" : "rounded-bl-sm border border-slate-200 bg-white text-slate-700"
+                    m.role === "user" ? "rounded-br-sm bg-teal-600 text-white" : "rounded-bl-sm border border-line bg-surface text-ink"
                   }`}
                 >
                   {m.text}
@@ -90,7 +90,7 @@ export function SupportChat() {
             ))}
             {busy && (
               <div className="flex justify-start">
-                <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-3.5 py-2.5 text-slate-400 shadow-sm">
+                <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-sm border border-line bg-surface px-3.5 py-2.5 text-ink-muted shadow-sm">
                   <span className="mn-typing-dot" />
                   <span className="mn-typing-dot" style={{ animationDelay: "0.15s" }} />
                   <span className="mn-typing-dot" style={{ animationDelay: "0.3s" }} />
@@ -103,7 +103,7 @@ export function SupportChat() {
                   <button
                     key={s}
                     onClick={() => send(s)}
-                    className="rounded-full border border-teal-200 bg-white px-3 py-1.5 text-xs font-medium text-teal-700 transition-colors hover:bg-teal-50"
+                    className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-tint-fg transition-colors hover:bg-tint"
                   >
                     {s}
                   </button>
@@ -117,7 +117,7 @@ export function SupportChat() {
               e.preventDefault();
               send(input);
             }}
-            className="flex items-center gap-2 border-t border-slate-100 bg-white p-3"
+            className="flex items-center gap-2 border-t border-line bg-surface p-3"
           >
             <input
               ref={inputRef}
@@ -126,7 +126,7 @@ export function SupportChat() {
               placeholder="Type your message..."
               maxLength={1000}
               disabled={busy}
-              className="min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm outline-none transition-colors focus:border-teal-400 focus:bg-white"
+              className="min-w-0 flex-1 rounded-full border border-line bg-subtle px-4 py-2 text-sm text-ink caret-teal-500 outline-none transition-colors placeholder:text-ink-muted focus:border-teal-500 focus:bg-surface"
             />
             <button
               type="submit"
