@@ -25,14 +25,23 @@ async function connect(): Promise<Db> {
     const pool = new Pool({ connectionString: url, max: Number(process.env.DATABASE_POOL_MAX) || 10 });
     return {
       exclusive: async (fn) => {
-        // Session-level advisory lock on one dedicated connection. Several instances starting together
-        // (serverless cold starts, rolling deploys) then migrate and seed one after another, never at once.
+        // Transaction-scoped advisory lock on one dedicated connection, so instances starting together
+        // (serverless cold starts, rolling deploys) migrate and seed one after another, never at once.
+        // It must be transaction-scoped: behind a transaction-mode pooler (Neon "-pooler", PgBouncer) a
+        // session lock can stay held by a pooled backend forever and hang every later cold start.
+        // The lock ends with the transaction, and lock_timeout stops a request from ever waiting indefinitely.
         const client = await pool.connect();
         try {
-          await client.query(`select pg_advisory_lock(727001)`);
-          return await fn();
+          await client.query("begin");
+          await client.query("set local lock_timeout = '30s'");
+          await client.query(`select pg_advisory_xact_lock(727002)`);
+          const out = await fn();
+          await client.query("commit");
+          return out;
+        } catch (err) {
+          await client.query("rollback").catch(() => {});
+          throw err;
         } finally {
-          await client.query(`select pg_advisory_unlock(727001)`).catch(() => {});
           client.release();
         }
       },
@@ -104,8 +113,23 @@ async function migrate(db: Db) {
 
 async function init(): Promise<Db> {
   const db = await connect();
-  await db.exclusive(() => startup(db));
+  // Fast path for the common case (a warm database): nothing to migrate and an admin exists, so skip the lock.
+  if (!(await upToDate(db))) await db.exclusive(() => startup(db));
   return db;
+}
+
+async function upToDate(db: Db): Promise<boolean> {
+  if (!isProd()) return false; // development always runs startup (sample data, dataset, ADMIN_RESET)
+  try {
+    const applied = new Set((await db.query<{ id: string }>(`select id from schema_migrations`)).map((r) => r.id));
+    if (!migrations.every((m) => applied.has(m.id))) return false;
+    const admins = await db.query<{ n: number }>(`select count(*)::int as n from user_roles where role = 'admin'`);
+    if (!admins[0]?.n) return false;
+    if (process.env.MEDNEED_DEMO_DATA === "1") return false; // demo deployments keep the seed-if-empty check
+    return true;
+  } catch {
+    return false; // fresh database (no tables yet)
+  }
 }
 
 async function startup(db: Db) {
