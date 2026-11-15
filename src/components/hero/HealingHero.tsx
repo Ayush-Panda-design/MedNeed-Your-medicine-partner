@@ -163,7 +163,7 @@ export function HealingHero() {
   const s = STEPS[step];
 
   return (
-    <section aria-labelledby="hh-title" className="mx-auto max-w-[1440px] px-3 pt-3 sm:px-5 sm:pt-5">
+    <section id="mn-cine" aria-labelledby="hh-title" className="relative">
       <div ref={root} className={`hh ${displaySerif.variable}`} style={{ "--mx": 0, "--my": 0, "--sy": 0 } as CSSProperties}>
         <svg className="hh-scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden focusable="false">
           <defs>
@@ -414,6 +414,10 @@ export function HealingHero() {
             <span className="hh-med-tag">Genuine</span>
           </div>
         </div>
+
+        <a href="#after-hero" className="hh-scrollcue" aria-label="Scroll to explore">
+          <span className="hh-mouse" aria-hidden><span /></span>
+        </a>
 
         {/* Content */}
         <div className="hh-content">

@@ -10,6 +10,7 @@ import { useAuth, useCart } from "@/lib/providers";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "./Logo";
 import { SearchBox } from "./SearchBox";
+import { CategoryMenu } from "./CategoryMenu";
 
 export function Header({ categories }: { categories: Category[] }) {
   const router = useRouter();
@@ -19,13 +20,13 @@ export function Header({ categories }: { categories: Category[] }) {
   const [menu, setMenu] = useState(false);
   const isHome = pathname === "/";
   // On the homepage the header floats transparently over the cinematic hero and turns solid once scrolled past it.
-  const [overHero, setOverHero] = useState(false);
+  const [overHero, setOverHero] = useState(isHome);
   // The header only floats over the page when a full-bleed cinematic hero (#mn-cine) is present; otherwise it is a
   // normal sticky bar so it never covers the page content.
-  const [floatOverHero, setFloatOverHero] = useState(false);
+  const [floatOverHero, setFloatOverHero] = useState(isHome);
 
   useEffect(() => {
-    if (!isHome) { setOverHero(false); return; }
+    if (!isHome) { setOverHero(false); setFloatOverHero(false); return; }
     const hero = document.getElementById("mn-cine");
     setFloatOverHero(Boolean(hero));
     if (!hero) { setOverHero(false); return; }
@@ -66,8 +67,10 @@ export function Header({ categories }: { categories: Category[] }) {
         </div>
       )}
 
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-2 gap-y-3 px-4 py-3 sm:gap-x-4 sm:px-6">
         <Logo light={overlay} />
+
+        <CategoryMenu categories={categories} overlay={overlay} />
 
         <button data-fx="pulse" className={`mn-fx-pulse hidden items-center gap-1.5 rounded-lg border px-3 py-2 text-left text-sm lg:flex ${cls.pincode}`} aria-label="Choose delivery location">
           <MapPin className={`h-4 w-4 ${overlay ? "text-lime-300" : "text-teal-600"}`} />
@@ -78,18 +81,18 @@ export function Header({ categories }: { categories: Category[] }) {
           <ChevronDown className={`h-4 w-4 ${cls.chevron}`} />
         </button>
 
-        <div className="order-last w-full flex-1 md:order-none md:w-auto">
+        <div className="order-last min-w-0 basis-full lg:order-none lg:flex-1 lg:basis-0">
           <SearchBox overlay={overlay} styles={{ box: cls.searchBox, icon: cls.searchIcon, input: cls.searchInput }} />
         </div>
 
-        <div className="ml-auto flex items-center gap-2 md:ml-0">
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 md:ml-0">
           <Link href="/account/prescriptions/new" className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold xl:flex ${cls.uploadRx}`}>
             <Upload className="h-4 w-4" /> Upload Rx
           </Link>
 
           {auth.user ? (
             <div className="relative">
-              <button onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-haspopup="menu" className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${cls.ghost}`}>
+              <button onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-haspopup="menu" className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium sm:px-3 ${cls.ghost}`}>
                 <User className="h-5 w-5" />
                 <span className="hidden max-w-[10rem] truncate sm:inline">{displayName(auth.user)}</span>
                 <ChevronDown className={`h-4 w-4 ${cls.chevron}`} />
@@ -123,7 +126,7 @@ export function Header({ categories }: { categories: Category[] }) {
               )}
             </div>
           ) : (
-            <Link href="/login" className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${cls.ghost}`}>
+            <Link href="/login" aria-label="Sign in" className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold sm:px-3 ${cls.ghost}`}>
               <User className="h-5 w-5" />
               <span className="hidden sm:inline">Sign in</span>
             </Link>
@@ -131,7 +134,7 @@ export function Header({ categories }: { categories: Category[] }) {
 
           <ThemeToggle className={cls.ghost} />
 
-          <Link href="/cart" className={`relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold ${cls.cart}`}>
+          <Link href="/cart" aria-label="Cart" className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold sm:px-4 ${cls.cart}`}>
             <ShoppingCart className="h-5 w-5" />
             <span className="hidden sm:inline">Cart</span>
             {cart.count > 0 && (
@@ -143,34 +146,7 @@ export function Header({ categories }: { categories: Category[] }) {
         </div>
       </div>
 
-      {!overlay && (
-        <>
-          <nav aria-label="Categories" className="relative border-t border-teal-100/70 bg-gradient-to-b from-teal-50/40 to-transparent">
-            <div className="relative mx-auto max-w-7xl">
-              <span aria-hidden className="mn-fade-l" />
-              <span aria-hidden className="mn-fade-r" />
-              <ul className="mn-scroll-x flex gap-1.5 px-4 py-2.5 text-sm sm:px-6">
-                <li>
-                  <Link href="/medicines" className="block whitespace-nowrap rounded-full bg-teal-600 px-4 py-1.5 font-semibold text-white shadow-sm shadow-teal-900/20 transition hover:bg-teal-700">
-                    All medicines
-                  </Link>
-                </li>
-                {categories.map((c) => (
-                  <li key={c.slug}>
-                    <Link
-                      href={`/medicines?category=${c.slug}`}
-                      className="block whitespace-nowrap rounded-full px-4 py-1.5 font-medium text-slate-600 transition hover:bg-teal-50 hover:text-teal-700"
-                    >
-                      {c.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </nav>
-          <div aria-hidden className="h-[2px] bg-gradient-to-r from-teal-600 via-lime-400 to-emerald-500" />
-        </>
-      )}
+      {!overlay && <div aria-hidden className="h-[2px] bg-gradient-to-r from-teal-600 via-lime-400 to-emerald-500" />}
     </header>
   );
 }

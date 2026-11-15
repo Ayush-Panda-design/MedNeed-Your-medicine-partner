@@ -33,7 +33,7 @@ export default async function Home() {
       <HealingHero />
 
       {/* Trust stats */}
-      <section className="border-b border-slate-100 bg-white">
+      <section id="after-hero" className="scroll-mt-24 border-b border-slate-100 bg-white">
         <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-8 text-center sm:px-6 md:grid-cols-4">
           <li data-reveal><p className="text-3xl font-extrabold text-teal-700"><CountUp value={2} /></p><p className="mt-1 text-xs font-medium text-slate-500">Branches in Bhubaneswar</p></li>
           <li data-reveal data-reveal-delay="90"><p className="text-3xl font-extrabold text-teal-700"><CountUp value={15} suffix=" km" /></p><p className="mt-1 text-xs font-medium text-slate-500">Home-delivery radius</p></li>
