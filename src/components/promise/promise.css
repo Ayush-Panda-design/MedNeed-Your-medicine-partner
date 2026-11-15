@@ -148,3 +148,40 @@
 /* Dark theme: keep the illustrated panels light (they are pictures), soften the frame. */
 :where(html.dark) .ps-wrap { background: radial-gradient(60% 80% at 100% 0%, rgb(163 230 53 / .08), transparent 70%), var(--bg-surface); }
 :where(html.dark) .ps-scene { box-shadow: 0 0 0 1px rgb(255 255 255 / .06); }
+
+/* ───────── Dark theme: re-colour the illustrations (the art uses fixed fills, re-mapped here) ───────── */
+:where(html.dark) .ps-svg [fill="#eef8f0"],
+:where(html.dark) .ps-svg [fill="#f1f8f3"],
+:where(html.dark) .ps-svg [fill="#f2f8f4"] { fill: #141d18; }
+:where(html.dark) .ps-svg [fill="#dcefe1"] { fill: #1f2b25; }
+:where(html.dark) .ps-svg [fill="#b5dcbd"] { fill: #284634; }
+:where(html.dark) .ps-svg [fill="#d6ecf7"] { fill: #132a33; }
+:where(html.dark) .ps-svg [fill="#e3f4e7"] { fill: #18261f; }
+:where(html.dark) .ps-svg [stroke="#b9e3c3"] { stroke: #24452f; }
+/* cards, chips, phone screen */
+:where(html.dark) .ps-svg rect[fill="#fff"],
+:where(html.dark) .ps-svg rect[fill="#f8fafc"] { fill: #1c2621; }
+:where(html.dark) .ps-svg [stroke="#e2efe5"],
+:where(html.dark) .ps-svg [stroke="#e2e8f0"] { stroke: #2d3b34; }
+:where(html.dark) .ps-svg [stroke="#bbf7d0"] { stroke: #1f5132; }
+:where(html.dark) .ps-svg [fill="#fff7ed"] { fill: #3b2615; }
+:where(html.dark) .ps-svg [fill="#f1f5f9"] { fill: #2a3530; }
+:where(html.dark) .ps-svg [fill="#e9eef3"] { fill: #dfe6ec; } /* blister strip stays a light object */
+/* text */
+:where(html.dark) .ps-svg text[fill="#0f172a"] { fill: #e8efe9; }
+:where(html.dark) .ps-svg text[fill="#64748b"] { fill: #9fb0a6; }
+:where(html.dark) .ps-svg text[fill="#94a3b8"] { fill: #7d8c84; }
+:where(html.dark) .ps-svg text[fill="#14532d"] { fill: #bbf7d0; }
+:where(html.dark) .ps-svg text[fill="#15803d"] { fill: #4ade80; }
+:where(html.dark) .ps-svg text[fill="#c2410c"] { fill: #fdba74; }
+:where(html.dark) .ps-svg text[fill="#b45309"] { fill: #fbbf24; }
+/* the stamp keeps a light card so it reads as a stamp */
+:where(html.dark) .ps-stamp rect { fill: #0f1a14; }
+/* rows and ticks */
+:where(html.dark) .ps-row-bg { fill: #1a241f; stroke: #2d3b34; }
+:where(html.dark) .ps-row:hover .ps-row-bg { stroke: #2f6b45; }
+:where(html.dark) .ps-row-done .ps-row-bg { fill: #13261a; stroke: #1f5132; }
+:where(html.dark) .ps-tick-bg { fill: #33413a; }
+:where(html.dark) .ps-row-done .ps-tick-bg { fill: #16a34a; }
+:where(html.dark) .ps-glow { fill: #fde047; }
+:where(html.dark) .ps-scene { box-shadow: 0 0 0 1px rgb(255 255 255 / .07), 0 24px 48px -30px rgb(0 0 0 / .8); }
