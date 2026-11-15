@@ -67,8 +67,8 @@ export function Header({ categories }: { categories: Category[] }) {
         </div>
       )}
 
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-2 gap-y-3 px-4 py-3 sm:gap-x-4 sm:px-6">
-        <Logo light={overlay} />
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-[6px] gap-y-[10px] px-[12px] py-[10px] sm:gap-x-4 sm:px-6 sm:py-3">
+        <Logo light={overlay} size="nav" />
 
         <CategoryMenu categories={categories} overlay={overlay} />
 
@@ -85,7 +85,7 @@ export function Header({ categories }: { categories: Category[] }) {
           <SearchBox overlay={overlay} styles={{ box: cls.searchBox, icon: cls.searchIcon, input: cls.searchInput }} />
         </div>
 
-        <div className="ml-auto flex items-center gap-1 sm:gap-2 md:ml-0">
+        <div className="ml-auto flex items-center gap-[2px] sm:gap-2 md:ml-0">
           <Link href="/account/prescriptions/new" className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold xl:flex ${cls.uploadRx}`}>
             <Upload className="h-4 w-4" /> Upload Rx
           </Link>
@@ -126,16 +126,16 @@ export function Header({ categories }: { categories: Category[] }) {
               )}
             </div>
           ) : (
-            <Link href="/login" aria-label="Sign in" className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold sm:px-3 ${cls.ghost}`}>
-              <User className="h-5 w-5" />
+            <Link href="/login" aria-label="Sign in" className={`flex h-[36px] items-center gap-2 rounded-lg px-[8px] text-sm font-semibold sm:h-auto sm:px-3 sm:py-2 ${cls.ghost}`}>
+              <User className="h-[20px] w-[20px]" />
               <span className="hidden sm:inline">Sign in</span>
             </Link>
           )}
 
-          <ThemeToggle className={cls.ghost} />
+          <ThemeToggle className={`${cls.ghost} max-sm:h-[36px] max-sm:w-[36px] max-[359px]:hidden`} />
 
-          <Link href="/cart" aria-label="Cart" className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold sm:px-4 ${cls.cart}`}>
-            <ShoppingCart className="h-5 w-5" />
+          <Link href="/cart" aria-label="Cart" className={`relative ml-[4px] flex h-[36px] items-center gap-2 rounded-lg px-[10px] text-sm font-semibold sm:ml-0 sm:h-auto sm:px-4 sm:py-2 ${cls.cart}`}>
+            <ShoppingCart className="h-[20px] w-[20px]" />
             <span className="hidden sm:inline">Cart</span>
             {cart.count > 0 && (
               <span key={cart.count} className="mn-cartpop absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-xs font-bold text-amber-950">

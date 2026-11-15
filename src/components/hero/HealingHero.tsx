@@ -422,7 +422,7 @@ export function HealingHero() {
         {/* Content */}
         <div className="hh-content">
           <p className="hh-chip hh-in" style={{ "--d": "0ms" } as CSSProperties}>
-            <span className="hh-live" aria-hidden /> Now delivering across Bhubaneswar
+            <span className="hh-live" aria-hidden /> <span className="sm:hidden">Delivering in Bhubaneswar</span><span className="hidden sm:inline">Now delivering across Bhubaneswar</span>
           </p>
 
           <h1 id="hh-title" className="hh-title">
@@ -438,17 +438,21 @@ export function HealingHero() {
 
           <div className="hh-actions hh-in" style={{ "--d": "560ms" } as CSSProperties}>
             <Link href="/medicines" className="hh-btn-primary group">
-              Order medicines <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              <span className="sm:hidden">Order now</span>
+              <span className="hidden sm:inline">Order medicines</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </Link>
             <Link href="/account/prescriptions/new" className="hh-btn-ghost">
-              <Upload className="h-4 w-4" aria-hidden /> Upload prescription
+              <Upload className="h-4 w-4" aria-hidden />
+              <span className="sm:hidden">Upload Rx</span>
+              <span className="hidden sm:inline">Upload prescription</span>
             </Link>
           </div>
 
           <ul className="hh-points hh-in" style={{ "--d": "700ms" } as CSSProperties}>
             <li><ShieldCheck className="h-4 w-4" aria-hidden /> Pharmacist-verified</li>
             <li><Check className="h-4 w-4" aria-hidden /> Genuine medicines</li>
-            <li><Truck className="h-4 w-4" aria-hidden /> Free delivery over ₹499</li>
+            <li className="hidden sm:inline-flex"><Truck className="h-4 w-4" aria-hidden /> Free delivery over ₹499</li>
           </ul>
         </div>
       </div>

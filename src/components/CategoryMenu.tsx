@@ -7,6 +7,7 @@ import type { Category } from "@/lib/catalog";
 import { CATEGORY_TILES, FALLBACK_TILE } from "@/lib/categoryTiles";
 import { CategoryArt } from "./category/CategoryArt";
 import "./category/tiles.css";
+import { ThemeToggle } from "./ThemeToggle";
 
 /**
  * Header "Categories" button: opens a visual menu of every category (the same illustrations as the homepage tiles),
@@ -46,9 +47,9 @@ export function CategoryMenu({ categories, overlay, className = "" }: { categori
         aria-expanded={open}
         aria-label="Categories"
         aria-controls={id}
-        className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm sm:px-3 font-semibold transition-colors ${overlay ? "text-white hover:bg-white/10" : "text-slate-800 hover:bg-teal-50 hover:text-teal-800"}`}
+        className={`flex h-[36px] items-center gap-2 rounded-lg px-[8px] text-sm sm:h-auto sm:px-3 sm:py-2 font-semibold transition-colors ${overlay ? "text-white hover:bg-white/10" : "text-slate-800 hover:bg-teal-50 hover:text-teal-800"}`}
       >
-        <LayoutGrid className="h-5 w-5" aria-hidden />
+        <LayoutGrid className="h-[20px] w-[20px]" aria-hidden />
         <span className="hidden sm:inline">Categories</span>
         <ChevronDown className={`hidden h-4 w-4 transition-transform sm:block ${open ? "rotate-180" : ""} ${overlay ? "text-white/70" : "text-slate-400"}`} aria-hidden />
       </button>
@@ -56,13 +57,17 @@ export function CategoryMenu({ categories, overlay, className = "" }: { categori
       {open && (
         <div
           id={id}
-          className="mn-catmenu fixed inset-x-3 top-[4.75rem] z-50 max-h-[calc(100svh-6rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-2xl shadow-slate-900/15 sm:absolute sm:inset-x-auto sm:left-0 sm:top-full sm:mt-2 sm:w-[min(46rem,calc(100vw-2rem))]"
+          className="mn-catmenu fixed inset-x-3 top-[6.5rem] z-50 max-h-[calc(100svh-6rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-2xl shadow-slate-900/15 sm:absolute sm:inset-x-auto sm:left-0 sm:top-full sm:mt-2 sm:w-[min(46rem,calc(100vw-2rem))]"
         >
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-slate-500">Shop by category</p>
-            <Link href="/medicines" onClick={() => setOpen(false)} className="text-sm font-semibold text-teal-700 hover:underline">
-              All medicines →
-            </Link>
+            <span className="flex items-center gap-2">
+              {/* On the narrowest phones the theme switch lives here instead of the header. */}
+              <ThemeToggle className="text-slate-700 hover:bg-slate-100 min-[360px]:hidden" />
+              <Link href="/medicines" onClick={() => setOpen(false)} className="text-sm font-semibold text-teal-700 hover:underline">
+                All medicines →
+              </Link>
+            </span>
           </div>
           <ul className="grid grid-cols-3 gap-2 sm:grid-cols-5">
             {categories.map((c, i) => {

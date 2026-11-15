@@ -9,7 +9,7 @@ type Props = {
   light?: boolean;
   /** Show the "For every need, for every life" line. */
   tagline?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "nav";
   /** Play the entrance animation on mount. */
   entrance?: boolean;
 };
@@ -18,6 +18,8 @@ const SIZES = {
   sm: { icon: "h-8 w-[34px]", text: "text-[1.4rem]", tag: "text-[0.52rem]" },
   md: { icon: "h-9 w-[38px]", text: "text-[1.6rem]", tag: "text-[0.55rem]" },
   lg: { icon: "h-14 w-[59px]", text: "text-[2.4rem]", tag: "text-[0.7rem]" },
+  // Header: compact on phones, normal from the sm breakpoint.
+  nav: { icon: "h-7 w-[30px] sm:h-9 sm:w-[38px]", text: "text-[21px] sm:text-[1.6rem]", tag: "text-[0.55rem]" },
 } as const;
 
 export function Logo({ light = false, tagline = false, size = "md", entrance = true }: Props) {
