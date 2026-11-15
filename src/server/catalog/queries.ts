@@ -3,6 +3,7 @@ import type { Category, Product, ProductDetail, SortKey } from "@/lib/catalog";
 import { MEDICINE_COLUMNS, MEDICINE_JOINS, MEDICINE_SELECT, mapMedicine } from "./repo";
 import { escapeLike } from "./text";
 import { inStockSql } from "../inventory/config";
+import { cached } from "../cache";
 
 // Storefront reads. Only medicines that are active (published) are ever returned from here.
 
@@ -13,12 +14,18 @@ const toProduct = (m: ReturnType<typeof mapMedicine>): Product => ({
 });
 
 export async function listCategories(): Promise<Category[]> {
+  return cached("categories", 300_000, listCategoriesNow);
+}
+async function listCategoriesNow(): Promise<Category[]> {
   const rows = await query<Row>(`select c.slug, c.name, c.icon, c.blurb from categories c where c.is_active and exists (select 1 from medicines m where m.category_id = c.id and m.status in ('active','catalog')) order by c.sort_order, c.name`);
   return rows.map((r) => ({ slug: r.slug, name: r.name, icon: r.icon, blurb: r.blurb }));
 }
 
 /** Number of products customers can see in each category (live + catalogue-only), for the homepage. */
 export async function categoryCounts(): Promise<Record<string, number>> {
+  return cached("category-counts", 600_000, categoryCountsNow);
+}
+async function categoryCountsNow(): Promise<Record<string, number>> {
   const rows = await query<{ slug: string; n: string }>(
     `select c.slug, count(m.id) as n from categories c join medicines m on m.category_id = c.id and m.status in ('active','catalog') where c.is_active group by c.slug`,
   );
@@ -64,6 +71,9 @@ export async function getRelated(p: { id: string; category: string }, limit = 4)
 }
 
 export async function listBrands(limit = 30): Promise<string[]> {
+  return cached(`brands:${limit}`, 600_000, () => listBrandsNow(limit));
+}
+async function listBrandsNow(limit: number): Promise<string[]> {
   const rows = await query<{ name: string }>(
     `select mf.name from medicines m join manufacturers mf on mf.id = m.manufacturer_id where m.status in ('active','catalog')
      group by mf.name order by count(*) desc, mf.name limit ${limit}`,
@@ -161,7 +171,9 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Prod
     likes.push(like);
     if (fuzzy) {
       const raw = add(t);
-      where.push(`(m.search_text like ${like} or word_similarity(${raw}, m.search_text) >= 0.5)`);
+      // %> lets the trigram index find close spellings (threshold set in migration 0016); the explicit check keeps
+      // the 0.5 cut-off even where that database setting is unavailable.
+      where.push(`(m.search_text like ${like} or (m.search_text %> ${raw} and word_similarity(${raw}, m.search_text) >= 0.5))`);
     } else where.push(`m.search_text like ${like}`);
   }
 
@@ -169,7 +181,8 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Prod
   const whereParams = params.slice();
   const clause = `where ${where.join(" and ")}`;
 
-  let order = `(m.status = 'active') desc, ${inStockSql()} desc, m.name`;
+  // Default browse order matches medicines_browse_idx, so a page is read from the index instead of sorting the table.
+  let order = `(m.status = 'active') desc, (m.stock_qty > 0) desc, m.name`;
   // Price/discount sorts: products with a confirmed price first, in the chosen order; catalog-only products (whose
   // reference price is not shown to customers) follow, by name.
   const priced = `(m.status = 'active') desc`;
@@ -182,9 +195,12 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Prod
     order = `((${scores.join(" + ")}) + (case when lower(m.name) like ${prefix} then 1 else 0 end)) desc, (m.status = 'active') desc, ${inStockSql()} desc, m.name`;
   }
 
-  const countRows = await query<{ n: string }>(`select count(*) as n ${MEDICINE_JOINS} ${clause}`, whereParams);
+  // Totals change rarely and counting tens of thousands of rows is the slowest part of a page, so they are cached briefly.
+  const total = await cached(`count:${clause}:${JSON.stringify(whereParams)}`, 120_000, async () =>
+    Number((await query<{ n: string }>(`select count(*) as n ${MEDICINE_JOINS} ${clause}`, whereParams))[0].n),
+  );
   const limit = add(c.pageSize);
   const offset = add((c.page - 1) * c.pageSize);
   const rows = await query(`${MEDICINE_COLUMNS} ${MEDICINE_JOINS} ${clause} order by ${order} limit ${limit} offset ${offset}`, params);
-  return { items: rows.map((r) => toProduct(mapMedicine(r))), total: Number(countRows[0].n) };
+  return { items: rows.map((r) => toProduct(mapMedicine(r))), total };
 }

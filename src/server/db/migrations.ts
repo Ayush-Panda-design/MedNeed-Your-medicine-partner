@@ -836,4 +836,21 @@ create table carts (
 );
 `,
   },
+  {
+    id: "0016_browse_speed",
+    sql: `
+-- Speed for a large catalogue (tens of thousands of medicines) on a small database:
+-- the default listing order can be read straight from an index (no sorting of the whole table per page),
+-- for the whole catalogue and per category.
+create index medicines_browse_idx on medicines (((status = 'active')) desc, ((stock_qty > 0)) desc, name)
+  where status in ('active','catalog');
+create index medicines_browse_cat_idx on medicines (category_id, ((status = 'active')) desc, ((stock_qty > 0)) desc, name)
+  where status in ('active','catalog');
+-- Typo-tolerant search uses the trigram index through the %> operator; make its threshold match the app's 0.5.
+do $$ begin
+  execute format('alter database %I set pg_trgm.word_similarity_threshold = 0.5', current_database());
+exception when others then null;
+end $$;
+`,
+  },
 ];

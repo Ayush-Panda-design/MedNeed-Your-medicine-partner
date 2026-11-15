@@ -1,4 +1,5 @@
 import { ApiError } from "../http";
+import { clearCache } from "../cache";
 import { audit } from "../auth/users";
 import { db, query, type Q, type Row, type Tx } from "../db";
 import { sellableQtySql } from "../inventory/config";
@@ -175,6 +176,7 @@ export async function insertMedicine(t: Runner, actorId: string | null, v: Medic
 }
 
 export async function createMedicine(actor: Actor, v: MedicineFields) {
+  clearCache(); // the shop shows the change straight away on this server
   const database = await db();
   const created = await database.tx(async (t) => {
     const r = await insertMedicine(t, actor.id, v);
@@ -273,6 +275,7 @@ export async function updateInTx(t: Tx, actor: Actor, id: string, patch: Partial
 }
 
 export async function updateMedicine(actor: Actor, id: string, patch: Partial<MedicineFields>) {
+  clearCache(); // the shop shows the change straight away on this server
   const database = await db();
   await database.tx((t) => updateInTx(t, actor, id, patch));
   return (await getAdminMedicine(id))!;
@@ -282,6 +285,7 @@ export async function updateMedicine(actor: Actor, id: string, patch: Partial<Me
 /* ---------- verify / publish workflow ---------- */
 
 export async function applyAction(actor: Actor, id: string, action: MedicineAction) {
+  clearCache(); // the shop shows the change straight away on this server
   const database = await db();
   await database.tx(async (t) => {
     const found = await t.query(`${MEDICINE_SELECT} where m.id = $1 for update of m`, [id]);
@@ -324,6 +328,7 @@ export async function applyAction(actor: Actor, id: string, action: MedicineActi
 }
 
 export async function bulkAction(actor: Actor, ids: string[], action: MedicineAction) {
+  clearCache(); // the shop shows the change straight away on this server
   const done: string[] = [];
   const failed: { id: string; error: string }[] = [];
   for (const id of ids) {
@@ -338,6 +343,7 @@ export async function bulkAction(actor: Actor, ids: string[], action: MedicineAc
 }
 
 export async function deleteDraft(actor: Actor, id: string) {
+  clearCache(); // the shop shows the change straight away on this server
   const database = await db();
   await database.tx(async (t) => {
     const rows = await t.query<{ name: string; status: string }>(`select name, status from medicines where id = $1 for update`, [id]);
@@ -396,6 +402,7 @@ export async function listCategoriesAdmin() {
 export type CategoryFields = { name: string; blurb: string; icon: string; sortOrder: number; isActive: boolean };
 
 export async function createCategory(actor: Actor, v: CategoryFields) {
+  clearCache(); // the shop shows the change straight away on this server
   const base = slugify(v.name);
   const taken = new Set((await query<{ slug: string }>(`select slug from categories where slug = $1 or slug like $2`, [base, `${escapeLike(base)}-%`])).map((r) => r.slug));
   let slug = base;
@@ -409,6 +416,7 @@ export async function createCategory(actor: Actor, v: CategoryFields) {
 }
 
 export async function updateCategory(actor: Actor, id: string, v: CategoryFields) {
+  clearCache(); // the shop shows the change straight away on this server
   const rows = await query<{ id: string }>(
     `update categories set name=$2, icon=$3, blurb=$4, sort_order=$5, is_active=$6, updated_at=now() where id=$1 returning id`,
     [id, v.name, v.icon, v.blurb, v.sortOrder, v.isActive],
