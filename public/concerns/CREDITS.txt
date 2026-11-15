@@ -1,0 +1,13 @@
+Photos in /public/concerns and /public/banners are Public Domain / CC0, found via free-images.com.
+Brand names and logos visible in the originals were blurred. Originals:
+fever.webp        https://pixabay.com/en/thermometer-temperature-fever-flu-833085/
+cold.webp         https://pixabay.com/en/tea-honey-lemon-ginger-mint-above-599227/
+diabetes.webp     https://pixabay.com/en/diabetes-blood-finger-glucose-777002/
+bp.webp           https://pixabay.com/en/high-blood-pressure-247139/
+acidity.webp      https://pixabay.com/en/peppermint-tea-tee-mint-tea-352334/
+immunity.webp     https://pixabay.com/en/vitamin-b-effervescent-tablet-871135/
+skin.webp         https://pixabay.com/en/cream-skin-care-cream-colors-194126/
+baby.webp         https://pixabay.com/en/baby-foot-blanket-newborn-child-1178539/
+banners/pharmacy.webp      https://pixabay.com/en/pharmacy-medicine-bless-you-pharma-1693004/
+banners/vitamins.webp      https://pixabay.com/en/oranges-fruit-citrus-juicy-vitamin-1660651/
+banners/baby.webp          https://pixabay.com/en/baby-foot-blanket-newborn-child-1178539/

@@ -92,3 +92,8 @@
 .vs-btn-main:hover { background: #15803d; }
 :where(html.dark) .vs-art { filter: brightness(.82) saturate(.9); }
 :where(html.dark) .vs-badge { background: rgb(15 21 18 / .88); color: #bbf7d0; }
+/* banners with a photo: on phones the photo becomes a soft full-bleed backdrop behind the text */
+@media (max-width: 639px) {
+  .ob-media:has(.ob-photo) { width: 100%; opacity: .32; }
+  .ob-media .ob-photo { opacity: 1; -webkit-mask-image: none; mask-image: none; }
+}

@@ -8,14 +8,14 @@
 export type Concern = { name: string; blurb: string; q: string; art: string; photo?: string };
 
 export const CONCERNS: Concern[] = [
-  { name: "Fever & pain", blurb: "Paracetamol, thermometers, pain relief", q: "paracetamol", art: "pain-relief" },
-  { name: "Cold & flu", blurb: "Cough syrups, nasal sprays, lozenges", q: "cold", art: "cold-cough" },
-  { name: "Diabetes care", blurb: "Glucometers, strips, sugar-free", q: "diabetes", art: "diabetes-care" },
-  { name: "Heart & BP", blurb: "BP monitors, heart-care essentials", q: "blood pressure", art: "heart-care" },
-  { name: "Acidity & digestion", blurb: "Antacids, digestives, ORS", q: "antacid", art: "digestive-care" },
-  { name: "Immunity", blurb: "Vitamin C, D3, zinc, multivitamins", q: "vitamin", art: "vitamins" },
-  { name: "Skin & allergy", blurb: "Creams, anti-allergy, sunscreen", q: "skin", art: "skin-care" },
-  { name: "Baby care", blurb: "Gentle care for little ones", q: "baby", art: "baby-care" },
+  { name: "Fever & pain", blurb: "Paracetamol, thermometers, pain relief", q: "paracetamol", art: "pain-relief", photo: "/concerns/fever.webp" },
+  { name: "Cold & flu", blurb: "Cough syrups, nasal sprays, lozenges", q: "cold", art: "cold-cough", photo: "/concerns/cold.webp" },
+  { name: "Diabetes care", blurb: "Glucometers, strips, sugar-free", q: "diabetes", art: "diabetes-care", photo: "/concerns/diabetes.webp" },
+  { name: "Heart & BP", blurb: "BP monitors, heart-care essentials", q: "blood pressure", art: "heart-care", photo: "/concerns/bp.webp" },
+  { name: "Acidity & digestion", blurb: "Antacids, digestives, ORS", q: "antacid", art: "digestive-care", photo: "/concerns/acidity.webp" },
+  { name: "Immunity", blurb: "Vitamin C, D3, zinc, multivitamins", q: "vitamin", art: "vitamins", photo: "/concerns/immunity.webp" },
+  { name: "Skin & allergy", blurb: "Creams, anti-allergy, sunscreen", q: "skin", art: "skin-care", photo: "/concerns/skin.webp" },
+  { name: "Baby care", blurb: "Gentle care for little ones", q: "baby", art: "baby-care", photo: "/concerns/baby.webp" },
 ];
 
 export type Banner = { eyebrow: string; title: string; text: string; cta: string; href: string; art: string; from: string; to: string; photo?: string };
@@ -28,6 +28,7 @@ export const BANNERS: Banner[] = [
     cta: "Upload prescription",
     href: "/account/prescriptions/new",
     art: "devices",
+    photo: "/banners/pharmacy.webp",
     from: "#0f5132",
     to: "#16a34a",
   },
@@ -38,6 +39,7 @@ export const BANNERS: Banner[] = [
     cta: "Shop vitamins",
     href: "/medicines?category=vitamins",
     art: "vitamins",
+    photo: "/banners/vitamins.webp",
     from: "#7c2d12",
     to: "#ea580c",
   },
@@ -48,6 +50,7 @@ export const BANNERS: Banner[] = [
     cta: "Shop baby care",
     href: "/medicines?category=baby-care",
     art: "baby-care",
+    photo: "/banners/baby.webp",
     from: "#0c4a6e",
     to: "#0891b2",
   },
