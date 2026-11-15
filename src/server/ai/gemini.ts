@@ -1,4 +1,4 @@
-import { geminiBase, geminiModel } from "../env";
+import { geminiBase, geminiModel, geminiFallbackModels } from "../env";
 import { coolDown, keyCount, nextKey } from "./keys";
 import { recordUsage } from "./usage";
 
@@ -13,16 +13,38 @@ type Opts = { system?: string; json?: boolean; temperature?: number; maxOutputTo
 const RATE_COOLDOWN_MS = Number(process.env.GEMINI_COOLDOWN_MS) || 60_000;
 const NET_COOLDOWN_MS = Math.min(RATE_COOLDOWN_MS, Number(process.env.GEMINI_NET_COOLDOWN_MS) || 15_000);
 
-/** Call Gemini generateContent, rotating across keys on rate-limit / transient errors. */
+/** Thrown when Google no longer serves a model name (retired or renamed); the next model in the chain is tried. */
+class ModelGone extends Error {}
+
+/**
+ * Call Gemini generateContent, rotating across keys on rate-limit / transient errors. If the model has been
+ * retired (Google retires model names regularly), falls back to the next model in the chain, so the site keeps
+ * working without a code change.
+ */
 export async function generate(parts: Part[], opts: Opts = {}): Promise<string> {
   if (keyCount() === 0) throw new AiUnavailable("No Gemini API keys configured.");
-  const model = opts.model ?? geminiModel();
+  const chain = [...new Set([opts.model ?? geminiModel(), ...geminiFallbackModels()])];
+  let last: unknown;
+  for (const model of chain) {
+    try {
+      return await generateWith(model, parts, opts);
+    } catch (e) {
+      if (!(e instanceof ModelGone)) throw e;
+      last = e;
+      console.warn(JSON.stringify({ event: "medneed_ai_model_gone", model, detail: (e as Error).message }));
+    }
+  }
+  throw new AiUnavailable(`AI unavailable (no usable model: ${(last as Error)?.message ?? "none"}).`);
+}
+
+async function generateWith(model: string, parts: Part[], opts: Opts): Promise<string> {
   const body = {
     ...(opts.system ? { systemInstruction: { parts: [{ text: opts.system }] } } : {}),
     contents: [{ role: "user", parts }],
     generationConfig: {
       temperature: opts.temperature ?? 0.2,
-      maxOutputTokens: opts.maxOutputTokens ?? 1024,
+      // Current Gemini models "think" before answering and that counts against the output budget, so leave headroom.
+      maxOutputTokens: (opts.maxOutputTokens ?? 1024) + 2048,
       ...(opts.json ? { responseMimeType: "application/json" } : {}),
     },
   };
@@ -58,6 +80,9 @@ export async function generate(parts: Part[], opts: Opts = {}): Promise<string> 
       coolDown(slot.id, 3600_000); // a bad/expired key: park it for an hour and try the next one
       lastError = `invalid API key (${slot.id})`;
       continue;
+    }
+    if (res.status === 404 || (res.status === 400 && /model|not found|not supported/i.test(data.error?.message ?? ""))) {
+      throw new ModelGone(`${model}: ${data.error?.message ?? res.status}`);
     }
     if (res.status === 400) throw new AiUnavailable(`bad request: ${data.error?.message ?? "400"}`); // not a key problem; stop
     if (failed) {

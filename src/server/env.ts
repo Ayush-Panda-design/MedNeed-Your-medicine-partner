@@ -85,14 +85,17 @@ export const whatsappDriver = () => process.env.WHATSAPP_DRIVER ?? (isProd() ? "
 
 // AI (Google Gemini). Free-tier keys are rate-limited per key, so several keys are rotated and responses cached.
 //   GEMINI_API_KEYS=key1,key2,key3   (or a single GEMINI_API_KEY)
-//   GEMINI_MODEL (default gemini-2.0-flash), GEMINI_API_BASE (override for tests).
+//   GEMINI_MODEL (default gemini-flash-latest, Google's always-current Flash alias), GEMINI_API_BASE (override for tests).
+//   If a model name is retired, calls fall back through GEMINI_FALLBACK_MODELS (comma-separated).
 export const geminiKeys = () =>
   (process.env.GEMINI_API_KEYS ?? process.env.GEMINI_API_KEY ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
 export const aiEnabled = () => geminiKeys().length > 0;
-export const geminiModel = () => process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+export const geminiModel = () => process.env.GEMINI_MODEL || "gemini-flash-latest";
+export const geminiFallbackModels = () =>
+  (process.env.GEMINI_FALLBACK_MODELS || "gemini-flash-latest,gemini-3.5-flash,gemini-2.5-flash").split(",").map((s) => s.trim()).filter(Boolean);
 // Vision (prescription reading) can use a different model if set; defaults to the main model, which on Gemini's flash tier is multimodal.
 export const geminiVisionModel = () => process.env.GEMINI_VISION_MODEL ?? geminiModel();
 // Embeddings model for semantic search. text-embedding-004 was retired by Google (Jan 2026); gemini-embedding-001 replaces it.
