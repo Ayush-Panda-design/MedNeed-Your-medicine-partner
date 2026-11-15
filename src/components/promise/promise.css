@@ -1,0 +1,150 @@
+/* "The MedNeed promise" section (PromiseStories). Scenes are 400×260 SVGs scaled to fit; every animation is
+   transform/opacity/stroke-offset only. Base styles are each scene's finished state, so reduced motion simply
+   switches the animations off. */
+
+.ps-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(60% 80% at 100% 0%, color-mix(in srgb, #a3e635 16%, transparent), transparent 70%),
+    radial-gradient(50% 70% at 0% 100%, color-mix(in srgb, #16a34a 12%, transparent), transparent 70%),
+    var(--bg-surface, #fff);
+  padding: 1.25rem 1rem;
+}
+@media (min-width: 640px) { .ps-wrap { padding: 1.75rem; } }
+@media (min-width: 768px) { .ps-wrap { padding: 2.5rem; } }
+
+.ps-head { margin-bottom: 1.25rem; }
+.ps-grid { display: grid; gap: 1rem; }
+@media (min-width: 1024px) { .ps-grid { grid-template-columns: minmax(0, 340px) minmax(0, 640px); justify-content: space-between; gap: 2rem; align-items: center; } }
+
+/* Tabs: a swipeable row of chips on phones, a stacked list with descriptions on desktop. */
+.ps-tabs { position: relative; display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; margin: 0 -0.25rem; padding: 0.25rem; scroll-snap-type: x mandatory; }
+.ps-tabs::-webkit-scrollbar { display: none; }
+.ps-tab {
+  position: relative; display: flex; align-items: center; gap: .6rem; flex-shrink: 0; scroll-snap-align: start;
+  border-radius: 9999px; border: 1px solid var(--border); background: var(--bg-surface, #fff);
+  padding: .45rem .9rem .45rem .45rem; color: var(--text-primary); text-align: left; overflow: hidden;
+  transition: border-color .25s, background-color .25s, box-shadow .25s, transform .2s;
+}
+.ps-tab:active { transform: scale(.98); }
+.ps-tab-ic { display: grid; place-items: center; width: 2.1rem; height: 2.1rem; flex-shrink: 0; border-radius: 9999px; background: color-mix(in srgb, #16a34a 12%, transparent); color: #15803d; transition: background-color .25s, color .25s; }
+.ps-tab-title { display: block; font-size: .875rem; font-weight: 700; white-space: nowrap; }
+.ps-tab-line { display: none; }
+.ps-tab-on { border-color: #16a34a; box-shadow: 0 8px 24px -14px rgb(22 101 52 / .55); }
+.ps-tab-on .ps-tab-ic { background: #16a34a; color: #fff; }
+.ps-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: color-mix(in srgb, #16a34a 12%, transparent); }
+.ps-bar-fill { display: block; height: 100%; width: 100%; transform-origin: 0 50%; background: linear-gradient(90deg, #16a34a, #a3e635); animation: ps-bar linear both; transition: opacity .3s; }
+@keyframes ps-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@media (min-width: 1024px) {
+  .ps-tabs { flex-direction: column; overflow: visible; margin: 0; padding: 0; gap: .65rem; }
+  .ps-tab { border-radius: 1.1rem; padding: .9rem 1rem; align-items: flex-start; gap: .85rem; flex-shrink: 1; }
+  .ps-tab-ic { width: 2.6rem; height: 2.6rem; border-radius: .85rem; }
+  .ps-tab-title { font-size: 1rem; white-space: normal; }
+  .ps-tab-line { display: block; margin-top: .15rem; font-size: .8rem; line-height: 1.35; color: var(--text-muted); }
+  html.mn-fine .ps-tab:not(.ps-tab-on):hover { border-color: var(--border-strong); transform: translateX(3px); }
+}
+
+/* Stage */
+.ps-stage { min-width: 0; }
+.ps-scene { border-radius: 1.25rem; overflow: hidden; box-shadow: 0 1px 2px rgb(15 23 42 / .05), 0 22px 44px -28px rgb(22 101 52 / .45); animation: ps-scene-in .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes ps-scene-in { from { opacity: 0; transform: translateY(10px) scale(.985); } }
+.ps-svg { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.ps-tap { cursor: crosshair; }
+.ps-foot { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: .75rem; }
+.ps-hint { display: flex; align-items: center; gap: .5rem; font-size: .8rem; font-weight: 600; color: var(--text-secondary, #475569); }
+.ps-dot { width: .5rem; height: .5rem; border-radius: 9999px; background: #16a34a; box-shadow: 0 0 0 0 rgb(22 163 74 / .5); animation: ps-dot 1.8s ease-out infinite; flex-shrink: 0; }
+@keyframes ps-dot { 70% { box-shadow: 0 0 0 8px rgb(22 163 74 / 0); } 100% { box-shadow: 0 0 0 0 rgb(22 163 74 / 0); } }
+.ps-replay { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 9999px; border: 1px solid var(--border); color: var(--text-secondary, #475569); background: var(--bg-surface, #fff); transition: transform .3s, border-color .2s; }
+.ps-replay:hover { border-color: #16a34a; color: #15803d; }
+.ps-replay:active { transform: rotate(-120deg); }
+.ps-link { border-radius: 9999px; background: #16a34a; color: #fff; font-size: .8rem; font-weight: 700; padding: .5rem .9rem; }
+.ps-link:hover { background: #15803d; }
+.ps-mobile-line { margin-top: .5rem; font-size: .85rem; color: var(--text-muted); }
+@media (min-width: 1024px) { .ps-mobile-line { display: none; } }
+
+/* SVG text */
+.ps-tiny { font: 600 10.5px/1 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.ps-small { font: 500 12.5px/1 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.ps-b { font-weight: 700; }
+.ps-strong { font: 700 14.5px/1 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.ps-mono { font: 700 10.5px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .02em; }
+.ps-chip-t { font: 600 11px/1 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.ps-seal-t { font: 800 9px/1 system-ui, sans-serif; letter-spacing: .12em; }
+.ps-stamp-t { font: 800 14px/1 system-ui, sans-serif; letter-spacing: .08em; }
+.ps-clock { font: 300 26px/1 system-ui, sans-serif; }
+
+/* 1 · Fast delivery */
+.ps-rider { offset-distance: 100%; offset-rotate: 0deg; }
+.ps-out { opacity: 0; }
+.ps-door { fill: #a3e635; }
+/* 2 · Genuine */
+.ps-mag { transform: translate(206px, 166px); }
+.ps-glow { fill: #fef08a; opacity: .9; }
+.ps-manual .ps-glow { opacity: 0; transition: opacity .3s; }
+.ps-manual .ps-glow.ps-on { opacity: .9; }
+.ps-manual { cursor: none; }
+.ps-seal > *, .ps-stamp > * { pointer-events: none; }
+/* 3 · Pharmacist */
+.ps-row { cursor: pointer; outline: none; }
+.ps-row-bg { fill: #f8fafc; stroke: #e2e8f0; transition: fill .3s, stroke .3s; }
+.ps-row:hover .ps-row-bg { stroke: #86efac; }
+.ps-row:focus-visible .ps-row-bg { stroke: #16a34a; stroke-width: 2.5; }
+.ps-row-done .ps-row-bg { fill: #f0fdf4; stroke: #bbf7d0; }
+.ps-tick-bg { fill: #e2e8f0; transition: fill .3s; }
+.ps-row-done .ps-tick-bg { fill: #16a34a; }
+.ps-tick { stroke-dasharray: 16; stroke-dashoffset: 16; transition: stroke-dashoffset .35s ease .1s; }
+.ps-row-done .ps-tick { stroke-dashoffset: 0; }
+/* 4 · Reminders */
+.ps-btn { cursor: pointer; outline: none; }
+.ps-btn:focus-visible .ps-btn-bg { stroke: #0f172a; stroke-width: 2; }
+.ps-btn:hover .ps-btn-bg { fill: #15803d; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 1 */
+  .ps-route { animation: ps-draw 2.4s cubic-bezier(.45,.05,.35,1) .3s both; }
+  .ps-rider { animation: ps-ride 2.8s cubic-bezier(.45,.05,.35,1) .45s both; }
+  .ps-home { transform-box: fill-box; transform-origin: 50% 100%; animation: ps-pop .5s cubic-bezier(.3,1.6,.5,1) both; }
+  .ps-door { animation: ps-door 3.4s both; }
+  .ps-out { animation: ps-out 3.35s both; }
+  .ps-done { animation: ps-done 3.5s both; }
+  .ps-radius { animation: ps-spin 40s linear infinite; transform-box: fill-box; transform-origin: center; }
+  /* 2 */
+  .ps-mag { animation: ps-mag 2.4s cubic-bezier(.45,.05,.35,1) .2s both; }
+  .ps-manual .ps-mag { animation: none; transition: transform .08s linear; }
+  .ps-glow { animation: ps-fade .4s ease 2.3s both; }
+  .ps-manual .ps-glow { animation: none; }
+  .ps-seal { transform-box: fill-box; transform-origin: center; animation: ps-stampin .55s cubic-bezier(.3,1.5,.5,1) 2.6s both; }
+  .ps-chip { transform-box: fill-box; transform-origin: center; animation: ps-pop .5s cubic-bezier(.3,1.6,.5,1) both; animation-delay: calc(2.95s + var(--i, 0) * .18s); }
+  .ps-manual .ps-seal { animation-delay: 0s; }
+  .ps-manual .ps-chip { animation-delay: calc(.2s + var(--i, 0) * .12s); }
+  /* 3 */
+  .ps-nod { transform-box: fill-box; transform-origin: 50% 100%; animation: ps-nod .6s ease; }
+  .ps-stamp { transform-box: fill-box; transform-origin: center; animation: ps-stampin .55s cubic-bezier(.3,1.5,.5,1) both; }
+  /* 4 */
+  .ps-notif { animation: ps-drop .55s cubic-bezier(.3,1.4,.5,1) .3s both; }
+  .ps-today { transform-box: fill-box; transform-origin: center; animation: ps-pulse 1.4s ease-in-out infinite; }
+  .ps-pop { transform-box: fill-box; transform-origin: center; animation: ps-pop .5s cubic-bezier(.3,1.8,.5,1) both; }
+  .ps-burst circle { animation: ps-burst .7s ease-out both; }
+}
+@keyframes ps-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes ps-ride { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+@keyframes ps-pop { from { scale: .2; opacity: 0; } }
+@keyframes ps-door { 0%, 94% { fill: #1b7f33; } 100% { fill: #a3e635; } }
+@keyframes ps-out { 0%, 92% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes ps-done { 0%, 94% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes ps-spin { to { rotate: 360deg; } }
+@keyframes ps-mag { 0% { transform: translate(70px, 40px); opacity: 0; } 12% { opacity: 1; } 45% { transform: translate(150px, 105px); } 100% { transform: translate(206px, 166px); } }
+@keyframes ps-fade { from { opacity: 0; } }
+@keyframes ps-stampin { 0% { scale: 2.2; opacity: 0; rotate: -25deg; } 100% { scale: 1; opacity: 1; rotate: 0deg; } }
+@keyframes ps-nod { 30% { rotate: -3deg; } 60% { rotate: 2deg; } }
+@keyframes ps-drop { from { translate: 0 -40px; opacity: 0; } }
+@keyframes ps-pulse { 50% { scale: 1.18; } }
+@keyframes ps-burst { from { transform: rotate(var(--a)) translateX(4px); opacity: 1; } to { transform: rotate(var(--a)) translateX(26px); opacity: 0; } }
+
+/* Dark theme: keep the illustrated panels light (they are pictures), soften the frame. */
+:where(html.dark) .ps-wrap { background: radial-gradient(60% 80% at 100% 0%, rgb(163 230 53 / .08), transparent 70%), var(--bg-surface); }
+:where(html.dark) .ps-scene { box-shadow: 0 0 0 1px rgb(255 255 255 / .06); }

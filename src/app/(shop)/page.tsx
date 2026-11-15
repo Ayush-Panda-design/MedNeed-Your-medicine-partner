@@ -19,6 +19,7 @@ import { FaqList } from "@/components/FaqList";
 import { FaqHelp } from "@/components/FaqHelp";
 import { RxStory } from "@/components/motion/RxStory";
 import { PromiseBand } from "@/components/PromiseBand";
+import { PromiseStories } from "@/components/promise/PromiseStories";
 import { CountUp } from "@/components/motion/CountUp";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryTiles } from "@/components/category/CategoryTiles";
@@ -71,6 +72,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* The MedNeed promise: four interactive stories */}
+      <PromiseStories />
 
       {/* Deals */}
       {deals.length > 0 && (
