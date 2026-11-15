@@ -376,12 +376,23 @@ export function PromiseStories() {
   const [visible, setVisible] = useState(false);
   const [hover, setHover] = useState(false);
   const [userDriven, setUserDriven] = useState(false);
+  const [pulse, setPulse] = useState(0);
+  const drivenRef = useRef(false);
+  useEffect(() => { drivenRef.current = userDriven; }, [userDriven]);
   const root = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const el = root.current;
     if (!el || !("IntersectionObserver" in window)) return;
-    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.35 });
+    // Each time the section comes into view, (re)start the current story so the visitor sees it play from
+    // the beginning, and flash the stage so the eye goes to it.
+    const io = new IntersectionObserver(([e]) => {
+      setVisible(e.isIntersecting);
+      if (e.isIntersecting && !drivenRef.current) {
+        setReplay((n) => n + 1);
+        setPulse((n) => n + 1);
+      }
+    }, { threshold: 0.35 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -461,9 +472,15 @@ export function PromiseStories() {
 
           {/* stage */}
           <div id="ps-stage" role="tabpanel" aria-labelledby={`ps-tab-${s.key}`} className="ps-stage">
-            <div className="ps-scene" key={`${active}-${replay}`}>{scene}</div>
+            <div className={`ps-frame ${autoplay ? "ps-frame-live" : ""}`} key={`f${pulse}`}>
+              <span className="ps-now" aria-hidden>
+                <span className="ps-now-dot" />
+                {autoplay ? "Now playing" : "Your turn"} · {s.title}
+              </span>
+              <div className="ps-scene" key={`${active}-${replay}`}>{scene}</div>
+            </div>
             <div className="ps-foot">
-              <p className="ps-hint"><span aria-hidden className="ps-dot" />{s.hint}</p>
+              <p className="ps-hint"><span aria-hidden className="ps-dot" /><span><span className="ps-hint-k">Try it:</span> {s.hint}</span></p>
               <div className="flex shrink-0 items-center gap-2">
                 {s.key === "track" && (
                   <Link href="/account/reminders" className="ps-link">Set reminders</Link>
