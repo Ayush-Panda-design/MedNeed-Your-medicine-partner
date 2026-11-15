@@ -20,15 +20,18 @@ import { FaqHelp } from "@/components/FaqHelp";
 import { RxStory } from "@/components/motion/RxStory";
 import { PromiseBand } from "@/components/PromiseBand";
 import { PromiseStories } from "@/components/promise/PromiseStories";
+import { ConcernCards } from "@/components/home/ConcernCards";
+import { OfferBanners } from "@/components/home/OfferBanners";
+import { VisitStore } from "@/components/home/VisitStore";
+import { businessInfo } from "@/server/orders/settings";
 import { CountUp } from "@/components/motion/CountUp";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryTiles } from "@/components/category/CategoryTiles";
-import { healthConcerns } from "@/lib/catalog";
 import { faqs } from "@/lib/faq";
 import { categoryCounts, listCategories, listDeals, listNewest } from "@/server/catalog/queries";
 
 export default async function Home() {
-  const [categories, deals, newest, counts] = await Promise.all([listCategories(), listDeals(4), listNewest(8), categoryCounts()]);
+  const [categories, deals, newest, counts, business] = await Promise.all([listCategories(), listDeals(4), listNewest(8), categoryCounts(), businessInfo()]);
   return (
     <main>
       <HealingHero />
@@ -76,6 +79,9 @@ export default async function Home() {
       {/* The MedNeed promise: four interactive stories */}
       <PromiseStories />
 
+      {/* Offer banners */}
+      <OfferBanners />
+
       {/* Deals */}
       {deals.length > 0 && (
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
@@ -89,22 +95,8 @@ export default async function Home() {
       </section>
       )}
 
-      {/* Health concerns */}
-      <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
-        <SectionHead eyebrow="By concern" title="Shop by health concern" />
-        <ul data-stagger className="mt-5 flex flex-wrap gap-3">
-          {healthConcerns.map((h) => (
-            <li key={h}>
-              <Link
-                href={`/medicines?q=${encodeURIComponent(h.split(" ")[0])}`}
-                className="inline-block rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-all hover:-translate-y-0.5 hover:border-teal-500 hover:bg-teal-50 hover:text-teal-700 hover:shadow-sm"
-              >
-                {h}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* Health concerns: picture cards */}
+      <ConcernCards />
 
       {/* New arrivals */}
       {newest.length > 0 && (
@@ -141,6 +133,9 @@ export default async function Home() {
           </ul>
         </div>
       </section>
+
+      {/* Visit our store */}
+      <VisitStore phone={business.phone} hoursLabel={business.hoursLabel} />
 
       {/* FAQ */}
       <section className="mx-auto max-w-5xl px-4 pt-14 sm:px-6">
