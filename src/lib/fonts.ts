@@ -18,3 +18,13 @@ export const displaySerif = localFont({
   variable: "--font-display-serif",
   display: "swap",
 });
+
+/** Hero headline: Fraunces, a soft, characterful variable serif (SIL Open Font License 1.1). Axes: wght, opsz. */
+export const heroSerif = localFont({
+  src: [
+    { path: "../app/fonts/Fraunces-Variable.woff2", weight: "100 900", style: "normal" },
+    { path: "../app/fonts/Fraunces-Variable-Italic.woff2", weight: "100 900", style: "italic" },
+  ],
+  variable: "--font-hero-serif",
+  display: "swap",
+});

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Pill, ShieldCheck, Truck, Upload } from "lucide-react";
-import { displaySerif } from "@/lib/fonts";
+import { displaySerif, heroSerif } from "@/lib/fonts";
 import "./healing-hero.css";
 
 /*
@@ -165,7 +165,7 @@ export function HealingHero() {
 
   return (
     <section id="mn-cine" aria-labelledby="hh-title" className="relative">
-      <div ref={root} className={`hh ${displaySerif.variable}`} style={{ "--mx": 0, "--my": 0, "--sy": 0 } as CSSProperties}>
+      <div ref={root} className={`hh ${displaySerif.variable} ${heroSerif.variable}`} style={{ "--mx": 0, "--my": 0, "--sy": 0 } as CSSProperties}>
         <svg className="hh-scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden focusable="false">
           <defs>
             <linearGradient id="hh-sky" x1="0" y1="0" x2="0" y2="1">
@@ -424,9 +424,15 @@ export function HealingHero() {
           </p>
 
           <h1 id="hh-title" className="hh-title">
-            <span className="hh-line hh-in" style={{ "--d": "120ms" } as CSSProperties}>Good health,</span>
-            <span className="hh-line hh-in" style={{ "--d": "260ms" } as CSSProperties}>
-              <em>delivered</em> to your door.
+            <span className="hh-line hh-l1 hh-in" style={{ "--d": "120ms" } as CSSProperties}>Good health,</span>
+            <span className="hh-line hh-l2 hh-in" style={{ "--d": "260ms" } as CSSProperties}>
+              <em className="hh-em">
+                <span className="hh-em-text">delivered</span>
+                <svg className="hh-swash" viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden>
+                  <path d="M3 10.5C38 4 86 2.5 128 5.5c26 1.9 48 4.6 68-1.5" pathLength={1} />
+                </svg>
+              </em>{" "}
+              <span className="hh-rest">to your door.</span>
             </span>
           </h1>
 

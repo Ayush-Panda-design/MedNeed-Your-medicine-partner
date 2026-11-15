@@ -510,3 +510,43 @@
   .hh-chip, .hh-btn-ghost, .hh-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
   .hh-grain { display: none; }
 }
+
+/* ───────── v7: headline typography (Fraunces variable serif) ───────── */
+.hh-title {
+  font-family: var(--font-hero-serif), var(--font-display-serif), Georgia, serif;
+  font-optical-sizing: auto;
+  font-variation-settings: "opsz" 144;
+  font-weight: 620;
+  letter-spacing: -0.028em;
+  word-spacing: 0.03em;
+  line-height: 0.95;
+  font-kerning: normal;
+  font-feature-settings: "kern", "liga", "ss01";
+}
+.hh-l1 { color: #fff; }
+.hh-l2 { margin-top: 0.04em; }
+.hh-rest { font-weight: 330; letter-spacing: -0.03em; color: rgb(255 255 255 / 0.96); }
+.hh-title em.hh-em { position: relative; display: inline-block; font-style: italic; font-weight: 440; letter-spacing: -0.02em; color: inherit; padding-right: 0.06em; }
+/* Gradient lettering; the shadow comes from a drop-shadow filter so it sits behind the gradient, not over it. */
+.hh-em-text {
+  background: linear-gradient(100deg, #ecfccb 0%, #bef264 28%, #86efac 52%, #d9f99d 76%, #fefce8 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 10px rgb(0 0 0 / 0.35));
+}
+/* Hand-drawn swash under "delivered" that draws itself in. */
+.hh-swash { position: absolute; left: -1%; bottom: -0.1em; width: 106%; height: 0.24em; overflow: visible; filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.35)); }
+.hh-swash path { fill: none; stroke: #bef264; stroke-width: 3.2; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .hh-swash path { animation: hh-swash 1s cubic-bezier(.6,.05,.25,1) 1.05s both; }
+  .hh-em-text { animation: hh-sheen 7s ease-in-out 1.6s infinite; }
+}
+@keyframes hh-swash { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes hh-sheen { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@media (max-width: 767px), (pointer: coarse) { .hh-em-text { animation: none !important; } }
+@media (max-width: 639px) {
+  .hh-title { font-size: clamp(2.45rem, 12.4vw, 3.2rem); letter-spacing: -0.026em; line-height: 0.98; }
+  .hh-rest { display: block; margin-top: 0.02em; }
+  .hh-swash path { stroke-width: 2.6; }
+}
