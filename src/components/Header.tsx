@@ -19,11 +19,15 @@ export function Header({ categories }: { categories: Category[] }) {
   const [menu, setMenu] = useState(false);
   const isHome = pathname === "/";
   // On the homepage the header floats transparently over the cinematic hero and turns solid once scrolled past it.
-  const [overHero, setOverHero] = useState(isHome);
+  const [overHero, setOverHero] = useState(false);
+  // The header only floats over the page when a full-bleed cinematic hero (#mn-cine) is present; otherwise it is a
+  // normal sticky bar so it never covers the page content.
+  const [floatOverHero, setFloatOverHero] = useState(false);
 
   useEffect(() => {
     if (!isHome) { setOverHero(false); return; }
     const hero = document.getElementById("mn-cine");
+    setFloatOverHero(Boolean(hero));
     if (!hero) { setOverHero(false); return; }
     const onScroll = () => setOverHero(hero.getBoundingClientRect().bottom > 120);
     onScroll();
@@ -34,7 +38,7 @@ export function Header({ categories }: { categories: Category[] }) {
 
   const overlay = overHero;
   const cls = {
-    header: `${isHome ? "fixed" : "sticky"} top-0 z-40 w-full transition-colors duration-300 ${overlay ? "text-white" : "bg-white/85 text-slate-900 shadow-sm shadow-slate-900/5 backdrop-blur-md"}`,
+    header: `${isHome && floatOverHero ? "fixed" : "sticky"} top-0 z-40 w-full transition-colors duration-300 ${overlay ? "text-white" : "bg-white/85 text-slate-900 shadow-sm shadow-slate-900/5 backdrop-blur-md"}`,
     pincode: overlay
       ? "border-white/40 text-white hover:border-white"
       : "border-slate-200 hover:border-teal-600",
