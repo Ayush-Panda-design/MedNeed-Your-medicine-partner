@@ -1,7 +1,7 @@
 import { aiEnabled } from "../env";
 import { searchProducts, productsByIds, type CatalogQuery } from "../catalog/queries";
 import type { Product } from "@/lib/catalog";
-import { AiUnavailable } from "./gemini";
+import { AiUnavailable, withDeadline } from "./gemini";
 import { embedQuery } from "./embeddings";
 import { cosineTopK, indexReady } from "./vector-index";
 import { smartSearch } from "./smart-search";
@@ -44,7 +44,7 @@ export async function hybridSearch(c: CatalogQuery): Promise<{ items: Product[];
   if (aiEnabled()) {
     try {
       if (await indexReady()) {
-        const qv = await embedQuery(q);
+        const qv = await withDeadline(embedQuery(q), Number(process.env.AI_SEARCH_EMBED_MS) || 2500, "query embedding");
         const top = await cosineTopK(qv, POOL);
         if (top.length) {
           const byId = await productsByIds(top.map((t) => t.id), c);

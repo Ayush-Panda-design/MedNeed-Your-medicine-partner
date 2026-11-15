@@ -2,14 +2,14 @@ import { aiEnabled } from "../env";
 import { listCategories, searchProducts, type CatalogQuery } from "../catalog/queries";
 import type { Product } from "@/lib/catalog";
 import { cached } from "./cache";
-import { AiUnavailable, generateJSON } from "./gemini";
+import { AiUnavailable, generateJSON, withDeadline } from "./gemini";
 
 type Intent = { keywords: string[]; categorySlug: string | null; note: string };
 
 /** Ask the model to turn a natural-language / misspelt query into catalogue terms. Cached for a week per query. */
 async function interpret(q: string): Promise<Intent | null> {
   try {
-    return await cached("search-intent", q.toLowerCase(), 7 * 24 * 3600, async () => {
+    return await withDeadline(cached("search-intent", q.toLowerCase(), 7 * 24 * 3600, async () => {
       const cats = (await listCategories()).map((c) => `${c.slug} (${c.name})`).join(", ");
       const system =
         `You map a customer's search on an Indian pharmacy to catalogue terms. Reply ONLY as JSON ` +
@@ -20,7 +20,7 @@ async function interpret(q: string): Promise<Intent | null> {
         `note: a short human phrase like "Showing results for antacids". ` +
         `Never invent brand names. Never give medical advice or dosing.`;
       return await generateJSON<Intent>([{ text: `Customer searched: "${q}"` }], { system, maxOutputTokens: 256 });
-    });
+    }), Number(process.env.AI_SEARCH_REWRITE_MS) || 4000, "search rewrite");
   } catch (e) {
     if (!(e instanceof AiUnavailable)) console.error("[ai search]", e);
     return null;

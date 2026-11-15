@@ -13,6 +13,18 @@ type Opts = { system?: string; json?: boolean; temperature?: number; maxOutputTo
 const RATE_COOLDOWN_MS = Number(process.env.GEMINI_COOLDOWN_MS) || 60_000;
 const NET_COOLDOWN_MS = Math.min(RATE_COOLDOWN_MS, Number(process.env.GEMINI_NET_COOLDOWN_MS) || 15_000);
 
+/**
+ * Give an AI step at most `ms` to finish. Shoppers should never wait on AI: if it is slow (rate limits, a cold
+ * model, many keys being rotated), the page continues without it. The underlying call may finish later and is
+ * then simply cached for next time.
+ */
+export function withDeadline<T>(p: Promise<T>, ms: number, what = "AI step"): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const t = setTimeout(() => reject(new AiUnavailable(`${what} took longer than ${ms} ms`)), ms);
+    p.then((v) => { clearTimeout(t); resolve(v); }, (e) => { clearTimeout(t); reject(e); });
+  });
+}
+
 /** Thrown when Google no longer serves a model name (retired or renamed); the next model in the chain is tried. */
 class ModelGone extends Error {}
 
