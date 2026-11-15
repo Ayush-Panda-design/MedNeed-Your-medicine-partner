@@ -550,3 +550,17 @@
   .hh-rest { display: block; margin-top: 0.02em; }
   .hh-swash path { stroke-width: 2.6; }
 }
+
+/* ───────── v8: one quiet order-status card instead of three glass bubbles ───────── */
+.hh-card {
+  padding: .7rem .85rem;
+  border-radius: .95rem;
+  background: rgb(10 30 22 / .32);
+  border-color: rgb(255 255 255 / .22);
+  box-shadow: 0 12px 28px -16px rgb(0 0 0 / .55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.hh-card-track { left: auto !important; right: 5.5%; top: auto !important; bottom: 17%; width: 15rem !important; }
+@media (min-width: 1536px) { .hh-card-track { right: 8%; } }
+:where(html.dark) .hh-card { background: rgb(8 14 28 / .45); border-color: rgb(255 255 255 / .14); }

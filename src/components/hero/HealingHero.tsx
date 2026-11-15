@@ -370,47 +370,20 @@ export function HealingHero() {
         {/* Floating story cards (decorative; larger screens) */}
         <div className="hh-cards" aria-hidden>
           <div className="hh-card hh-card-track hh-in" style={{ "--d": "900ms" } as CSSProperties}>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-white/70">Your order</span>
-              <span className="text-[11px] text-white/60">#MN-2481</span>
-            </div>
-            <div key={step} className="hh-step mt-2.5 flex items-center gap-2.5">
+            <div key={step} className="hh-step flex items-center gap-2.5">
               <span className="hh-step-icon"><StepIcon name={s.icon} /></span>
               <span className="min-w-0">
                 <span className="block text-sm font-semibold text-white">{s.label}</span>
                 <span className="block truncate text-xs text-white/70">{s.sub}</span>
               </span>
             </div>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/20">
-              <div className="hh-progress h-full rounded-full" style={{ width: `${s.pct}%` }} />
-            </div>
-            <div className="mt-2 flex gap-1.5">
+            <div className="mt-2.5 flex gap-1">
               {STEPS.map((_, i) => (
-                <span key={i} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i <= step ? "bg-lime-300" : "bg-white/20"}`} />
+                <span key={i} className={`h-[3px] flex-1 rounded-full transition-colors duration-500 ${i <= step ? "bg-lime-300" : "bg-white/25"}`} />
               ))}
             </div>
           </div>
 
-          <div className="hh-card hh-card-rx hh-in" style={{ "--d": "1150ms" } as CSSProperties}>
-            <span className="hh-rx-badge">Rx</span>
-            <span className="min-w-0">
-              <span className="block text-sm font-semibold text-white">Prescription verified</span>
-              <span className="block text-xs text-white/70">by a registered pharmacist</span>
-            </span>
-            <svg className="hh-tick" viewBox="0 0 24 24" width="22" height="22">
-              <circle cx="12" cy="12" r="11" />
-              <path d="M7 12.5 L10.5 16 L17 9" />
-            </svg>
-          </div>
-
-          <div className="hh-card hh-card-med hh-in" style={{ "--d": "1400ms" } as CSSProperties}>
-            <span className="hh-med-icon"><Pill className="h-5 w-5" /></span>
-            <span className="min-w-0">
-              <span className="block text-sm font-semibold text-white">Paracetamol 650</span>
-              <span className="block text-xs text-white/70">Strip of 15 · In stock</span>
-            </span>
-            <span className="hh-med-tag">Genuine</span>
-          </div>
         </div>
 
         <a href="#after-hero" className="hh-scrollcue" aria-label="Scroll to explore">

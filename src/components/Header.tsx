@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronDown, LayoutDashboard, LogOut, MapPin, Package, ShoppingCart, Truck, Upload, User, UserCircle } from "lucide-react";
+import { ChevronDown, HelpCircle, LayoutDashboard, LogOut, Package, PackageSearch, Pill, ShoppingCart, Truck, Upload, User, UserCircle } from "lucide-react";
 import { displayName } from "@/lib/api";
 import type { Category } from "@/lib/catalog";
 import { useAuth, useCart } from "@/lib/providers";
@@ -11,6 +11,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "./Logo";
 import { SearchBox } from "./SearchBox";
 import { CategoryMenu } from "./CategoryMenu";
+import { PincodePicker } from "./PincodePicker";
 
 export function Header({ categories }: { categories: Category[] }) {
   const router = useRouter();
@@ -67,26 +68,21 @@ export function Header({ categories }: { categories: Category[] }) {
         </div>
       )}
 
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-[6px] gap-y-[10px] px-[12px] py-[10px] sm:gap-x-4 sm:px-6 sm:py-3">
+      {/* Row 1: brand, search, account actions */}
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-[6px] gap-y-[10px] px-[12px] py-[10px] sm:gap-x-4 sm:px-6 sm:py-3 lg:flex-nowrap lg:gap-x-6 lg:py-2.5">
         <Logo light={overlay} size="nav" />
 
-        <CategoryMenu categories={categories} overlay={overlay} />
+        {/* phones and tablets keep the categories button in the top row; desktop has it in the second row */}
+        <div className="lg:hidden">
+          <CategoryMenu categories={categories} overlay={overlay} />
+        </div>
 
-        <button data-fx="pulse" className={`mn-fx-pulse hidden items-center gap-1.5 rounded-lg border px-3 py-2 text-left text-sm lg:flex ${cls.pincode}`} aria-label="Choose delivery location">
-          <MapPin className={`h-4 w-4 ${overlay ? "text-lime-300" : "text-teal-600"}`} />
-          <span>
-            <span className={`block text-[11px] leading-none ${overlay ? "text-white/70" : "text-slate-500"}`}>Deliver to</span>
-            <span className="block font-semibold leading-tight">Select pincode</span>
-          </span>
-          <ChevronDown className={`h-4 w-4 ${cls.chevron}`} />
-        </button>
-
-        <div className="order-last min-w-0 basis-full lg:order-none lg:flex-1 lg:basis-0">
+        <div className="order-last min-w-0 basis-full lg:order-none lg:mx-auto lg:max-w-2xl lg:flex-1 lg:basis-0">
           <SearchBox overlay={overlay} styles={{ box: cls.searchBox, icon: cls.searchIcon, input: cls.searchInput }} />
         </div>
 
         <div className="ml-auto flex items-center gap-[2px] sm:gap-2 md:ml-0">
-          <Link href="/account/prescriptions/new" className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold xl:flex ${cls.uploadRx}`}>
+          <Link href="/account/prescriptions/new" className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold lg:flex ${cls.uploadRx}`}>
             <Upload className="h-4 w-4" /> Upload Rx
           </Link>
 
@@ -143,6 +139,20 @@ export function Header({ categories }: { categories: Category[] }) {
               </span>
             )}
           </Link>
+        </div>
+      </div>
+
+      {/* Row 2 (desktop): browse and delivery */}
+      <div className={`hidden border-t lg:block ${overlay ? "border-white/15" : "border-slate-200/80"}`}>
+        <div className="mx-auto flex h-11 max-w-7xl items-center gap-2 px-6 text-[13px]">
+          <CategoryMenu categories={categories} overlay={overlay} />
+          <span aria-hidden className={`h-5 w-px ${overlay ? "bg-white/25" : "bg-slate-200"}`} />
+          <PincodePicker overlay={overlay} />
+          <nav aria-label="Quick links" className="ml-auto flex items-center gap-1">
+            <Link href="/medicines" className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-medium ${cls.ghost}`}><Pill className="h-4 w-4" aria-hidden /> All medicines</Link>
+            <Link href="/account/orders" className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-medium ${cls.ghost}`}><PackageSearch className="h-4 w-4" aria-hidden /> Track order</Link>
+            <Link href="/contact" className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-medium ${cls.ghost}`}><HelpCircle className="h-4 w-4" aria-hidden /> Help</Link>
+          </nav>
         </div>
       </div>
 
