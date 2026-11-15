@@ -1,0 +1,7 @@
+# Store text files with LF in the repo; Windows checkouts may use CRLF without showing as changes.
+* text=auto
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.zip binary
