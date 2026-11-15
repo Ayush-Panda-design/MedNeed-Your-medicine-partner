@@ -40,7 +40,7 @@ const LEAVES = Array.from({ length: 34 }, (_, i) => ({
 
 // Big, soft-focus leaves passing close to the "camera".
 const NEAR_LEAVES = Array.from({ length: 5 }, (_, i) => ({
-  left: r2(60 + rnd(i, 51) * 40),
+  left: r2(68 + rnd(i, 51) * 32),
   top: r2(-6 + rnd(i, 52) * 30),
   dur: r2(13 + rnd(i, 53) * 8),
   delay: r2(-rnd(i, 54) * 20),

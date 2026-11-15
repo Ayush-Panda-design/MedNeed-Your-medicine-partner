@@ -55,8 +55,8 @@ export function Header({ categories }: { categories: Category[] }) {
   };
 
   return (
-    <header className={cls.header}>
-      {overlay && <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/50 via-black/20 to-transparent" />}
+    <header className={`${cls.header} ${overlay ? "[text-shadow:0_1px_2px_rgb(0_0_0/0.4)]" : ""}`}>
+      {overlay && <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/30 to-transparent" />}
 
       {!overlay && (
         <div className="bg-teal-700 text-teal-50">
