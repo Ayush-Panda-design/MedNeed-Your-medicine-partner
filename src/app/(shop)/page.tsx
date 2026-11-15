@@ -12,7 +12,7 @@ import {
   Upload,
   UserCheck,
 } from "lucide-react";
-import { CinemaHero } from "@/components/CinemaHero";
+import { HealingHero } from "@/components/hero/HealingHero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { SectionHead } from "@/components/SectionHead";
 import { FaqList } from "@/components/FaqList";
@@ -30,7 +30,7 @@ export default async function Home() {
   return (
     <main>
       <RevealOnScroll />
-      <CinemaHero />
+      <HealingHero />
 
       {/* Trust stats */}
       <section className="border-b border-slate-100 bg-white">

@@ -1,0 +1,288 @@
+/* Homepage hero (HealingHero). Day palette by default; html.dark switches to the night scene. */
+
+.hh {
+  /* day */
+  --sky1: #5aa7e0;
+  --sky2: #9fd0ee;
+  --sky3: #f7dcc0;
+  --sunglow: #ffe3a3;
+  --sun: #fff1c9;
+  --mist: #f3efe6;
+  --far1: #9fbad6;
+  --far2: #7f9fc2;
+  --temple: #6f8fb4;
+  --hill: #5f9c6c;
+  --hill2: #4a8a58;
+  --path: #e9d6b0;
+  --house: #fbf6ec;
+  --roof: #b5523b;
+  --window: #ffe9a8;
+  --trunk: #4b3426;
+  --leaf0: #2f6b37;
+  --leaf1: #3f8a45;
+  --leaf2: #6fb257;
+  --leafshade: #24552c;
+  --grass0: #3d8a44;
+  --blade0: #4f9e50;
+  --blade1: #3a8340;
+  --blade2: #7cc061;
+  --cloud: #ffffff;
+  --stars: 0;
+  --moon: 0;
+  --glow: 0.25;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  height: min(84svh, 760px);
+  min-height: 560px;
+  border-radius: 28px;
+  background: var(--sky2);
+  box-shadow: 0 30px 60px -30px rgb(10 40 25 / 0.45), 0 0 0 1px rgb(255 255 255 / 0.06) inset;
+  animation: hh-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@media (max-width: 640px) {
+  .hh { border-radius: 22px; height: min(88svh, 720px); }
+}
+
+:where(html.dark) .hh {
+  --sky1: #0a1530;
+  --sky2: #1a2c55;
+  --sky3: #3c3f6b;
+  --sunglow: #9fb6ff;
+  --sun: #fff1c9;
+  --mist: #5c6a99;
+  --far1: #2b3a63;
+  --far2: #223154;
+  --temple: #1c2a4a;
+  --hill: #1d3a33;
+  --hill2: #17302a;
+  --path: #4a4a5a;
+  --house: #c9c4d6;
+  --roof: #5d2e2a;
+  --window: #ffd56b;
+  --trunk: #20160f;
+  --leaf0: #12301e;
+  --leaf1: #1a4229;
+  --leaf2: #2c5f36;
+  --leafshade: #0b2215;
+  --grass0: #143523;
+  --blade0: #1d4a2d;
+  --blade1: #163b24;
+  --blade2: #2d6339;
+  --cloud: #8d98c4;
+  --stars: 1;
+  --moon: 1;
+  --glow: 1;
+}
+
+.hh-scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hh-scene g { transform-box: view-box; }
+
+/* colour hooks */
+.hh-sun { fill: var(--sun); opacity: calc(1 - var(--moon)); }
+.hh-sunglow { opacity: calc(1 - var(--moon) * 0.75); animation: hh-breathe 7s ease-in-out infinite; transform-origin: 900px 430px; }
+.hh-moon { opacity: var(--moon); }
+.hh-stars { fill: #fff; opacity: var(--stars); }
+.hh-stars circle { animation: hh-twinkle 4s ease-in-out infinite; }
+.hh-cloud { fill: var(--cloud); opacity: 0.7; }
+:where(html.dark) .hh-cloud { opacity: 0.25; }
+.hh-far1 { fill: var(--far1); }
+.hh-far2 { fill: var(--far2); }
+.hh-temple { fill: var(--temple); opacity: 0.9; }
+.hh-hill { fill: var(--hill); }
+.hh-hill2 { fill: var(--hill2); }
+.hh-path { fill: var(--path); opacity: 0.9; }
+.hh-house { fill: var(--house); }
+.hh-roof { fill: var(--roof); }
+.hh-window { fill: var(--window); }
+.hh-door { fill: var(--trunk); }
+.hh-glow { opacity: var(--glow); }
+.hh-trunk { fill: var(--trunk); }
+.hh-leaf0 { fill: var(--leaf0); }
+.hh-leaf1 { fill: var(--leaf1); }
+.hh-leaf2 { fill: var(--leaf2); }
+.hh-leafshade { fill: var(--leafshade); }
+.hh-temple-ribs { fill: none; stroke: var(--far1); stroke-width: 1.2; opacity: 0.5; }
+.hh-grass0 { fill: var(--grass0); }
+.hh-blade0 { fill: var(--blade0); }
+.hh-blade1 { fill: var(--blade1); }
+.hh-blade2 { fill: var(--blade2); }
+.hh-flower { fill: #fffaf0; }
+.hh-flower-warm { fill: #ffb3a7; }
+:where(html.dark) .hh-flower, :where(html.dark) .hh-flower-warm { opacity: 0.45; }
+.hh-tyre { fill: #1d2a24; }
+.hh-helmet { fill: #ffffff; }
+
+/* Ambient motion */
+.hh-cloud-a { animation: hh-drift 70s linear infinite; }
+.hh-cloud-b { animation: hh-drift 95s linear infinite; animation-delay: -30s; }
+.hh-cloud-c { animation: hh-drift 80s linear infinite; animation-delay: -55s; }
+.hh-tree { transform-origin: 1360px 900px; animation: hh-sway 9s ease-in-out infinite; }
+.hh-blades { transform-origin: 50% 100%; }
+.hh-blades-0 { animation: hh-grass 5.5s ease-in-out infinite; }
+.hh-blades-1 { animation: hh-grass 6.5s ease-in-out infinite; animation-delay: -1.7s; }
+.hh-blades-2 { animation: hh-grass 4.8s ease-in-out infinite; animation-delay: -3.1s; }
+
+/* Delivery rider travelling the path to the house. */
+.hh-rider { opacity: 0; }
+@supports (offset-path: path("M0 0")) {
+  .hh-rider {
+    offset-path: path("M400 892 C470 820 620 790 760 762 C880 736 940 698 990 630");
+    offset-rotate: 0deg;
+    animation: hh-ride 16s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  }
+}
+
+/* Falling leaves */
+.hh-leaves { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.hh-fall {
+  position: absolute;
+  animation-name: hh-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+.hh-leafsvg { display: block; animation: hh-flutter ease-in-out infinite alternate; filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.15)); }
+.hh-tone0 { fill: #4f9a3f; }
+.hh-tone1 { fill: #8fbf47; }
+.hh-tone2 { fill: #d8b23f; }
+:where(html.dark) .hh-tone0 { fill: #2f6a35; }
+:where(html.dark) .hh-tone1 { fill: #4f7d36; }
+:where(html.dark) .hh-tone2 { fill: #8a7a33; }
+
+/* Readability scrim behind the text (left side), deeper at the bottom on phones. */
+.hh-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(6 26 20 / 0.55) 0%, rgb(6 26 20 / 0.32) 34%, rgb(6 26 20 / 0) 62%),
+    linear-gradient(0deg, rgb(6 26 20 / 0.38) 0%, rgb(6 26 20 / 0) 34%);
+}
+@media (max-width: 768px) {
+  .hh-scrim { background: linear-gradient(0deg, rgb(6 26 20 / 0.78) 0%, rgb(6 26 20 / 0.45) 45%, rgb(6 26 20 / 0.05) 75%); }
+}
+
+/* Content */
+.hh-content {
+  position: absolute;
+  z-index: 3;
+  left: clamp(1.25rem, 5vw, 4.5rem);
+  right: clamp(1.25rem, 5vw, 4.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 44rem;
+  color: #fff;
+}
+@media (max-width: 768px) {
+  .hh-content { top: auto; bottom: 4.25rem; transform: none; }
+}
+
+.hh-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+  background: rgb(255 255 255 / 0.14);
+  border: 1px solid rgb(255 255 255 / 0.28);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.hh-live { position: relative; width: 8px; height: 8px; border-radius: 9999px; background: #4ade80; }
+.hh-live::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; border: 2px solid #4ade80; animation: hh-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+.hh-title {
+  margin-top: 1.1rem;
+  font-family: var(--font-display-serif), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 5.2vw, 4.9rem);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.25);
+}
+.hh-title em { font-style: italic; color: #d9f99d; }
+.hh-line { display: block; }
+
+.hh-sub { margin-top: 1.1rem; max-width: 30rem; font-size: clamp(0.95rem, 1.3vw, 1.08rem); line-height: 1.6; color: rgb(255 255 255 / 0.86); }
+
+.hh-actions { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.hh-btn-primary, .hh-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.85rem;
+  padding: 0.8rem 1.35rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.hh-btn-primary { background: #fff; color: #14532d; box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.45); }
+.hh-btn-primary:hover { background: #f0fdf4; transform: translateY(-1px); }
+.hh-btn-ghost { color: #fff; background: rgb(255 255 255 / 0.08); border: 1px solid rgb(255 255 255 / 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.hh-btn-ghost:hover { background: rgb(255 255 255 / 0.16); transform: translateY(-1px); }
+.hh-btn-primary:focus-visible, .hh-btn-ghost:focus-visible { outline: 3px solid #bbf7d0; outline-offset: 2px; }
+
+.hh-badge {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 1.1rem;
+  translate: -50% 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  border-radius: 9999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgb(10 30 22 / 0.45);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+@media (max-width: 420px) { .hh-badge { font-size: 0.66rem; } }
+
+/* Entrance */
+.hh-in { animation: hh-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--d, 0ms) + 250ms); }
+
+@keyframes hh-rise { from { opacity: 0; transform: scale(0.975); } to { opacity: 1; transform: none; } }
+@keyframes hh-in { from { opacity: 0; transform: translateY(18px); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes hh-drift { from { transform: translateX(-260px); } to { transform: translateX(1860px); } }
+@keyframes hh-sway { 0%, 100% { transform: rotate(-0.5deg); } 50% { transform: rotate(0.6deg); } }
+@keyframes hh-grass { 0%, 100% { transform: skewX(-2deg); } 50% { transform: skewX(2.5deg); } }
+@keyframes hh-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes hh-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes hh-ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+@keyframes hh-fall {
+  0% { transform: translate3d(0, -12vh, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translate3d(calc(var(--drift) * -1), 95vh, 0) rotate(var(--spin)); opacity: 0; }
+}
+@keyframes hh-flutter { from { transform: translateX(-14px) rotateX(0deg); } to { transform: translateX(14px) rotateX(60deg); } }
+@keyframes hh-ride {
+  0% { offset-distance: 0%; transform: scale(1.25); opacity: 0; }
+  6% { opacity: 1; }
+  78% { offset-distance: 100%; transform: scale(0.45); opacity: 1; }
+  84%, 100% { offset-distance: 100%; transform: scale(0.45); opacity: 0; }
+}
+
+/* Off screen: pause everything. */
+.hh[data-paused] *, .hh[data-paused] { animation-play-state: paused !important; }
+
+/* Reduced motion: a still, complete picture. */
+@media (prefers-reduced-motion: reduce) {
+  .hh, .hh *, .hh *::after { animation: none !important; }
+  .hh-leaves { display: none; }
+  .hh-rider { opacity: 0; }
+  .hh-in { opacity: 1; filter: none; transform: none; }
+}
