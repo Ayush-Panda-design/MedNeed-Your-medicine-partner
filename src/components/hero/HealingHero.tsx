@@ -149,7 +149,8 @@ export function HealingHero() {
       el.addEventListener("pointermove", onMove);
       el.addEventListener("pointerleave", onLeave);
     }
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // Scroll parallax re-styles the whole scene on every scroll frame: desktop only (phones scroll smoothly instead).
+    if (fine) window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       io.disconnect();
       window.clearInterval(timer);
@@ -212,10 +213,6 @@ export function HealingHero() {
               <circle cx="1250" cy="170" r="40" fill="#fff" />
               <circle cx="1270" cy="156" r="36" fill="#000" />
             </mask>
-            <filter id="hh-grain" x="0" y="0" width="100%" height="100%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
           </defs>
 
           <rect width="1600" height="900" fill="url(#hh-sky)" />
@@ -337,8 +334,6 @@ export function HealingHero() {
             ))}
           </g>
 
-          {/* Paper grain for an illustrated, painterly finish */}
-          <rect width="1600" height="900" filter="url(#hh-grain)" className="hh-grainlayer" />
         </svg>
 
         {/* Falling neem leaves + fireflies */}
@@ -355,6 +350,9 @@ export function HealingHero() {
             <span key={`f${i}`} className="hh-firefly" style={{ left: `${f.left}%`, top: `${f.top}%`, animationDelay: `${-f.d}s`, animationDuration: `${f.dur}s` }} />
           ))}
         </div>
+
+        {/* Paper grain (a small static texture, cheap to draw) */}
+        <div className="hh-grain" aria-hidden />
 
         <div className="hh-scrim" aria-hidden />
 

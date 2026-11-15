@@ -485,3 +485,28 @@
 @media (max-width: 639px) and (max-height: 600px) {
   .hh-points { display: none; }
 }
+
+/* ---- v6: performance ---- */
+.hh-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: url("/hero-grain.png") repeat;
+  background-size: 128px 128px;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+.hh-fall { contain: layout style; }
+
+/* Phones and touch devices: keep only animations the GPU composites on its own (falling leaves, entrance),
+   and stop everything that forces the big illustrated scene to be redrawn every frame. */
+@media (max-width: 767px), (pointer: coarse) {
+  .hh-scene *, .hh-scene { animation: none !important; }
+  .hh-rider { display: none; }
+  .hh-near { display: none; }
+  .hh-leafsvg { filter: none; animation: none; }
+  .hh-fall:nth-child(n + 15) { display: none; }
+  .hh-chip, .hh-btn-ghost, .hh-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .hh-grain { display: none; }
+}
