@@ -10,7 +10,7 @@ import "./tiles.css";
 /**
  * Homepage "Shop by category": a grid of bright square tiles, each with a soft arc, a folded corner and an
  * illustration (or a licensed photo, when one is configured), with the category name underneath.
- * Server-rendered and CSS-only: no client JavaScript.
+ * Server-rendered and CSS-only (the scroll entrance and mouse spotlight come from the shared motion helpers).
  */
 export function CategoryTiles({ categories, counts = {} }: { categories: Category[]; counts?: Record<string, number> }) {
   return (
@@ -25,14 +25,14 @@ export function CategoryTiles({ categories, counts = {} }: { categories: Categor
           </Link>
         }
       />
-      <ul className="ct-grid" role="list">
+      <ul className="ct-grid" role="list" data-stagger>
         {categories.map((c, i) => {
           const t = CATEGORY_TILES[c.slug] ?? FALLBACK_TILE;
           const n = counts[c.slug] ?? 0;
           const style = { "--c1": t.c1, "--c2": t.c2, "--a": t.a, "--p": t.p, "--i": i } as CSSProperties;
           return (
             <li key={c.slug}>
-              <Link href={`/medicines?category=${c.slug}`} className="ct-tile" style={style} aria-label={n > 0 ? `${c.name}, ${n.toLocaleString("en-IN")} products` : c.name}>
+              <Link href={`/medicines?category=${c.slug}`} className="ct-tile" data-spot style={style} aria-label={n > 0 ? `${c.name}, ${n.toLocaleString("en-IN")} products` : c.name}>
                 <span className="ct-card">
                   <span className="ct-arc" aria-hidden />
                   <span className="ct-fold" aria-hidden />

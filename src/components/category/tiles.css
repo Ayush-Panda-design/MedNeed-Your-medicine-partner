@@ -109,11 +109,14 @@
 .ct-tile:focus-visible .ct-card { box-shadow: 0 0 0 3px var(--bg-page), 0 0 0 5px #16a34a; }
 .ct-tile:active .ct-card { transform: scale(0.97); }
 
-/* Gentle staggered entrance. */
-@media (prefers-reduced-motion: no-preference) {
-  .ct-tile { animation: ct-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 35ms); }
+/* The staggered scroll entrance comes from data-stagger (globals.css). Mouse spotlight: a soft light follows
+   the pointer across the tile (desktop only; PointerFx sets --sx/--sy). */
+.ct-card::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; border-radius: inherit;
+  background: radial-gradient(140px circle at var(--sx, 50%) var(--sy, 30%), rgb(255 255 255 / 0.45), transparent 70%);
+  transition: opacity 0.3s ease;
 }
-@keyframes ct-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+html.mn-fine .ct-tile:hover .ct-card::after { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .ct-card, .ct-art, .ct-photo { transition: none; }
 }

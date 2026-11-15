@@ -13,7 +13,14 @@ export function SectionHead({ eyebrow, title, sub, action, center = false }: { e
         <span className="inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-teal-600">
           <Bar /> {eyebrow} {center && <Bar />}
         </span>
-        <h2 className="mt-2 text-2xl font-bold sm:text-3xl">{title}</h2>
+        <h2 data-words className="mt-2 text-2xl font-bold sm:text-3xl">
+          {title.split(" ").map((w, i, a) => (
+            <span key={i}>
+              <span className="mn-w">{w}</span>
+              {i < a.length - 1 ? " " : ""}
+            </span>
+          ))}
+        </h2>
         {sub && <p className="mt-1 text-sm text-slate-500">{sub}</p>}
       </div>
       {action}

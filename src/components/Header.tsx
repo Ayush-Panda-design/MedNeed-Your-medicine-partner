@@ -147,6 +147,7 @@ export function Header({ categories }: { categories: Category[] }) {
       </div>
 
       {!overlay && <div aria-hidden className="h-[2px] bg-gradient-to-r from-teal-600 via-lime-400 to-emerald-500" />}
+      <div aria-hidden className="mn-progress" />
     </header>
   );
 }

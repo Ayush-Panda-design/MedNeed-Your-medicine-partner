@@ -17,7 +17,8 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { SectionHead } from "@/components/SectionHead";
 import { FaqList } from "@/components/FaqList";
 import { FaqHelp } from "@/components/FaqHelp";
-import { RevealOnScroll } from "@/components/motion/RevealOnScroll";
+import { RxStory } from "@/components/motion/RxStory";
+import { PromiseBand } from "@/components/PromiseBand";
 import { CountUp } from "@/components/motion/CountUp";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryTiles } from "@/components/category/CategoryTiles";
@@ -29,7 +30,6 @@ export default async function Home() {
   const [categories, deals, newest, counts] = await Promise.all([listCategories(), listDeals(4), listNewest(8), categoryCounts()]);
   return (
     <main>
-      <RevealOnScroll />
       <HealingHero />
 
       {/* Trust stats */}
@@ -41,6 +41,8 @@ export default async function Home() {
           <li data-reveal data-reveal-delay="270"><p className="text-3xl font-extrabold text-teal-700">7<span className="text-xl">AM</span>–10<span className="text-xl">PM</span></p><p className="mt-1 text-xs font-medium text-slate-500">Open every day</p></li>
         </ul>
       </section>
+
+      <PromiseBand />
 
       {/* Categories */}
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
@@ -63,6 +65,7 @@ export default async function Home() {
                 <Upload className="h-4 w-4" /> Upload prescription
               </Link>
               <p className="mt-3 text-xs text-ink-muted">Approved prescriptions can be reused for repeat orders until they expire.</p>
+              <RxStory />
             </div>
             <HowItWorks />
           </div>
@@ -74,7 +77,7 @@ export default async function Home() {
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
         <SectionHead eyebrow="Offers" title="Deals of the day" sub="Biggest savings on everyday essentials"
           action={<Link href="/medicines?sort=discount" className="flex items-center gap-1 text-sm font-semibold text-teal-700 hover:underline">See all deals <ChevronRight className="h-4 w-4" /></Link>} />
-        <div data-reveal className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div data-stagger className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {deals.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -85,7 +88,7 @@ export default async function Home() {
       {/* Health concerns */}
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
         <SectionHead eyebrow="By concern" title="Shop by health concern" />
-        <ul data-reveal className="mt-5 flex flex-wrap gap-3">
+        <ul data-stagger className="mt-5 flex flex-wrap gap-3">
           {healthConcerns.map((h) => (
             <li key={h}>
               <Link
@@ -104,7 +107,7 @@ export default async function Home() {
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
         <SectionHead eyebrow="New" title="New arrivals" sub="Recently added to our catalogue"
           action={<Link href="/medicines" className="flex items-center gap-1 text-sm font-semibold text-teal-700 hover:underline">View all <ChevronRight className="h-4 w-4" /></Link>} />
-        <div data-reveal className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div data-stagger className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {newest.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -116,7 +119,7 @@ export default async function Home() {
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
         <div data-reveal className="rounded-3xl bg-teal-50 p-8 md:p-12">
           <SectionHead eyebrow="Why MedNeed" title="Why order from MedNeed" center />
-          <ul data-reveal className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <ul data-stagger className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { icon: BadgeCheck, t: "Genuine medicines", d: "Sourced from licensed distributors and manufacturers." },
               { icon: UserCheck, t: "Pharmacist-checked", d: "Every prescription order is verified by a registered pharmacist." },

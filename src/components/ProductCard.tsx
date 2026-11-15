@@ -7,7 +7,7 @@ import { ProductVisual } from "./ProductVisual";
 export function ProductCard({ product }: { product: Product }) {
   const off = product.orderable ? discountPercent(product) : 0;
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-xl hover:shadow-teal-900/10">
+    <article data-spot className="mn-spot group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-xl hover:shadow-teal-900/10">
       <Link href={`/medicines/${product.slug}`} className="relative block overflow-hidden">
         <ProductVisual product={product} className="aspect-[4/3] w-full transition-transform duration-500 ease-out group-hover:scale-[1.05]" />
         {off > 0 && (

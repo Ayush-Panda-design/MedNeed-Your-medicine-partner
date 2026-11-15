@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Category } from "@/lib/catalog";
 import type { BusinessInfo } from "@/server/orders/settings";
+import { displaySerif } from "@/lib/fonts";
 import { Logo } from "./Logo";
 
 type FooterBusiness = Pick<BusinessInfo, "legalName" | "phone" | "email" | "hoursLabel" | "drugLicense" | "gstin" | "pharmacistName" | "pharmacistRegNo">;
@@ -14,7 +15,7 @@ export function Footer({ categories, business: b }: { categories: Category[]; bu
     { href: "/shipping", label: "Shipping & delivery" },
   ];
   return (
-    <footer className="mt-20 bg-slate-900 text-slate-300">
+    <footer className="mt-20 overflow-hidden bg-slate-900 text-slate-300">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="space-y-4">
           <Logo light tagline />
@@ -63,7 +64,10 @@ export function Footer({ categories, business: b }: { categories: Category[]; bu
           </dl>
         </div>
       </div>
-      <div className="border-t border-slate-800">
+      <div aria-hidden className={`${displaySerif.variable} -mb-[0.12em] px-2`}>
+        <span className="mn-footmark">MedNeed</span>
+      </div>
+      <div className="relative border-t border-slate-800">
         <p className="mx-auto max-w-7xl px-4 py-5 text-xs text-slate-500 sm:px-6">
           © {new Date().getFullYear()} MedNeed. The information on this site is for general awareness and is not a substitute for professional medical advice. Always consult a doctor or pharmacist before taking any medicine.
         </p>

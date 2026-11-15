@@ -1,6 +1,8 @@
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SupportChat } from "@/components/SupportChat";
+import { PointerFx } from "@/components/motion/PointerFx";
+import { RevealOnScroll } from "@/components/motion/RevealOnScroll";
 import { listCategories } from "@/server/catalog/queries";
 import { aiEnabled } from "@/server/env";
 import { businessInfo } from "@/server/orders/settings";
@@ -16,6 +18,8 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
       {children}
       <Footer categories={categories} business={business} />
       {aiEnabled() && <SupportChat />}
+      <RevealOnScroll />
+      <PointerFx />
     </>
   );
 }
