@@ -309,7 +309,7 @@ export function SearchBox({ styles, overlay }: { styles: Styles; overlay: boolea
                           className={`flex items-center gap-3 rounded-control p-2 ${active === i ? "bg-subtle" : ""}`}
                         >
                           <Link href={`/medicines/${p.slug}`} onClick={() => { remember(term); setOpen(false); }} className="flex min-w-0 flex-1 items-center gap-3">
-                            <ProductVisual product={p} className="h-12 w-12 shrink-0 rounded-lg" />
+                            <ProductVisual product={p} art="icon" className="h-12 w-12 shrink-0 rounded-lg" />
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm font-semibold"><Highlight text={p.name} term={term} /></span>
                               <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-ink-2">

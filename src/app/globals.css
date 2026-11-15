@@ -554,3 +554,29 @@ html.mn-fine .mn-spot:hover::after { opacity: 1; }
 }
 .mn-hdr-shell { position: relative; }
 .mn-hdr[data-compact] .mn-progress { left: 1.75rem; right: 1.75rem; bottom: -1px; border-radius: 2px; }
+
+/* ───────── Lovable-concept design language: serif display headings, floating product cards ───────── */
+.mn-display { font-family: var(--font-hero-serif), Georgia, serif; font-optical-sizing: auto; font-weight: 520; letter-spacing: -0.025em; }
+.mn-accent { font-style: italic; color: #15803d; font-weight: 480; }
+:where(html.dark) .mn-display:not(.hb-title) { color: #f1f5f2; }
+:where(html.dark) .mn-accent { color: #4ade80; }
+
+.mn-pcard { box-shadow: 0 1px 2px rgb(15 23 42 / .04), 0 14px 32px -22px rgb(15 23 42 / .35); transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .45s ease; }
+@media (hover: hover) { .mn-pcard:hover { transform: translateY(-4px); box-shadow: 0 2px 4px rgb(15 23 42 / .05), 0 26px 44px -24px rgb(22 101 52 / .45); } }
+.mn-pcard .mn-price { font-family: var(--font-hero-serif), Georgia, serif; letter-spacing: -0.01em; }
+:where(html.dark) .mn-pcard { background: #121a16; box-shadow: 0 0 0 1px rgb(255 255 255 / .06); }
+:where(html.dark) .mn-pcard .text-slate-900 { color: #eef3ef; }
+:where(html.dark) .mn-stepper { background: rgb(34 197 94 / .14); color: #bbf7d0; }
+:where(html.dark) .mn-stepper > button:first-child { background: #1c2621; color: #bbf7d0; }
+
+.mn-packshot-art { transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+@media (hover: hover) { .group:hover .mn-packshot-art { transform: translateY(-8px) rotate(-3deg); } }
+:where(html.dark) .mn-packshot { filter: brightness(.9) saturate(.95); }
+
+.mn-flydot { position: fixed; z-index: 70; width: 14px; height: 14px; border-radius: 9999px; pointer-events: none; background: radial-gradient(circle at 35% 35%, #d9f99d, #16a34a); box-shadow: 0 4px 10px rgb(22 101 52 / .45); }
+@media (prefers-reduced-motion: no-preference) {
+  .mn-qty { animation: mn-qty .3s ease; }
+  .mn-stepper { animation: mn-morph .35s cubic-bezier(.3,1.4,.5,1); }
+}
+@keyframes mn-qty { from { opacity: 0; transform: translateY(-6px); } }
+@keyframes mn-morph { from { transform: scale(.94); opacity: .6; } }

@@ -14,6 +14,12 @@ const SUGGESTIONS = ["What are your delivery charges?", "Do I need a prescriptio
 
 export function SupportChat() {
   const [open, setOpen] = useState(false);
+  // Other parts of the page (e.g. the FAQ "Chat with us" button) can open the assistant.
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener("medneed:open-chat", onOpen);
+    return () => window.removeEventListener("medneed:open-chat", onOpen);
+  }, []);
   const [messages, setMessages] = useState<Turn[]>([GREETING]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);

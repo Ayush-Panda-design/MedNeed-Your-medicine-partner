@@ -15,8 +15,7 @@ import {
 import { HealingHero } from "@/components/hero/HealingHero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { SectionHead } from "@/components/SectionHead";
-import { FaqList } from "@/components/FaqList";
-import { FaqHelp } from "@/components/FaqHelp";
+import { FaqChat } from "@/components/home/FaqChat";
 import { RxStory } from "@/components/motion/RxStory";
 import { PromiseBand } from "@/components/PromiseBand";
 import { PromiseStories } from "@/components/promise/PromiseStories";
@@ -85,7 +84,7 @@ export default async function Home() {
       {/* Deals */}
       {deals.length > 0 && (
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
-        <SectionHead eyebrow="Offers" title="Deals of the day" sub="Biggest savings on everyday essentials"
+        <SectionHead display eyebrow="Offers" title="Deals of the day" sub="Biggest savings on everyday essentials"
           action={<Link href="/medicines?sort=discount" className="flex items-center gap-1 text-sm font-semibold text-teal-700 hover:underline">See all deals <ChevronRight className="h-4 w-4" /></Link>} />
         <div data-stagger className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {deals.map((p) => (
@@ -101,7 +100,7 @@ export default async function Home() {
       {/* New arrivals */}
       {newest.length > 0 && (
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
-        <SectionHead eyebrow="New" title="New arrivals" sub="Recently added to our catalogue"
+        <SectionHead display eyebrow="New" title="New arrivals" sub="Recently added to our catalogue"
           action={<Link href="/medicines" className="flex items-center gap-1 text-sm font-semibold text-teal-700 hover:underline">View all <ChevronRight className="h-4 w-4" /></Link>} />
         <div data-stagger className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {newest.map((p) => (
@@ -137,14 +136,8 @@ export default async function Home() {
       {/* Visit our store */}
       <VisitStore phone={business.phone} hoursLabel={business.hoursLabel} />
 
-      {/* FAQ */}
-      <section className="mx-auto max-w-5xl px-4 pt-14 sm:px-6">
-        <SectionHead eyebrow="FAQ" title="Frequently asked questions" center />
-        <div className="mt-2 grid items-center gap-8 lg:grid-cols-[300px_1fr]">
-          <div data-reveal className="hidden lg:block"><FaqHelp /></div>
-          <div className="min-w-0"><FaqList faqs={faqs} /></div>
-        </div>
-      </section>
+      {/* FAQ: a conversation with our pharmacist */}
+      <FaqChat faqs={faqs} />
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import { Droplet, FlaskConical, Pill, Stethoscope, Tag } from "lucide-react";
 import type { Product } from "@/lib/catalog";
+import { Packshot } from "./Packshot";
 
 const tone: Record<string, string> = {
   "pain-relief": "from-rose-50 to-orange-100 text-rose-500",
@@ -34,7 +35,7 @@ function iconFor(form: string) {
 }
 
 // Shows the uploaded product photo, or placeholder artwork until one is uploaded.
-export function ProductVisual({ product, className = "" }: { product: Pick<Product, "category" | "form" | "imageUrl" | "name">; className?: string }) {
+export function ProductVisual({ product, className = "", art = "packshot" }: { product: Pick<Product, "category" | "form" | "imageUrl" | "name"> & { slug?: string }; className?: string; art?: "packshot" | "icon" }) {
   const Icon = iconFor(product.form) ?? Tag;
   if (product.imageUrl) {
     return (
@@ -44,6 +45,7 @@ export function ProductVisual({ product, className = "" }: { product: Pick<Produ
       </div>
     );
   }
+  if (art === "packshot") return <Packshot name={product.name} form={product.form} seed={product.slug ?? product.name} className={className} />;
   return (
     <div className={`mn-tile grid place-items-center bg-gradient-to-br ${tone[product.category] ?? tone.devices} ${className}`}>
       <Icon className="h-1/3 w-1/3" strokeWidth={1.5} />

@@ -97,3 +97,50 @@
   .ob-media:has(.ob-photo) { width: 100%; opacity: .32; }
   .ob-media .ob-photo { opacity: 1; -webkit-mask-image: none; mask-image: none; }
 }
+
+/* ── Health-concern bento (from the Lovable concept) ── */
+.hb-grid { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -1rem; padding: 0 1rem 1rem; scrollbar-width: none; }
+.hb-grid::-webkit-scrollbar { display: none; }
+.hb-item { flex: 0 0 78%; scroll-snap-align: start; }
+@media (min-width: 640px) {
+  .hb-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; margin: 0; padding: 0; }
+  .hb-item { flex: none; }
+}
+@media (min-width: 1024px) {
+  .hb-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 230px; gap: 1.25rem; }
+  .hb-big { grid-column: span 2; grid-row: span 2; }
+  .hb-wide { grid-column: span 2; }
+}
+.hb-card {
+  position: relative; display: block; overflow: hidden; height: 22rem; border-radius: 1.75rem; isolation: isolate; color: #fff; background: #e2e8f0;
+  box-shadow: 0 1px 2px rgb(15 23 42 / .05), 0 18px 36px -24px rgb(15 23 42 / .45);
+  transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease;
+}
+@media (min-width: 640px) { .hb-card { height: 18.5rem; } }
+@media (min-width: 1024px) { .hb-card { height: 100%; } }
+.hb-photo { object-fit: cover; transition: transform .8s cubic-bezier(.2,.8,.2,1); z-index: -2; }
+.hb-scrim { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(0 0 0 / .1) 0%, rgb(0 0 0 / 0) 35%, rgb(5 20 12 / .55) 72%, rgb(5 20 12 / .82) 100%); }
+.hb-count { position: absolute; left: 1rem; top: 1rem; border-radius: 9999px; background: rgb(255 255 255 / .9); color: #0f172a; padding: .3rem .75rem; font-size: .75rem; font-weight: 700; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.hb-arrow { position: absolute; right: 1rem; top: 1rem; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; background: #a3e635; color: #1a2e05; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+.hb-body { position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-direction: column; padding: 1.25rem 1.3rem 1.35rem; }
+.hb-title { font-size: 1.6rem; line-height: 1.08; text-shadow: 0 1px 12px rgb(0 0 0 / .35); }
+.hb-title-lg { font-size: 1.9rem; }
+@media (min-width: 1024px) { .hb-title { font-size: 1.65rem; } .hb-title-lg { font-size: 3rem; } .hb-body { padding: 1.5rem; } }
+.hb-blurb { margin-top: .3rem; font-size: .875rem; opacity: .92; }
+.hb-picks-wrap { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .5s cubic-bezier(.2,.8,.2,1); }
+.hb-picks { display: flex; flex-wrap: wrap; gap: .4rem; overflow: hidden; padding-top: .75rem; transition: opacity .45s ease; }
+.hb-pick { border-radius: 9999px; border: 1px solid rgb(255 255 255 / .32); background: rgb(255 255 255 / .16); padding: .25rem .65rem; font-size: .75rem; font-weight: 600; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+@media (min-width: 1024px) and (hover: hover) {
+  .hb-picks-wrap { grid-template-rows: 0fr; }
+  .hb-picks { opacity: 0; }
+  .hb-card:hover .hb-picks-wrap, .hb-card:focus-visible .hb-picks-wrap { grid-template-rows: 1fr; }
+  .hb-card:hover .hb-picks, .hb-card:focus-visible .hb-picks { opacity: 1; }
+}
+@media (hover: hover) {
+  .hb-card:hover { transform: translateY(-6px); box-shadow: 0 2px 4px rgb(15 23 42 / .06), 0 30px 50px -26px rgb(15 23 42 / .55); }
+  .hb-card:hover .hb-photo { transform: scale(1.05); }
+  .hb-card:hover .hb-arrow { transform: rotate(45deg); }
+}
+.hb-card:focus-visible { outline: 3px solid #16a34a; outline-offset: 3px; transform: translateY(-6px); }
+.hb-card:focus-visible .hb-arrow { transform: rotate(45deg); }
+.hb-card:active { transform: scale(.985); }
