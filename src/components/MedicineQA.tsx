@@ -26,7 +26,7 @@ export function MedicineQA({ slug }: { slug: string }) {
   }
 
   return (
-    <section className="rounded-2xl border border-teal-200 bg-teal-50/50 p-5" aria-label="Ask about this medicine">
+    <section className="rounded-2xl border border-teal-200 bg-tint p-5" aria-label="Ask about this medicine">
       <h2 className="flex items-center gap-2 font-bold text-teal-900"><Sparkles className="h-5 w-5 text-teal-600" /> Ask about this medicine</h2>
       <p className="mt-1 text-sm text-slate-600">Answers use only this product's information. Not a substitute for your doctor or pharmacist.</p>
 
