@@ -76,6 +76,8 @@ export type ProductDetail = Product & {
   dataStatus: "unverified" | "verified" | "sample";
   nppaCeilingPrice: number | null;
   updatedAt: string;
+  /** Set when the "used for" / side-effect text comes from general ingredient information (AI-written), not from this product's own record. */
+  ingredientInfo?: { reviewed: boolean };
 };
 
 export type SortKey = "relevance" | "price-asc" | "price-desc" | "discount";

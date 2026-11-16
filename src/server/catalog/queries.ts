@@ -1,4 +1,5 @@
 import { query, type Row } from "../db";
+import { infoForMedicine, symptomSaltIds } from "./salt-info";
 import type { Category, Product, ProductDetail, SortKey } from "@/lib/catalog";
 import { MEDICINE_COLUMNS, MEDICINE_JOINS, MEDICINE_SELECT, mapMedicine } from "./repo";
 import { escapeLike } from "./text";
@@ -39,7 +40,21 @@ export async function getCategory(slug: string): Promise<Category | null> {
 
 export async function getProductBySlug(slug: string): Promise<ProductDetail | null> {
   const rows = await query(`${MEDICINE_SELECT} where m.slug = $1 and m.status in ('active','catalog')`, [slug]);
-  return rows[0] ? mapMedicine(rows[0]) : null;
+  if (!rows[0]) return null;
+  const p = mapMedicine(rows[0]);
+  // Fill gaps from the ingredient information (general text, marked as such). The product's own text always wins.
+  const gaps = p.uses.length === 0 || !p.howToUse || p.sideEffects.length === 0 || p.precautions.length === 0;
+  if (!gaps) return p;
+  const info = await infoForMedicine(p.id).catch(() => null);
+  if (!info) return p;
+  return {
+    ...p,
+    uses: p.uses.length ? p.uses : info.uses,
+    howToUse: p.howToUse || info.howToUse,
+    sideEffects: p.sideEffects.length ? p.sideEffects : info.sideEffects,
+    precautions: p.precautions.length ? p.precautions : info.precautions,
+    ingredientInfo: { reviewed: info.reviewed },
+  };
 }
 
 export async function getProductsBySlugs(slugs: string[]): Promise<Product[]> {
@@ -116,9 +131,20 @@ export async function searchProducts(c: CatalogQuery): Promise<{ items: Product[
   // Exact word matches first. Only when nothing matches exactly do we allow close spellings, so a correct
   // search is not diluted by thousands of loosely similar products while a typo still finds its target.
   const exact = await runSearch(c, false);
-  if (exact.total > 0 || !(c.q ?? "").trim()) return exact;
+  const q = (c.q ?? "").trim();
+  if (!q) return exact;
+  // Thin results: also look for medicines whose ingredients are used for what was typed ("fever", "acidity").
+  // Keyword matches stay first; nothing changes while no ingredient information has been stored.
+  if (exact.total < SYMPTOM_BELOW_HITS) {
+    const salts = await symptomSaltIds(q).catch(() => [] as string[]);
+    if (salts.length > 0) return runSearch(c, false, salts);
+  }
+  if (exact.total > 0) return exact;
   return runSearch(c, true);
 }
+
+/** Below this many keyword hits, a search is widened with ingredient-based (symptom) matches. */
+const SYMPTOM_BELOW_HITS = 40;
 
 /**
  * Fetch specific products by id, applying the same visibility and facet filters as search.
@@ -148,7 +174,7 @@ export async function productsByIds(ids: string[], c: Partial<CatalogQuery> = {}
   return out;
 }
 
-async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Product[]; total: number }> {
+async function runSearch(c: CatalogQuery, fuzzy: boolean, symptomSalts?: string[]): Promise<{ items: Product[]; total: number }> {
   const params: unknown[] = [];
   const add = (v: unknown) => {
     params.push(v);
@@ -169,6 +195,7 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Prod
   for (const t of tokens) {
     const like = add(`%${escapeLike(t)}%`);
     likes.push(like);
+    if (symptomSalts) continue; // keyword words are combined with the ingredient match below
     if (fuzzy) {
       const raw = add(t);
       // %> lets the trigram index find close spellings (threshold set in migration 0016); the explicit check keeps
@@ -176,6 +203,10 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Prod
       where.push(`(m.search_text like ${like} or (m.search_text %> ${raw} and word_similarity(${raw}, m.search_text) >= 0.5))`);
     } else where.push(`m.search_text like ${like}`);
   }
+
+  // Symptom mode: a medicine matches when every typed word is in its text OR it contains an ingredient used for it.
+  const kwMatch = likes.length ? likes.map((l) => `m.search_text like ${l}`).join(" and ") : "false";
+  if (symptomSalts) where.push(`((${kwMatch}) or m.id in (select ms.medicine_id from medicine_salts ms where ms.salt_id = any(${add(symptomSalts)}::uuid[])))`);
 
   // Parameters used by the WHERE clause. The count query must receive exactly these and nothing else.
   const whereParams = params.slice();
@@ -189,7 +220,10 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean): Promise<{ items: Prod
   if (c.sort === "price-asc") order = `${priced}, (case when m.status = 'active' then m.price end) asc nulls last, m.name`;
   else if (c.sort === "price-desc") order = `${priced}, (case when m.status = 'active' then m.price end) desc nulls last, m.name`;
   else if (c.sort === "discount") order = `${priced}, (case when m.status = 'active' then (m.mrp - m.price) / m.mrp end) desc nulls last, m.name`;
-  else if (tokens.length) {
+  else if (symptomSalts) {
+    // Direct keyword matches first, then medicines that can be bought, then simpler (fewer-ingredient) products.
+    order = `(${kwMatch}) desc, (m.status = 'active') desc, ${inStockSql()} desc, length(m.composition_key), m.name`;
+  } else if (tokens.length) {
     const scores = tokens.map((t, i) => `greatest(word_similarity(${add(t)}, lower(m.name)), (case when m.search_text like ${likes[i]} then 0.5 else 0 end))`);
     const prefix = add(`${escapeLike(tokens.join(" "))}%`);
     order = `((${scores.join(" + ")}) + (case when lower(m.name) like ${prefix} then 1 else 0 end)) desc, (m.status = 'active') desc, ${inStockSql()} desc, m.name`;

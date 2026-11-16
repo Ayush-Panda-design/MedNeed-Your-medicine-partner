@@ -23,6 +23,8 @@ function buildText(r: Row): string {
 }
 const hashText = (model: string, text: string) => createHash("sha256").update(`${model}\n${text}`).digest("hex");
 
+// Only medicines the store actually sells (status 'active') are embedded. The catalogue-only reference list is far too large
+// to embed on free tiers, and ingredient-based symptom search (see salt-info.ts) covers it instead.
 const CANDIDATE_SQL = `
   select m.id, m.name, m.description, m.uses, c.name as category_name,
     coalesce((select string_agg(s.name, ' ') from medicine_salts ms join salts s on s.id = ms.salt_id where ms.medicine_id = m.id), '') as salts,
@@ -30,7 +32,7 @@ const CANDIDATE_SQL = `
   from medicines m
   join categories c on c.id = m.category_id
   left join product_embeddings pe on pe.medicine_id = m.id
-  where m.status in ('active','catalog')
+  where m.status = 'active'
     and (pe.medicine_id is null or m.updated_at > pe.updated_at or pe.model <> $1)
   order by m.updated_at desc
   limit $2`;
@@ -128,8 +130,8 @@ export async function indexReady(): Promise<boolean> {
 
 /** Coverage readout for the admin: how many shoppable products are embedded for semantic search. */
 export async function embeddingStats(): Promise<{ active: number; embedded: number; pending: number; model: string; aiEnabled: boolean }> {
-  const [a] = await query<Row>(`select count(*)::int n from medicines where status in ('active','catalog')`);
-  const [e] = await query<Row>(`select count(*)::int n from product_embeddings pe join medicines m on m.id = pe.medicine_id where m.status in ('active','catalog')`);
+  const [a] = await query<Row>(`select count(*)::int n from medicines where status = 'active'`);
+  const [e] = await query<Row>(`select count(*)::int n from product_embeddings pe join medicines m on m.id = pe.medicine_id where m.status = 'active'`);
   const active = Number(a?.n ?? 0);
   const embedded = Number(e?.n ?? 0);
   return { active, embedded, pending: Math.max(0, active - embedded), model: geminiEmbedModel(), aiEnabled: aiEnabled() };

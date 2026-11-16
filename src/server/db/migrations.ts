@@ -853,4 +853,28 @@ exception when others then null;
 end $$;
 `,
   },
+  {
+    id: "0017_salt_info",
+    sql: `
+-- General information per active ingredient (not per medicine), so the whole catalogue can be searched by symptom
+-- and shown with "used for" text without a row-by-row update of hundreds of thousands of medicines.
+-- Written by AI from well-known general knowledge and marked unreviewed until a pharmacist checks it.
+create table salt_info (
+  salt_id uuid primary key references salts(id) on delete cascade,
+  uses jsonb not null default '[]'::jsonb,
+  keywords text not null default '',
+  how_to_use text not null default '',
+  side_effects jsonb not null default '[]'::jsonb,
+  precautions jsonb not null default '[]'::jsonb,
+  search_text text not null default '',
+  source text not null default 'ai',
+  reviewed boolean not null default false,
+  reviewed_by uuid references users(id) on delete set null,
+  reviewed_at timestamptz,
+  model text,
+  generated_at timestamptz not null default now()
+);
+create index salt_info_search_trgm on salt_info using gin (search_text gin_trgm_ops);
+`,
+  },
 ];

@@ -204,6 +204,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
       {/* Information */}
       <section className="mt-12 grid gap-6 lg:grid-cols-2">
+        {product.ingredientInfo && (
+          <p className="lg:col-span-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
+            General information about the ingredients in this medicine{product.ingredientInfo.reviewed ? "" : ", not yet reviewed by our pharmacist"}. It is not a prescription or medical advice; please follow your doctor&apos;s or pharmacist&apos;s instructions.
+          </p>
+        )}
         {[
           product.description && { t: "About this product", body: <p>{product.description}</p> },
           product.howToUse && { t: "How to use", body: <p>{product.howToUse}</p> },
