@@ -7,6 +7,7 @@ import { PAYMENT_LABEL, dateTime, slotText } from "@/lib/orderStatus";
 import { DispatchBoard } from "./DispatchBoard";
 import { OnTheRoad } from "./OnTheRoad";
 import { AutoRefresh } from "./AutoRefresh";
+import { LiveRefresh } from "@/lib/live";
 
 export const metadata: Metadata = { title: "Fulfilment" };
 export const dynamic = "force-dynamic";
@@ -43,6 +44,7 @@ export default async function Fulfilment({ searchParams }: { searchParams: Promi
 
   return (
     <div className="space-y-5">
+      <LiveRefresh topics={["order"]} />
       <AutoRefresh />
       <div>
         <h1 className="text-2xl font-bold">Fulfilment</h1>

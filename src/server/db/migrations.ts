@@ -877,4 +877,77 @@ create table salt_info (
 create index salt_info_search_trgm on salt_info using gin (search_text gin_trgm_ops);
 `,
   },
+  {
+    id: "0018_chat_and_live",
+    sql: `
+-- One conversation per customer with the store team (the AI assistant keeps no history here).
+create table chat_threads (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references users(id) on delete cascade,
+  status text not null default 'open' check (status in ('open', 'closed')),
+  staff_unread integer not null default 0,
+  customer_unread integer not null default 0,
+  last_message_at timestamptz not null default now(),
+  last_preview text not null default '',
+  last_sender text not null default 'customer',
+  customer_read_at timestamptz,
+  staff_read_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create unique index chat_threads_user_uq on chat_threads (user_id);
+create index chat_threads_inbox_idx on chat_threads (status, last_message_at desc);
+
+create table chat_messages (
+  id bigserial primary key,
+  thread_id uuid not null references chat_threads(id) on delete cascade,
+  sender_role text not null check (sender_role in ('customer', 'staff', 'system')),
+  sender_id uuid references users(id) on delete set null,
+  body text not null check (char_length(body) between 1 and 2000),
+  ref_type text check (ref_type in ('order', 'prescription')),
+  ref_id uuid,
+  client_id text,
+  created_at timestamptz not null default now()
+);
+create index chat_messages_thread_idx on chat_messages (thread_id, id);
+create unique index chat_messages_client_uq on chat_messages (thread_id, client_id) where client_id is not null;
+
+-- Small "something changed" signals that the browser listens for, so pages update without a refresh.
+-- They carry only ids, never message text or personal data; the browser then asks the normal, access-checked API.
+create table live_events (
+  id bigserial primary key,
+  user_id uuid references users(id) on delete cascade,
+  staff boolean not null default false,
+  topic text not null,
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+create index live_events_user_idx on live_events (user_id, id) where user_id is not null;
+create index live_events_staff_idx on live_events (id) where staff;
+create index live_events_age_idx on live_events (created_at);
+
+-- Signals for orders and prescriptions come from the database itself, so every place that changes one
+-- (checkout, payments, packing, delivery, the pharmacist's review) is covered without each needing to remember.
+create function live_order_changed() returns trigger language plpgsql as $fn$
+begin
+  insert into live_events (user_id, topic, payload) values (new.user_id, 'order', jsonb_build_object('order', new.id));
+  insert into live_events (staff, topic, payload) values (true, 'order', jsonb_build_object('order', new.id));
+  return new;
+end $fn$;
+create trigger orders_live_insert after insert on orders for each row execute function live_order_changed();
+create trigger orders_live_update after update of status, payment_status on orders for each row
+  when (old.status is distinct from new.status or old.payment_status is distinct from new.payment_status)
+  execute function live_order_changed();
+
+create function live_rx_changed() returns trigger language plpgsql as $fn$
+begin
+  insert into live_events (user_id, topic, payload) values (new.user_id, 'prescription', jsonb_build_object('prescription', new.id));
+  insert into live_events (staff, topic, payload) values (true, 'prescription', jsonb_build_object('prescription', new.id));
+  return new;
+end $fn$;
+create trigger prescriptions_live_insert after insert on prescriptions for each row execute function live_rx_changed();
+create trigger prescriptions_live_update after update of status on prescriptions for each row
+  when (old.status is distinct from new.status)
+  execute function live_rx_changed();
+`,
+  },
 ];

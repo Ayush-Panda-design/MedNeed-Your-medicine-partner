@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { query } from "@/server/db";
 import { requireStaff } from "@/server/auth/session";
+import { LiveRefresh } from "@/lib/live";
 
 const fmt = new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" });
 
@@ -37,6 +38,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      <LiveRefresh topics={["order"]} />
       <div>
         <h1 className="text-2xl font-bold">Welcome back, {user.name?.split(" ")[0] ?? "there"}</h1>
         <p className="mt-1 text-sm text-slate-500">Open orders are under Orders. Stock and expiry alerts are under Inventory.</p>

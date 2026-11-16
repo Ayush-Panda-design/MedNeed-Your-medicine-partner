@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, ClipboardList, FileCheck2, LayoutDashboard, LogOut, MapPinned, Package, PackageCheck, PackageSearch, Settings, ShieldCheck, Sparkles, Store, Tag, Truck, Users } from "lucide-react";
+import { Bell, ClipboardList, Inbox, FileCheck2, LayoutDashboard, LogOut, MapPinned, Package, PackageCheck, PackageSearch, Settings, ShieldCheck, Sparkles, Store, Tag, Truck, Users } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/providers";
+import { useLive } from "@/lib/live";
+import { useCallback, useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 
 type Shell = { name: string; email: string | null; roles: string[] };
@@ -14,6 +16,7 @@ const nav = [
   { href: "/admin/catalog", label: "Catalog", icon: PackageSearch, roles: ["admin", "pharmacist", "inventory_manager"] },
   { href: "/admin/ai", label: "AI search", icon: Sparkles, roles: ["admin"] },
   { href: "/admin/inventory", label: "Inventory", icon: Package, roles: ["admin", "pharmacist", "inventory_manager"] },
+  { href: "/admin/inbox", label: "Inbox", icon: Inbox, roles: ["admin", "pharmacist"] },
   { href: "/admin/orders", label: "Orders", icon: ClipboardList, roles: ["admin", "pharmacist"] },
   { href: "/admin/fulfilment", label: "Fulfilment", icon: PackageCheck, roles: ["admin", "pharmacist"] },
   { href: "/admin/prescriptions", label: "Prescriptions", icon: FileCheck2, roles: ["admin", "pharmacist"] },
@@ -27,11 +30,31 @@ const nav = [
 ];
 const soon: { label: string; icon: typeof FileCheck2; roles: string[]; phase: string }[] = [];
 
+/** Unread customer messages, kept up to date live. */
+function useInboxUnread(enabled: boolean) {
+  const [n, setN] = useState(0);
+  const load = useCallback(async () => {
+    if (!enabled) return;
+    try {
+      const res = await fetch("/api/admin/chat/threads?filter=unread", { cache: "no-store" });
+      if (res.ok) setN(((await res.json()) as { unreadTotal: number }).unreadTotal);
+    } catch {
+      /* keep the last number */
+    }
+  }, [enabled]);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  useLive(enabled ? ["chat"] : ["__none__"], () => void load());
+  return n;
+}
+
 export function AdminShell({ user, children }: { user: Shell; children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const auth = useAuth();
   const has = (roles: string[]) => roles.some((r) => user.roles.includes(r));
+  const inboxUnread = useInboxUnread(has(["admin", "pharmacist"]));
 
   return (
     <div className="min-h-screen bg-slate-100 md:flex">
@@ -41,6 +64,7 @@ export function AdminShell({ user, children }: { user: Shell; children: React.Re
           {nav.filter((n) => has(n.roles)).map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} aria-current={path === href || (href !== "/admin" && path.startsWith(`${href}/`)) ? "page" : undefined} className={`flex items-center gap-3 whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium ${path === href || (href !== "/admin" && path.startsWith(`${href}/`)) ? "bg-teal-600 text-white" : "hover:bg-slate-800"}`}>
               <Icon className="h-4 w-4" /> {label}
+              {href === "/admin/inbox" && inboxUnread > 0 && <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-rose-500 px-1 text-[11px] font-bold text-white">{inboxUnread > 99 ? "99+" : inboxUnread}</span>}
             </Link>
           ))}
           {soon.some((n) => has(n.roles)) && <p className="mt-4 hidden px-3 text-xs font-semibold uppercase tracking-wide text-slate-500 md:block">Coming soon</p>}

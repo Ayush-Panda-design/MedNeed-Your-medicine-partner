@@ -4,6 +4,7 @@ import { requireStaff } from "@/server/auth/session";
 import { adminListOrders } from "@/server/orders/queries";
 import { formatINR } from "@/lib/catalog";
 import { STATUS_LABEL, STATUS_STYLE, dateTime } from "@/lib/orderStatus";
+import { LiveRefresh } from "@/lib/live";
 
 export const metadata: Metadata = { title: "Orders" };
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
 
   return (
     <div className="space-y-5">
+      <LiveRefresh topics={["order"]} />
       <div><h1 className="text-2xl font-bold">Orders</h1><p className="mt-1 text-sm text-slate-500">{open} order{open === 1 ? "" : "s"} to pack or deliver.</p></div>
       <div className="flex flex-wrap items-center gap-2">
         {TABS.map(([v, label]) => (

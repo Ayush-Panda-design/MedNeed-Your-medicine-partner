@@ -18,7 +18,7 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
       <Header categories={categories} />
       {children}
       <Footer categories={categories} business={business} />
-      {aiEnabled() && <SupportChat />}
+      <SupportChat aiEnabled={aiEnabled()} />
       <RevealOnScroll />
       <PointerFx />
       <InteractiveFx />

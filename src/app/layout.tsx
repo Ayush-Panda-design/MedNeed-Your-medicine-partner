@@ -7,6 +7,7 @@ import { Toaster } from "@/components/Toaster";
 import { appUrl } from "@/server/env";
 import { lexend } from "@/lib/fonts";
 import { ThemeSync, themeScript } from "@/components/ThemeToggle";
+import { LiveProvider } from "@/lib/live";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl()),
@@ -21,10 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <ThemeSync />
         <Providers>
-          {children}
-          <Toaster />
-          <ScrollToTop />
-          <ButtonFx />
+          <LiveProvider>
+            {children}
+            <Toaster />
+            <ScrollToTop />
+            <ButtonFx />
+          </LiveProvider>
         </Providers>
       </body>
     </html>

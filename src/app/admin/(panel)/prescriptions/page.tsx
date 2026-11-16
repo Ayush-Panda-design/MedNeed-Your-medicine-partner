@@ -4,6 +4,7 @@ import { requireStaff } from "@/server/auth/session";
 import { adminListPrescriptions } from "@/server/prescriptions/service";
 import { RX_LABEL, RX_STYLE } from "@/lib/prescriptionStatus";
 import { dateTime } from "@/lib/orderStatus";
+import { LiveRefresh } from "@/lib/live";
 
 export const metadata: Metadata = { title: "Prescriptions" };
 export const dynamic = "force-dynamic";
@@ -27,6 +28,7 @@ export default async function AdminPrescriptions({ searchParams }: { searchParam
 
   return (
     <div className="space-y-5">
+      <LiveRefresh topics={["prescription"]} />
       <div><h1 className="text-2xl font-bold">Prescriptions</h1><p className="mt-1 text-sm text-slate-500">{counts.pending ?? 0} waiting for review{counts.needs_info ? `, ${counts.needs_info} waiting for the customer` : ""}. Oldest first.</p></div>
       <div className="flex flex-wrap items-center gap-2">
         {TABS.map(([v, label]) => (

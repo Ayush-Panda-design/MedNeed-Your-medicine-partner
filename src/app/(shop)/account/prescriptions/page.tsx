@@ -5,6 +5,7 @@ import { requireUser } from "@/server/auth/session";
 import { listUserPrescriptions } from "@/server/prescriptions/service";
 import { RX_LABEL, RX_STYLE, rxState } from "@/lib/prescriptionStatus";
 import { dateTime } from "@/lib/orderStatus";
+import { LiveRefresh } from "@/lib/live";
 
 export const metadata: Metadata = { title: "My prescriptions", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -30,6 +31,7 @@ export default async function PrescriptionsPage() {
             const st = rxState(p);
             return (
               <li key={p.id}>
+                <LiveRefresh topics={["prescription"]} />
                 <Link href={`/account/prescriptions/${p.id}`} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-5 hover:border-teal-300">
                   <div>
                     <p className="font-semibold">{p.doctorName ? `Dr ${p.doctorName.replace(/^dr\.?\s*/i, "")}` : "Prescription"}{p.patientName ? ` · ${p.patientName}` : ""}</p>

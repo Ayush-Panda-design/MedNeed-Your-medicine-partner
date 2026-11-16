@@ -5,6 +5,7 @@ import { requireUser } from "@/server/auth/session";
 import { listOrdersForUser } from "@/server/orders/queries";
 import { formatINR } from "@/lib/catalog";
 import { STATUS_STYLE, dateTime, labelFor } from "@/lib/orderStatus";
+import { LiveRefresh } from "@/lib/live";
 
 export const metadata: Metadata = { title: "My orders" };
 export const dynamic = "force-dynamic";
@@ -14,6 +15,7 @@ export default async function OrdersPage() {
   const orders = await listOrdersForUser(claims.userId);
   return (
     <div>
+      <LiveRefresh topics={["order"]} />
       <h2 className="text-lg font-bold">My orders</h2>
       {orders.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">

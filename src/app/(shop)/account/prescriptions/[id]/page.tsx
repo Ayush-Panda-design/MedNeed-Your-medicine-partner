@@ -7,6 +7,8 @@ import { getUserPrescription } from "@/server/prescriptions/service";
 import { RX_LABEL, RX_STYLE, fileUrl, rxState } from "@/lib/prescriptionStatus";
 import { STATUS_LABEL, dateTime } from "@/lib/orderStatus";
 import { PrescriptionActions } from "./PrescriptionActions";
+import { LiveRefresh } from "@/lib/live";
+import { AskStoreButton } from "@/components/chat/AskStoreButton";
 
 export const metadata: Metadata = { title: "Prescription", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -20,6 +22,7 @@ export default async function PrescriptionPage({ params, searchParams }: { param
   const st = rxState(p);
   return (
     <div className="space-y-5">
+      <LiveRefresh topics={["prescription"]} match={{ key: "prescription", value: p.id }} />
       {uploaded && (
         <div role="status" className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900">
           <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0" />
@@ -76,6 +79,8 @@ export default async function PrescriptionPage({ params, searchParams }: { param
         <h3 className="font-bold">Progress</h3>
         <ol className="mt-3 space-y-2 text-sm">{p.events.map((e, i) => <li key={i} className="flex justify-between gap-3"><span>{e.note || e.status}</span><span className="shrink-0 text-slate-500">{dateTime(e.at)}</span></li>)}</ol>
       </section>
+
+      <AskStoreButton type="prescription" id={p.id} label={`Prescription of ${new Date(p.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`} />
 
       <PrescriptionActions id={p.id} status={p.status} canRemove={p.orders.every((o) => o.status === "cancelled" || o.status === "expired")} />
     </div>

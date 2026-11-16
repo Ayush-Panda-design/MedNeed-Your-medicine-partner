@@ -172,7 +172,7 @@ body.mn-has-chat .mn-fab { bottom: 6.25rem; }
 body.mn-chat-open .mn-fab { display: none; }
 @media (max-width: 1023px) {
   body.mn-has-buybar .mn-chat-fab { bottom: 5.5rem; }
-  body.mn-has-buybar .mn-chat-panel { bottom: 9rem; }
+  body.mn-has-buybar .mn-chat-panel { bottom: 9rem; max-height: calc(100dvh - 11rem); }
   body.mn-has-chat.mn-has-buybar .mn-fab { bottom: 10rem; }
 }
 

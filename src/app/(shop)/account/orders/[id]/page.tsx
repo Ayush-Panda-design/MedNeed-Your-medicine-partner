@@ -13,6 +13,8 @@ import { OrderTracker } from "@/components/OrderTracker";
 import { CancelOrder } from "./CancelOrder";
 import { PayNow } from "./PayNow";
 import { FileText } from "lucide-react";
+import { LiveRefresh } from "@/lib/live";
+import { AskStoreButton } from "@/components/chat/AskStoreButton";
 
 export const metadata: Metadata = { title: "Order details", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -29,6 +31,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
 
   return (
     <div className="space-y-5">
+      <LiveRefresh topics={["order"]} match={{ key: "order", value: o.id }} />
       {placed && (
         <div role="status" className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900">
           <CheckCircle2 className="mn-tick mt-0.5 h-6 w-6 shrink-0" />
@@ -110,6 +113,9 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
           <FileText className="h-4 w-4" /> Download invoice {o.invoiceNumber}
         </a>
       )}
+      <div className="flex flex-wrap gap-3">
+        <AskStoreButton type="order" id={o.id} label={`Order ${o.orderNumber}`} />
+      </div>
       {canCancel && <CancelOrder id={o.id} />}
     </div>
   );
