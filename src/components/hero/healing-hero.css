@@ -564,3 +564,59 @@
 .hh-card-track { left: auto !important; right: 5.5%; top: auto !important; bottom: 17%; width: 15rem !important; }
 @media (min-width: 1536px) { .hh-card-track { right: 8%; } }
 :where(html.dark) .hh-card { background: rgb(8 14 28 / .45); border-color: rgb(255 255 255 / .14); }
+
+
+/* ───────── v9: lively typography and calls to action ─────────
+ * Only transform, opacity, clip and background-position are animated, so it stays smooth on phones; everything is
+ * inside no-preference, so people who prefer reduced motion see the finished text at once. The scene's existing
+ * [data-paused] rule stops it all while the hero is off screen. Colours are the same pale limes and whites that already
+ * read on both the day and the night scene, so light and dark mode need no separate treatment beyond a stronger glow. */
+.hh-w { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.05em 0.06em 0.16em; margin: -0.05em -0.06em -0.16em; }
+.hh-w > span, .hh-sw > span { display: inline-block; }
+.hh-sw { display: inline-block; }
+.hh-hl { position: relative; white-space: nowrap; font-weight: 600; color: #fff; }
+.hh-pop { display: inline-block; }
+.hh-spark { position: absolute; width: 0.3em; height: 0.3em; fill: #fefce8; opacity: 0; pointer-events: none; filter: drop-shadow(0 0 6px rgb(217 249 157 / 0.9)); }
+.hh-spark-a { right: -0.08em; top: -0.04em; }
+.hh-spark-b { left: 18%; top: -0.1em; width: 0.2em; height: 0.2em; }
+
+.hh-points li { display: inline-flex; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hh-w > span { transform: translateY(112%) rotate(5deg); transform-origin: 0 100%; opacity: 0; animation: hh-word 0.85s cubic-bezier(0.2, 0.9, 0.2, 1) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+  .hh-sw > span { opacity: 0; transform: translateY(0.5em); filter: blur(6px); animation: hh-fadeword 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+  .hh-pop { animation: hh-pop 1s cubic-bezier(0.2, 1.2, 0.3, 1) both; animation-delay: calc(var(--d, 0ms) + 200ms); transform-origin: 50% 100%; }
+  /* The highlight under "registered pharmacist" sweeps in, then glows softly. */
+  .hh-hl::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0.02em; height: 0.42em; z-index: -1; border-radius: 0.2em; background: linear-gradient(90deg, rgb(190 242 100 / 0.5), rgb(134 239 172 / 0.4)); transform: scaleX(0); transform-origin: 0 50%; animation: hh-hl 0.9s cubic-bezier(0.6, 0.05, 0.2, 1) 1.5s both, hh-hlglow 4s ease-in-out 2.6s infinite; }
+  .hh-spark-a { animation: hh-twinkle 3.2s ease-in-out 1.6s infinite; }
+  .hh-spark-b { animation: hh-twinkle 3.2s ease-in-out 2.7s infinite; }
+
+  .hh-points li { opacity: 0; transform: translateY(10px) scale(0.94); animation: hh-chip 0.6s cubic-bezier(0.2, 1.1, 0.3, 1) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+  .hh-points li svg { animation: hh-tick 4.5s ease-in-out infinite; }
+  .hh-points li:nth-child(2) svg { animation-delay: 0.6s; }
+  .hh-points li:nth-child(3) svg { animation-delay: 1.2s; }
+
+  /* Buttons: a light sweep across "Order medicines", a breathing ring, a nudging arrow, and a lean toward the pointer. */
+  .hh-btn-primary, .hh-btn-ghost { position: relative; overflow: hidden; translate: var(--bx, 0px) var(--by, 0px); }
+  .hh-btn-primary::before { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgb(34 197 94 / 0.28) 50%, transparent 65%); transform: translateX(-120%); animation: hh-sweep 3.8s ease-in-out 2s infinite; pointer-events: none; }
+  .hh-btn-primary { animation: hh-ring 2.8s ease-out 2.2s infinite; }
+  .hh-btn-primary > svg { animation: hh-nudge 1.6s ease-in-out 2.4s infinite; }
+  .hh-btn-ghost:hover svg { animation: hh-hop 0.6s ease; }
+  .hh-btn-primary:active, .hh-btn-ghost:active { transform: scale(0.97); }
+}
+:where(html.dark) .hh-btn-primary { --ring: 190 242 100; }
+.hh-btn-primary { --ring: 255 255 255; }
+:where(html.dark) .hh-spark { filter: drop-shadow(0 0 8px rgb(190 242 100 / 1)); }
+
+@keyframes hh-word { from { transform: translateY(112%) rotate(5deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes hh-fadeword { from { opacity: 0; transform: translateY(0.5em); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes hh-pop { 0% { opacity: 0; transform: translateY(40%) scale(0.7); filter: blur(10px); } 60% { opacity: 1; transform: translateY(-4%) scale(1.06); filter: blur(0); } 100% { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes hh-hl { to { transform: scaleX(1); } }
+@keyframes hh-hlglow { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+@keyframes hh-twinkle { 0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); } 45% { opacity: 1; transform: scale(1) rotate(45deg); } 70% { opacity: 0; transform: scale(0.4) rotate(90deg); } }
+@keyframes hh-chip { from { opacity: 0; transform: translateY(10px) scale(0.94); } to { opacity: 1; transform: none; } }
+@keyframes hh-tick { 0%, 88%, 100% { transform: none; } 92% { transform: scale(1.35) rotate(-8deg); } 96% { transform: scale(1) rotate(0deg); } }
+@keyframes hh-sweep { 0% { transform: translateX(-120%); } 45%, 100% { transform: translateX(120%); } }
+@keyframes hh-ring { 0% { box-shadow: 0 12px 28px -10px rgb(0 0 0 / 0.55), 0 0 0 0 rgb(var(--ring) / 0.55); } 70%, 100% { box-shadow: 0 12px 28px -10px rgb(0 0 0 / 0.55), 0 0 0 14px rgb(var(--ring) / 0); } }
+@keyframes hh-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+@keyframes hh-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-3px); } }

@@ -86,6 +86,23 @@ const STEPS = [
 
 const depth = (n: number): CSSProperties => ({ transform: `translate3d(calc(var(--mx) * ${n}px), calc(var(--my) * ${n * 0.5}px + var(--sy) * ${n * 1.6}px), 0)` });
 
+/** Splits text into words that rise into view one after another (pure CSS, so it also works before hydration and is visible without motion). */
+function Words({ text, start, step = 70, kind = "mask" }: { text: string; start: number; step?: number; kind?: "mask" | "fade" }) {
+  const words = text.split(" ");
+  return (
+    <>
+      {words.map((w, i) => (
+        <span key={i}>
+          <span className={kind === "mask" ? "hh-w" : "hh-sw"} style={{ "--d": `${start + i * step}ms` } as CSSProperties}>
+            <span>{w}</span>
+          </span>
+          {i < words.length - 1 ? " " : ""}
+        </span>
+      ))}
+    </>
+  );
+}
+
 function StepIcon({ name }: { name: (typeof STEPS)[number]["icon"] }) {
   const cls = "h-4 w-4";
   if (name === "pill") return <Pill className={cls} aria-hidden />;
@@ -115,6 +132,20 @@ export function HealingHero() {
     const timer = window.setInterval(() => {
       if (visible.current && !document.hidden) setStep((s) => (s + 1) % STEPS.length);
     }, 2600);
+
+    // Buttons lean slightly toward the pointer (desktop only).
+    const magnets = window.matchMedia("(pointer: fine)").matches ? Array.from(el.querySelectorAll<HTMLElement>(".hh-btn-primary, .hh-btn-ghost")) : [];
+    const offs: (() => void)[] = magnets.map((b) => {
+      const move = (e: PointerEvent) => {
+        const r = b.getBoundingClientRect();
+        b.style.setProperty("--bx", `${(((e.clientX - r.left) / r.width - 0.5) * 8).toFixed(1)}px`);
+        b.style.setProperty("--by", `${(((e.clientY - r.top) / r.height - 0.5) * 6).toFixed(1)}px`);
+      };
+      const out = () => { b.style.setProperty("--bx", "0px"); b.style.setProperty("--by", "0px"); };
+      b.addEventListener("pointermove", move);
+      b.addEventListener("pointerleave", out);
+      return () => { b.removeEventListener("pointermove", move); b.removeEventListener("pointerleave", out); };
+    });
 
     // Gentle parallax: pointer (desktop) and scroll.
     let tx = 0, ty = 0, cx = 0, cy = 0, sy = 0, raf = 0;
@@ -157,6 +188,7 @@ export function HealingHero() {
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("scroll", onScroll);
+      offs.forEach((off) => off());
       cancelAnimationFrame(raf);
     };
   }, []);
@@ -397,23 +429,27 @@ export function HealingHero() {
           </p>
 
           <h1 id="hh-title" className="hh-title">
-            <span className="hh-line hh-l1 hh-in" style={{ "--d": "120ms" } as CSSProperties}>Good health,</span>
-            <span className="hh-line hh-l2 hh-in" style={{ "--d": "260ms" } as CSSProperties}>
+            <span className="hh-line hh-l1"><Words text="Good health," start={140} /></span>
+            <span className="hh-line hh-l2">
               <em className="hh-em">
-                <span className="hh-em-text">delivered</span>
+                <span className="hh-em-text hh-pop" style={{ "--d": "420ms" } as CSSProperties}>delivered</span>
                 <svg className="hh-swash" viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden>
                   <path d="M3 10.5C38 4 86 2.5 128 5.5c26 1.9 48 4.6 68-1.5" pathLength={1} />
                 </svg>
+                <svg className="hh-spark hh-spark-a" viewBox="0 0 24 24" aria-hidden><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z" /></svg>
+                <svg className="hh-spark hh-spark-b" viewBox="0 0 24 24" aria-hidden><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z" /></svg>
               </em>{" "}
-              <span className="hh-rest">to your door.</span>
+              <span className="hh-rest"><Words text="to your door." start={560} /></span>
             </span>
           </h1>
 
-          <p className="hh-sub hh-in" style={{ "--d": "420ms" } as CSSProperties}>
-            Genuine medicines from your neighbourhood pharmacy, checked by a registered pharmacist and brought to you between 7&nbsp;AM and 10&nbsp;PM.
+          <p className="hh-sub">
+            <Words kind="fade" step={20} start={520} text="Genuine medicines from your neighbourhood pharmacy, checked by a" />{" "}
+            <span className="hh-hl"><Words kind="fade" step={20} start={700} text="registered pharmacist" /></span>{" "}
+            <Words kind="fade" step={20} start={740} text={"and brought to you between 7\u00a0AM and 10\u00a0PM."} />
           </p>
 
-          <div className="hh-actions hh-in" style={{ "--d": "560ms" } as CSSProperties}>
+          <div className="hh-actions hh-in" style={{ "--d": "800ms" } as CSSProperties}>
             <Link href="/medicines" className="hh-btn-primary group">
               <span className="sm:hidden">Order now</span>
               <span className="hidden sm:inline">Order medicines</span>
@@ -426,10 +462,10 @@ export function HealingHero() {
             </Link>
           </div>
 
-          <ul className="hh-points hh-in" style={{ "--d": "700ms" } as CSSProperties}>
-            <li><ShieldCheck className="h-4 w-4" aria-hidden /> Pharmacist-verified</li>
-            <li><Check className="h-4 w-4" aria-hidden /> Genuine medicines</li>
-            <li className="hidden sm:inline-flex"><Truck className="h-4 w-4" aria-hidden /> Free delivery over ₹499</li>
+          <ul className="hh-points">
+            <li style={{ "--d": "1000ms" } as CSSProperties}><ShieldCheck className="h-4 w-4" aria-hidden /> Pharmacist-verified</li>
+            <li style={{ "--d": "1120ms" } as CSSProperties}><Check className="h-4 w-4" aria-hidden /> Genuine medicines</li>
+            <li className="hidden sm:inline-flex" style={{ "--d": "1240ms" } as CSSProperties}><Truck className="h-4 w-4" aria-hidden /> Free delivery over ₹499</li>
           </ul>
         </div>
       </div>
