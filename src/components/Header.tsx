@@ -32,11 +32,13 @@ export function Header({ categories }: { categories: Category[] }) {
   const [spacer, setSpacer] = useState<number | null>(null);
 
   useEffect(() => {
-    const hero = isHome ? document.getElementById("mn-cine") : null;
-    setFloatOverHero(Boolean(hero));
     let raf = 0;
+    // The hero is looked up on every update, not once: the page can stream in after the header mounts (the loading skeleton shows first),
+    // and a header that missed the hero would stay in its plain "not on the homepage" look.
     const update = () => {
       raf = 0;
+      const hero = isHome ? document.getElementById("mn-cine") : null;
+      setFloatOverHero(Boolean(hero));
       const y = window.scrollY;
       const over = hero ? hero.getBoundingClientRect().bottom > 120 : false;
       setOverHero(over);
@@ -47,7 +49,10 @@ export function Header({ categories }: { categories: Category[] }) {
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); cancelAnimationFrame(raf); };
+    // Re-check when page content is added or swapped (streaming, navigation). Only on the homepage, and only structural changes.
+    const mo = isHome ? new MutationObserver(onScroll) : null;
+    mo?.observe(document.body, { childList: true, subtree: true });
+    return () => { mo?.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); cancelAnimationFrame(raf); };
   }, [isHome]);
 
   useEffect(() => { if (!compact) setSearchOpen(false); }, [compact]);
