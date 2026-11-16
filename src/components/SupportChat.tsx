@@ -34,6 +34,15 @@ export function SupportChat() {
     if (open) inputRef.current?.focus();
   }, [open]);
 
+  // Lets the stylesheet keep the scroll-to-top button clear of the chat button and panel.
+  useEffect(() => {
+    document.body.classList.add("mn-has-chat");
+    return () => document.body.classList.remove("mn-has-chat", "mn-chat-open");
+  }, []);
+  useEffect(() => {
+    document.body.classList.toggle("mn-chat-open", open);
+  }, [open]);
+
   async function send(text: string) {
     const q = text.trim();
     if (!q || busy) return;

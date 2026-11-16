@@ -167,6 +167,14 @@ html.mn-reveal-ready [data-reveal].mn-in {
 
 /* Sticky mobile buy bar lifts the back-to-top button so they never overlap. */
 @media (max-width: 1023px) { body.mn-has-buybar .mn-fab { bottom: 5.5rem; } }
+/* The chat launcher and the scroll-to-top button used to sit on the same spot. When the chat is on the page (body.mn-has-chat, set by SupportChat), scroll-to-top sits above it, and hides while the chat panel is open. */
+body.mn-has-chat .mn-fab { bottom: 6.25rem; }
+body.mn-chat-open .mn-fab { display: none; }
+@media (max-width: 1023px) {
+  body.mn-has-buybar .mn-chat-fab { bottom: 5.5rem; }
+  body.mn-has-buybar .mn-chat-panel { bottom: 9rem; }
+  body.mn-has-chat.mn-has-buybar .mn-fab { bottom: 10rem; }
+}
 
 /* Order tracker: the active step pulses; the delivery truck bobs along. */
 @keyframes mn-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(27,127,51,.35); } 70% { box-shadow: 0 0 0 9px rgba(27,127,51,0); } 100% { box-shadow: 0 0 0 0 rgba(27,127,51,0); } }
