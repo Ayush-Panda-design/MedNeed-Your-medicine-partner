@@ -19,19 +19,19 @@ const ERRORS: Record<string, string> = {
   account_disabled: "This account has been disabled. Contact support.",
 };
 
-export function LoginForm({ googleEnabled, captchaSiteKey = null }: { googleEnabled: boolean; captchaSiteKey?: string | null }) {
+export function LoginForm({ googleEnabled, smsEnabled = true, captchaSiteKey = null }: { googleEnabled: boolean; smsEnabled?: boolean; captchaSiteKey?: string | null }) {
   return (
     <Suspense>
-      <LoginInner googleEnabled={googleEnabled} captchaSiteKey={captchaSiteKey} />
+      <LoginInner googleEnabled={googleEnabled} smsEnabled={smsEnabled} captchaSiteKey={captchaSiteKey} />
     </Suspense>
   );
 }
 
-function LoginInner({ googleEnabled, captchaSiteKey }: { googleEnabled: boolean; captchaSiteKey: string | null }) {
+function LoginInner({ googleEnabled, smsEnabled, captchaSiteKey }: { googleEnabled: boolean; smsEnabled: boolean; captchaSiteKey: string | null }) {
   const params = useSearchParams();
   const rawNext = params.get("next") ?? "/";
   const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
-  const [tab, setTab] = useState<"phone" | "email">("phone");
+  const [tab, setTab] = useState<"phone" | "email">(smsEnabled ? "phone" : "email");
   const urlError = ERRORS[params.get("error") ?? ""] ?? "";
 
   return (
@@ -67,7 +67,7 @@ function LoginInner({ googleEnabled, captchaSiteKey }: { googleEnabled: boolean;
             </p>
           )}
 
-          <div role="tablist" aria-label="Sign-in method" className="mt-6 grid grid-cols-2 rounded-xl bg-slate-100 p-1 text-sm font-semibold">
+          {smsEnabled && <div role="tablist" aria-label="Sign-in method" className="mt-6 grid grid-cols-2 rounded-xl bg-slate-100 p-1 text-sm font-semibold">
             {([["phone", "Mobile OTP", Smartphone], ["email", "Email", Mail]] as const).map(([key, label, Icon]) => (
               <button
                 key={key}
@@ -79,9 +79,9 @@ function LoginInner({ googleEnabled, captchaSiteKey }: { googleEnabled: boolean;
                 <Icon className="h-4 w-4" /> {label}
               </button>
             ))}
-          </div>
+          </div>}
 
-          <div className="mt-6">{tab === "phone" ? <PhoneFlow next={next} captchaSiteKey={captchaSiteKey} /> : <EmailFlow next={next} />}</div>
+          <div className="mt-6">{smsEnabled && tab === "phone" ? <PhoneFlow next={next} captchaSiteKey={captchaSiteKey} /> : <EmailFlow next={next} />}</div>
 
           <div className="my-6 flex items-center gap-3 text-xs text-slate-400">
             <span className="h-px flex-1 bg-slate-200" /> OR <span className="h-px flex-1 bg-slate-200" />

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { googleConfig } from "@/server/env";
+import { googleConfig, isProd, smsDriver } from "@/server/env";
 import { captchaSiteKey } from "@/server/security/captcha";
 import { LoginForm } from "./LoginForm";
 
@@ -8,5 +8,7 @@ export const metadata: Metadata = { title: "Sign in" };
 export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
-  return <LoginForm googleEnabled={Boolean(googleConfig())} captchaSiteKey={captchaSiteKey()} />;
+  // Mobile OTP is offered only when texts can really be sent (a real SMS provider, or the dev console while developing).
+  const smsEnabled = !isProd() || smsDriver() !== "console";
+  return <LoginForm googleEnabled={Boolean(googleConfig())} smsEnabled={smsEnabled} captchaSiteKey={captchaSiteKey()} />;
 }

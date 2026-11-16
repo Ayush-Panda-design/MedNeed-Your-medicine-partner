@@ -7,6 +7,7 @@ import { lockMedicines, allocateFefo, returnSale } from "../inventory/stock";
 import { rateLimit } from "../security/rate-limit";
 import { processRefundsForOrder, queueRefundForOrder } from "../payments/refunds";
 import { razorpayConfigured } from "../payments/razorpay";
+import { emailLinksAvailable } from "../auth/email-links";
 import { kickNotifications, notifyOrder } from "../notifications/queue";
 import { lockPrescriptions, planPrescriptions, recordUsage, releaseRxUsage, type RxLine } from "../prescriptions/coverage";
 import { assignInvoiceNumber } from "./invoice-number";
@@ -65,6 +66,15 @@ type Placed = { id: string; orderNumber: string; total: number; status: string; 
 export async function placeOrder(user: { id: string; name: string | null; phone: string | null }, input: PlaceOrderInput, ip?: string): Promise<Placed> {
   await rateLimit(`order:${user.id}`, Number(process.env.ORDER_RATE_LIMIT) || 10, 600, "Too many orders in a short time. Please wait a few minutes.");
   await expirePendingOrders().catch(() => undefined);
+
+  // Once the site can send email, an emailed address must be verified before an order (confirmations and receipts go there). Staff accounts are exempt so the shop can test.
+  if (emailLinksAvailable()) {
+    const [u] = await query<{ email: string | null; email_verified: boolean; staff: boolean }>(
+      `select u.email, u.email_verified, exists (select 1 from user_roles r where r.user_id = u.id and r.role in ('admin', 'pharmacist')) as staff from users u where u.id = $1`,
+      [user.id],
+    );
+    if (u?.email && !u.email_verified && !u.staff) throw new ApiError(403, `Please verify your email address (${u.email}) before placing an order. We sent you a link; you can send it again from My account.`, "email_unverified");
+  }
 
   const existing = await query<{ id: string; order_number: string; total: string; status: string }>(`select id, order_number, total, status from orders where user_id = $1 and idempotency_key = $2`, [user.id, input.idempotencyKey]);
   if (existing[0]) return { id: existing[0].id, orderNumber: existing[0].order_number, total: Number(existing[0].total), status: existing[0].status, replayed: true };
