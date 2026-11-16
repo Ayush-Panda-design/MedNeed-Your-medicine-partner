@@ -18,7 +18,8 @@ import { generateJSON, AiUnavailable } from "../src/server/ai/gemini";
 import { cleanSaltInfo, searchTextOf, type SaltInfoInput } from "../src/server/catalog/salt-info";
 import { geminiModel } from "../src/server/env";
 
-const BATCH = 12;
+// Ingredients per AI request. ENRICH_BATCH overrides it (for example $env:ENRICH_BATCH=12 for smaller, safer batches).
+const BATCH = Math.min(40, Math.max(4, Number(process.env.ENRICH_BATCH) || 25));
 const SYSTEM = `You write short, general patient-facing information about medicine ingredients for an Indian online pharmacy.
 Rules:
 - Use only widely known, well-established information. If you are not sure about an ingredient, return an empty "uses" list for it.
@@ -56,7 +57,7 @@ async function main() {
      where si.salt_id is null order by n desc, s.name`,
   )) as { id: string; name: string; n: string }[];
   const work = todo.slice(0, limit);
-  console.log(`${todo.length} ingredients still need information. Doing ${work.length}. Model: ${geminiModel()}`);
+  console.log(`${todo.length} ingredients still need information. Doing ${work.length}, ${BATCH} per request. Model: ${geminiModel()}`);
 
   let done = 0, empty = 0, waits = 0;
   for (let i = 0; i < work.length; i += BATCH) {
@@ -66,7 +67,7 @@ async function main() {
       try {
         const res = await generateJSON<{ ingredients?: SaltInfoInput[] } | SaltInfoInput[]>(
           [{ text: `Ingredients: ${JSON.stringify(chunk.map((c) => c.name))}\nReturn JSON like {"ingredients":[{"name":"<exactly as given>","uses":[],"keywords":[],"how_to_use":"","side_effects":[],"precautions":[]}]} with one entry per ingredient.` }],
-          { system: SYSTEM, temperature: 0.2, maxOutputTokens: 4096 },
+          { system: SYSTEM, temperature: 0.2, maxOutputTokens: Math.max(4096, BATCH * 330) },
         );
         out = Array.isArray(res) ? res : res.ingredients ?? [];
       } catch (e) {
