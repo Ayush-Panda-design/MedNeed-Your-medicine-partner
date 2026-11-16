@@ -59,7 +59,7 @@ export function CheckoutForm({ initialAddresses }: { initialAddresses: Address[]
   // Pick a valid payment method whenever the way of receiving the order changes.
   useEffect(() => {
     if (!data) return;
-    if (fulfilment === "pickup") setPayment("pay_at_store");
+    if (fulfilment === "pickup") setPayment((p) => (p === "online" && data.onlineEnabled ? "online" : "pay_at_store"));
     else setPayment((p) => (p === "pay_at_store" ? (data.codEnabled ? "cod" : data.onlineEnabled ? "online" : "cod") : p));
   }, [fulfilment, data]);
   useEffect(() => { if (settings && fulfilment === "delivery" && !settings.deliveryEnabled && settings.pickupEnabled) setFulfilment("pickup"); }, [settings, fulfilment]);
@@ -209,7 +209,15 @@ export function CheckoutForm({ initialAddresses }: { initialAddresses: Address[]
             <h2 className="font-bold">Payment</h2>
             <div className="mt-3 space-y-3">
               {fulfilment === "pickup" ? (
-                <label className="flex items-start gap-3 rounded-xl border border-teal-600 bg-teal-50 p-4"><input type="radio" checked readOnly className="mt-1 accent-teal-600" /><span className="text-sm"><span className="font-semibold">Pay at the store</span><span className="block text-slate-600">Pay when you collect your order.</span></span></label>
+                <>
+                  <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${payment === "pay_at_store" ? "border-teal-600 bg-teal-50" : "border-slate-300"}`}><input type="radio" name="pay" checked={payment === "pay_at_store"} onChange={() => setPayment("pay_at_store")} className="mt-1 accent-teal-600" /><span className="text-sm"><span className="font-semibold">Pay at the store</span><span className="block text-slate-600">Pay when you collect your order.</span></span></label>
+                  {data?.onlineEnabled && (
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${payment === "online" ? "border-teal-600 bg-teal-50" : "border-slate-300"}`}>
+                      <input type="radio" name="pay" checked={payment === "online"} onChange={() => setPayment("online")} className="mt-1 accent-teal-600" />
+                      <span className="text-sm"><span className="font-semibold">Pay online now</span><span className="block text-slate-600">Card, UPI or netbanking. Then just collect your order.</span></span>
+                    </label>
+                  )}
+                </>
               ) : (
                 <>
                   {data?.codEnabled && (
