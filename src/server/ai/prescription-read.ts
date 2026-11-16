@@ -88,6 +88,8 @@ export async function readPrescription(prescriptionId: string): Promise<Prescrip
       system: SYSTEM,
       model: geminiVisionModel(),
       maxOutputTokens: 1024,
+      // A prescription photo is a large request; the 20 s shopper default cuts it off.
+      timeoutMs: 60_000,
     });
   });
 
