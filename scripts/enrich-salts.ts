@@ -63,11 +63,12 @@ async function main() {
   for (let i = 0; i < work.length; i += BATCH) {
     const chunk = work.slice(i, i + BATCH);
     let out: SaltInfoInput[] | null = null;
+    console.log(`  asking Gemini about ${chunk.length} ingredients (${chunk[0].name} ... ) this can take up to a minute`);
     for (let attempt = 0; attempt < 6 && !out; attempt++) {
       try {
         const res = await generateJSON<{ ingredients?: SaltInfoInput[] } | SaltInfoInput[]>(
           [{ text: `Ingredients: ${JSON.stringify(chunk.map((c) => c.name))}\nReturn JSON like {"ingredients":[{"name":"<exactly as given>","uses":[],"keywords":[],"how_to_use":"","side_effects":[],"precautions":[]}]} with one entry per ingredient.` }],
-          { system: SYSTEM, temperature: 0.2, maxOutputTokens: Math.max(4096, BATCH * 330) },
+          { system: SYSTEM, temperature: 0.2, maxOutputTokens: Math.max(4096, BATCH * 330), timeoutMs: 150_000 },
         );
         out = Array.isArray(res) ? res : res.ingredients ?? [];
       } catch (e) {

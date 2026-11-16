@@ -6,7 +6,7 @@ import { recordUsage } from "./usage";
 export class AiUnavailable extends Error {}
 
 export type Part = { text: string } | { inlineData: { mimeType: string; data: string } };
-type Opts = { system?: string; json?: boolean; temperature?: number; maxOutputTokens?: number; model?: string };
+type Opts = { system?: string; json?: boolean; temperature?: number; maxOutputTokens?: number; model?: string; /** Per-request time limit. Shopper-facing calls keep the 20 s default; long batch jobs pass more. */ timeoutMs?: number };
 
 // How long a key is parked after a rate-limit (429/503) or a network error. Tunable so tests can run fast
 // and operators can adjust for their key mix; defaults suit Gemini's free tier.
@@ -72,7 +72,7 @@ async function generateWith(model: string, parts: Part[], opts: Opts): Promise<s
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(20_000),
+        signal: AbortSignal.timeout(opts.timeoutMs ?? 20_000),
       });
     } catch (e) {
       lastError = `network: ${(e as Error).message}`;
