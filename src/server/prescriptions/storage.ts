@@ -1,4 +1,4 @@
-import { loadS3 } from "../s3";
+import { loadS3, S3_COMPAT } from "../s3";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -51,6 +51,7 @@ async function s3() {
     region: cfg.region,
     endpoint: cfg.endpoint,
     forcePathStyle: Boolean(cfg.endpoint),
+    ...S3_COMPAT,
     credentials: cfg.accessKeyId && cfg.secretAccessKey ? { accessKeyId: cfg.accessKeyId, secretAccessKey: cfg.secretAccessKey } : undefined,
   });
   return { client, bucket: cfg.bucket };

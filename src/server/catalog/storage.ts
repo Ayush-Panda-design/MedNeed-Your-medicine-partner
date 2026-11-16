@@ -1,4 +1,4 @@
-import { loadS3 } from "../s3";
+import { loadS3, S3_COMPAT } from "../s3";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -36,6 +36,7 @@ export async function saveMedicineImage(buf: Buffer): Promise<string> {
       region: s3.region,
       endpoint: s3.endpoint,
       forcePathStyle: Boolean(s3.endpoint),
+      ...S3_COMPAT,
       credentials: s3.accessKeyId && s3.secretAccessKey ? { accessKeyId: s3.accessKeyId, secretAccessKey: s3.secretAccessKey } : undefined,
     });
     await client.send(
