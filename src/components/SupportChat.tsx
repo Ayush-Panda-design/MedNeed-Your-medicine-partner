@@ -66,6 +66,9 @@ export function SupportChat({ aiEnabled = true }: { aiEnabled?: boolean }) {
         )}
       </button>
 
+      {/* Veil: dims and softly blurs the page so the chat is the only thing in focus. Tapping it closes the chat. */}
+      {open && <div aria-hidden onClick={() => setOpen(false)} className="fixed inset-0 z-[45] bg-slate-950/45 backdrop-blur-[3px] [animation:mn-veil_.2s_ease-out]" />}
+
       {/* Panel */}
       {open && (
         <div className="mn-chat-panel fixed bottom-24 right-5 z-50 flex h-[34rem] max-h-[calc(100dvh-7.5rem)] w-[23rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-line bg-surface text-ink shadow-2xl">
