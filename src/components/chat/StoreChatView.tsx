@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { ArrowDown, Loader2, LogIn, MessageSquareText } from "lucide-react";
+import { ArrowDown, Loader2, LogIn } from "lucide-react";
 import { useState } from "react";
 import { Bubbles } from "./Bubbles";
 import { Composer } from "./Composer";
+import { Petals, Scene } from "./JpArt";
 import type { Ref, useStoreChat } from "./useStoreChat";
 
 type Chat = ReturnType<typeof useStoreChat>;
@@ -62,7 +63,8 @@ export function StoreChatView({
 
   return (
     <>
-      <div className="relative flex-1 overflow-hidden bg-page">
+      <div className="jp-room relative flex-1 overflow-hidden bg-page">
+        <Petals />
         <div
           ref={scroller}
           onScroll={(e) => {
@@ -70,16 +72,17 @@ export function StoreChatView({
             stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
             if (stick.current) setNewBelow(false);
           }}
-          className="h-full overflow-y-auto p-4"
+          className="jp-content h-full overflow-y-auto p-4"
         >
           {!chat.loaded ? (
             <div className="grid h-full place-items-center"><Loader2 className="h-5 w-5 animate-spin text-ink-muted" /></div>
           ) : count === 0 ? (
             <div className="grid h-full place-items-center text-center">
-              <div className="max-w-[16rem]">
-                <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-tint text-tint-fg"><MessageSquareText className="h-5 w-5" /></span>
-                <p className="mt-3 text-sm font-semibold text-ink">Message our store team</p>
-                <p className="mt-1 text-xs leading-relaxed text-ink-muted">Ask if a medicine is in stock, about your prescription, or about an order. A real person from the store will reply here.</p>
+              <div className="max-w-[18rem]">
+                <Scene />
+                <p className="mt-3 text-base font-bold tracking-wide text-ink">いらっしゃいませ</p>
+                <p className="text-xs font-semibold text-teal-700 dark:text-lime-300">Welcome to MedNeed</p>
+                <p className="mt-2 text-xs leading-relaxed text-ink-muted">Ask if a medicine is in stock, about your prescription, or about an order. A real person from the store will reply here.</p>
               </div>
             </div>
           ) : (

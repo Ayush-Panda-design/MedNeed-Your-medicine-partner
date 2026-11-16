@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles, Store, UserRound } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, UserRound } from "lucide-react";
+import { Lantern, Petals, Scene, ToriiIcon } from "@/components/chat/JpArt";
 import { useAuth } from "@/lib/providers";
 import { useLiveState } from "@/lib/live";
 import { StoreChatView } from "@/components/chat/StoreChatView";
@@ -12,7 +13,7 @@ type Mode = "ai" | "store";
 
 const GREETING: Turn = {
   role: "assistant",
-  text: "Hi! I'm the MedNeed assistant. Ask me about orders, delivery, payments, prescriptions or how the store works. For anything medical, please consult a doctor or our pharmacist.",
+  text: "こんにちは! I'm the MedNeed assistant. Ask me about orders, delivery, payments, prescriptions or how the store works. For anything medical, please consult a doctor or our pharmacist.",
 };
 
 const SUGGESTIONS = ["What are your delivery charges?", "Do I need a prescription?", "Where is my order?", "What are your timings?"];
@@ -72,14 +73,14 @@ export function SupportChat({ aiEnabled = true }: { aiEnabled?: boolean }) {
       {/* Panel */}
       {open && (
         <div className="mn-chat-panel fixed bottom-24 right-5 z-50 flex h-[34rem] max-h-[calc(100dvh-7.5rem)] w-[23rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-line bg-surface text-ink shadow-2xl">
-          <div className="bg-gradient-to-r from-teal-600 to-lime-500 px-4 pb-3 pt-3 text-white">
+          <div className="jp-head bg-gradient-to-r from-teal-600 to-lime-500 px-4 pb-3 pt-3 text-white">
             <div className="flex items-center gap-3">
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-white/20">{mode === "ai" ? <Sparkles className="h-4 w-4" /> : <Store className="h-4 w-4" />}</span>
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-white/20">{mode === "ai" ? <Lantern className="h-5 w-5" /> : <ToriiIcon className="h-5 w-5" />}</span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold leading-tight">{mode === "ai" ? "MedNeed Assistant" : "MedNeed store team"}</p>
                 <p className="flex items-center gap-1.5 text-[11px] text-white/85">
                   {mode === "ai" ? (
-                    "Usually replies instantly"
+                    "お手伝いします · Usually replies instantly"
                   ) : (
                     <>
                       <span className={`h-1.5 w-1.5 rounded-full ${live === "live" || live === "polling" ? "bg-lime-200" : "bg-white/50"}`} />
@@ -129,7 +130,8 @@ function AiChat({ onHuman }: { onHuman: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
+    // With only the greeting showing, stay at the top so the illustration is visible.
+    if (scroller.current) scroller.current.scrollTop = messages.length > 1 || busy ? scroller.current.scrollHeight : 0;
   }, [messages, busy]);
   useEffect(() => {
     inputRef.current?.focus();
@@ -161,12 +163,15 @@ function AiChat({ onHuman }: { onHuman: () => void }) {
 
   return (
     <>
-      <div ref={scroller} className="flex-1 space-y-3 overflow-y-auto bg-page p-4">
+      <div className="jp-room relative min-h-0 flex-1 overflow-hidden bg-page">
+      <Petals />
+      <div ref={scroller} className="jp-content h-full space-y-3 overflow-y-auto p-4">
+        {messages.length === 1 && <div className="pb-1"><Scene /></div>}
         {messages.map((m, i) => (
-          <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
+          <div key={i} className={`jp-in ${m.role === "user" ? "flex justify-end" : "flex justify-start"}`}>
             <div
               className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm ${
-                m.role === "user" ? "rounded-br-sm bg-teal-600 text-white" : "rounded-bl-sm border border-line bg-surface text-ink"
+                m.role === "user" ? "rounded-br-sm bg-teal-600 text-white" : "jp-paper rounded-bl-sm border"
               }`}
             >
               {m.text}
@@ -175,10 +180,10 @@ function AiChat({ onHuman }: { onHuman: () => void }) {
         ))}
         {busy && (
           <div className="flex justify-start">
-            <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-sm border border-line bg-surface px-3.5 py-2.5 text-ink-muted shadow-sm">
-              <span className="mn-typing-dot" />
-              <span className="mn-typing-dot" style={{ animationDelay: "0.15s" }} />
-              <span className="mn-typing-dot" style={{ animationDelay: "0.3s" }} />
+            <div className="jp-paper flex items-center gap-1.5 rounded-2xl rounded-bl-sm border px-3.5 py-2.5 shadow-sm">
+              <span className="jp-typing" />
+              <span className="jp-typing" style={{ animationDelay: "0.15s" }} />
+              <span className="jp-typing" style={{ animationDelay: "0.3s" }} />
             </div>
           </div>
         )}
@@ -197,6 +202,7 @@ function AiChat({ onHuman }: { onHuman: () => void }) {
             </button>
           )
         )}
+      </div>
       </div>
 
       <form

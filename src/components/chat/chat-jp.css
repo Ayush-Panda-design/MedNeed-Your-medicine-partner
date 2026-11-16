@@ -1,0 +1,93 @@
+/* Japanese-themed chat rooms. Original artwork only. Brand green stays; vermilion, pink and washi paper are accents.
+   Motion is transform/opacity only, paused for reduced-motion, and the page behind the chat is already paused by the veil. */
+
+.jp-room { position: relative; isolation: isolate; container-type: size; }
+.jp-room::before {
+  content: ""; position: absolute; inset: 0; z-index: -2; pointer-events: none; opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' viewBox='0 0 44 22'%3E%3Cg fill='none' stroke='%23166534' stroke-width='1.1'%3E%3Ccircle cx='0' cy='22' r='7'/%3E%3Ccircle cx='0' cy='22' r='14'/%3E%3Ccircle cx='0' cy='22' r='21'/%3E%3Ccircle cx='44' cy='22' r='7'/%3E%3Ccircle cx='44' cy='22' r='14'/%3E%3Ccircle cx='44' cy='22' r='21'/%3E%3Ccircle cx='22' cy='11' r='7'/%3E%3Ccircle cx='22' cy='11' r='14'/%3E%3Ccircle cx='22' cy='11' r='21'/%3E%3C/g%3E%3C/svg%3E");
+}
+html.dark .jp-room::before { opacity: .09; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' viewBox='0 0 44 22'%3E%3Cg fill='none' stroke='%23bef264' stroke-width='1.1'%3E%3Ccircle cx='0' cy='22' r='7'/%3E%3Ccircle cx='0' cy='22' r='14'/%3E%3Ccircle cx='0' cy='22' r='21'/%3E%3Ccircle cx='44' cy='22' r='7'/%3E%3Ccircle cx='44' cy='22' r='14'/%3E%3Ccircle cx='44' cy='22' r='21'/%3E%3Ccircle cx='22' cy='11' r='7'/%3E%3Ccircle cx='22' cy='11' r='14'/%3E%3Ccircle cx='22' cy='11' r='21'/%3E%3C/g%3E%3C/svg%3E"); }
+.jp-room > .jp-content { position: relative; z-index: 1; }
+
+/* Header: a soft wave pattern over the brand gradient */
+.jp-head { position: relative; overflow: hidden; }
+.jp-head::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' viewBox='0 0 44 22'%3E%3Cg fill='none' stroke='white' stroke-width='1.2'%3E%3Ccircle cx='0' cy='22' r='7'/%3E%3Ccircle cx='0' cy='22' r='14'/%3E%3Ccircle cx='44' cy='22' r='7'/%3E%3Ccircle cx='44' cy='22' r='14'/%3E%3Ccircle cx='22' cy='11' r='7'/%3E%3Ccircle cx='22' cy='11' r='14'/%3E%3C/g%3E%3C/svg%3E");
+  animation: jp-drift 24s linear infinite;
+}
+.jp-head > * { position: relative; }
+@keyframes jp-drift { to { background-position: 44px 0; } }
+
+/* Falling sakura petals (behind the bubbles) */
+.jp-petals { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.jp-petal {
+  position: absolute; top: -14px; left: var(--x); width: var(--s); height: calc(var(--s) * .78);
+  border-radius: 80% 0 80% 0; opacity: 0;
+  background: radial-gradient(circle at 30% 30%, #ffe4ec, #f7a8c0 70%);
+  animation: jp-fall var(--t) linear var(--d) infinite;
+}
+@keyframes jp-fall {
+  0% { transform: translate3d(0, -10px, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: .85; }
+  50% { transform: translate3d(var(--dx), 55cqh, 0) rotate(190deg); }
+  92% { opacity: .7; }
+  100% { transform: translate3d(calc(var(--dx) * -.6), 108cqh, 0) rotate(400deg); opacity: 0; }
+}
+html.dark .jp-petal { background: radial-gradient(circle at 30% 30%, #fbcfe0, #e58fb0 70%); }
+
+/* Scene (empty state) */
+.jp-scene { width: 100%; max-width: 20rem; height: auto; display: block; margin: 0 auto; border-radius: 1rem; overflow: hidden; }
+.jp-sky-a { stop-color: #fde7df; } .jp-sky-b { stop-color: #fff8ec; }
+html.dark .jp-sky-a { stop-color: #1a2c33; } html.dark .jp-sky-b { stop-color: #12241f; }
+.jp-fuji { fill: #6f8fb4; } html.dark .jp-fuji { fill: #38557a; }
+.jp-fuji-2 { fill: #5d7ea6; } html.dark .jp-fuji-2 { fill: #2f4968; }
+.jp-snow { fill: #fff; } html.dark .jp-snow { fill: #dbe7f5; }
+.jp-cloud { fill: #fff; opacity: .9; } html.dark .jp-cloud { fill: #cfe1ee; opacity: .18; }
+.jp-sun { fill: #e0463c; transform-box: fill-box; transform-origin: center; animation: jp-sun 5s ease-in-out infinite; }
+.jp-torii { fill: #d9423a; } html.dark .jp-torii { fill: #ef5a4f; }
+.jp-wave-a { fill: #2f8f68; opacity: .9; } .jp-wave-b { fill: #1f7a52; }
+html.dark .jp-wave-a { fill: #1f6b4d; } html.dark .jp-wave-b { fill: #155a3e; }
+.jp-wave-line { fill: none; stroke: rgb(255 255 255 / .45); stroke-width: 1.2; }
+.jp-branch { stroke: #6b4a3a; fill: none; stroke-linecap: round; } html.dark .jp-branch { stroke: #a9806a; }
+.jp-bl { fill: #f9b9cb; } .jp-bl-c { fill: #e8688f; }
+.jp-cloud-1 { animation: jp-cloud 26s linear infinite; } .jp-cloud-2 { animation: jp-cloud 38s linear -14s infinite; }
+.jp-waves-1 { animation: jp-wave 7s linear infinite; } .jp-waves-2 { animation: jp-wave 5s linear infinite reverse; }
+.jp-koi { animation: jp-koi 17s linear infinite; } .jp-koi-bob { animation: jp-bob 2.2s ease-in-out infinite; transform-box: fill-box; }
+.jp-tail { transform-box: fill-box; transform-origin: 0% 50%; animation: jp-tail .5s ease-in-out infinite alternate; }
+.jp-bloom { transform-box: fill-box; transform-origin: center; animation: jp-bloom 4s ease-in-out infinite; }
+@keyframes jp-sun { 50% { transform: scale(1.08); opacity: .9; } }
+@keyframes jp-cloud { from { transform: translateX(-60px); } to { transform: translateX(380px); } }
+@keyframes jp-wave { to { transform: translateX(-40px); } }
+@keyframes jp-koi { from { transform: translateX(-40px); } to { transform: translateX(360px); } }
+@keyframes jp-bob { 50% { transform: translateY(-2.5px); } }
+@keyframes jp-tail { to { transform: rotate(22deg); } }
+@keyframes jp-bloom { 50% { transform: scale(1.12) rotate(6deg); } }
+
+/* Lantern / torii avatars */
+.jp-lantern-glow { transform-box: fill-box; transform-origin: center; animation: jp-glow 2.6s ease-in-out infinite; }
+.jp-sway { transform-box: fill-box; transform-origin: 50% 0; animation: jp-sway 4s ease-in-out infinite; }
+@keyframes jp-glow { 50% { opacity: .55; transform: scale(1.15); } }
+@keyframes jp-sway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+
+/* Messages arrive with a small spring */
+.jp-in { animation: jp-in .32s cubic-bezier(.2, .9, .3, 1.2) both; }
+@keyframes jp-in { from { opacity: 0; transform: translateY(10px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* Washi-paper bubbles for the store's / assistant's side, with a faint corner fold */
+.jp-paper { background: #fffdf6; border-color: #ece3cd; color: #1f2937; }
+.jp-paper::after { content: ""; }
+html.dark .jp-paper { background: #1b231e; border-color: #2c3a31; color: #e6efe8; }
+
+/* Typing: three petals */
+.jp-typing { display: inline-block; width: 8px; height: 6px; border-radius: 80% 0 80% 0; background: #f08fb0; animation: jp-bounce 1s ease-in-out infinite; }
+@keyframes jp-bounce { 0%, 100% { transform: translateY(0) rotate(0); opacity: .6; } 50% { transform: translateY(-4px) rotate(40deg); opacity: 1; } }
+
+/* Hanko-style "seen" stamp */
+.jp-hanko { display: inline-grid; place-items: center; width: 19px; height: 19px; border-radius: 4px; border: 1.2px solid #d9423a; color: #d9423a; font-size: 9px; letter-spacing: -.5px; white-space: nowrap; overflow: hidden; font-weight: 800; line-height: 1; transform: rotate(-6deg); }
+html.dark .jp-hanko { border-color: #ef7e75; color: #ef7e75; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jp-petals { display: none; }
+  .jp-head::before, .jp-sun, .jp-cloud-1, .jp-cloud-2, .jp-waves-1, .jp-waves-2, .jp-koi, .jp-koi-bob, .jp-tail, .jp-bloom, .jp-lantern-glow, .jp-sway, .jp-in, .jp-typing { animation: none !important; }
+}

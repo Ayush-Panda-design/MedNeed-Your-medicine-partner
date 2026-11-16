@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AlertCircle, Check, CheckCheck, Clock, FileText, Package } from "lucide-react";
+import { AlertCircle, Check, Clock, FileText, Package } from "lucide-react";
 import { dayLabel, timeOf } from "./format";
 import type { Msg } from "./useStoreChat";
 
@@ -75,12 +75,12 @@ export function Bubbles({
     lastRole = m.role;
     const seen = side === "me" && !m.state && seenAt != null && new Date(m.at) <= new Date(seenAt);
     out.push(
-      <div key={m.clientId && m.state ? `c${m.clientId}` : m.id} className={`flex ${side === "me" ? "justify-end" : "justify-start"} ${first ? "mt-2" : "mt-0.5"}`}>
+      <div key={m.clientId && m.state ? `c${m.clientId}` : m.id} className={`jp-in flex ${side === "me" ? "justify-end" : "justify-start"} ${first ? "mt-2" : "mt-0.5"}`}>
         <div className={`flex max-w-[85%] flex-col ${side === "me" ? "items-end" : "items-start"}`}>
           {first && side === "them" && <span className="mb-0.5 ml-1 text-[11px] font-medium text-ink-muted">{m.senderName ?? theirLabel ?? "Store team"}</span>}
           <div
             className={`whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm [overflow-wrap:anywhere] ${
-              side === "me" ? `rounded-br-md bg-teal-600 text-white ${m.state === "sending" ? "opacity-70" : ""}` : "rounded-bl-md border border-line bg-surface text-ink"
+              side === "me" ? `rounded-br-md bg-teal-600 text-white ${m.state === "sending" ? "opacity-70" : ""}` : "jp-paper rounded-bl-md border"
             } ${m.state === "failed" ? "ring-2 ring-rose-400" : ""}`}
           >
             {m.ref && <div><RefChip r={m.ref} href={refHref?.(m.ref)} onDark={side === "me"} /></div>}
@@ -94,7 +94,7 @@ export function Bubbles({
             ) : (
               <>
                 <span>{timeOf(m.at)}</span>
-                {side === "me" && (m.state === "sending" ? <Clock className="h-3 w-3" aria-label="Sending" /> : seen ? <CheckCheck className="h-3.5 w-3.5 text-teal-500" aria-label="Seen" /> : <Check className="h-3 w-3" aria-label="Sent" />)}
+                {side === "me" && (m.state === "sending" ? <Clock className="h-3 w-3" aria-label="Sending" /> : seen ? <span className="jp-hanko" title="Seen" aria-label="Seen">既読</span> : <Check className="h-3 w-3" aria-label="Sent" />)}
               </>
             )}
           </div>
