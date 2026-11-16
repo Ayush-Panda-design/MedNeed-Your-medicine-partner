@@ -580,3 +580,36 @@ html.mn-fine .mn-spot:hover::after { opacity: 1; }
 }
 @keyframes mn-qty { from { opacity: 0; transform: translateY(-6px); } }
 @keyframes mn-morph { from { transform: scale(.94); opacity: .6; } }
+
+/* ───────── Stage 5: entrance variants, parallax, magnetic buttons, cursor follower (see InteractiveFx) ───────── */
+/* Entrance directions for data-reveal="left" | "right" | "zoom" | "rise". The plain data-reveal keeps its small rise. */
+html.mn-reveal-ready [data-reveal="left"] { transform: translateX(-56px); }
+html.mn-reveal-ready [data-reveal="right"] { transform: translateX(56px); }
+html.mn-reveal-ready [data-reveal="zoom"] { transform: scale(.94) translateY(20px); }
+html.mn-reveal-ready [data-reveal="rise"] { transform: translateY(48px); }
+
+/* Parallax: the element drifts by --py (set while it is on screen). `translate` is a separate property, so it never clashes with transforms. */
+[data-parallax] { translate: 0 var(--py, 0px); will-change: translate; }
+
+/* Magnetic: leans toward the pointer by --bx / --by (mouse devices only, see InteractiveFx). */
+html.mn-fine [data-magnetic] { translate: var(--bx, 0px) var(--by, 0px); transition: translate .3s var(--ease-out); }
+
+/* Soft colour orbs that drift behind a section (decorative). Same hues read on both the light and dark surfaces. */
+.mn-orb { position: absolute; border-radius: 9999px; pointer-events: none; filter: blur(48px); opacity: .55; background: radial-gradient(circle at 30% 30%, rgb(52 211 153 / .55), rgb(34 197 94 / .15) 60%, transparent 72%); }
+.mn-orb-warm { background: radial-gradient(circle at 30% 30%, rgb(190 242 100 / .55), rgb(250 204 21 / .14) 60%, transparent 72%); }
+:where(html.dark) .mn-orb { opacity: .32; }
+
+/* Cursor follower: a ring and a dot. The real cursor stays; these are extra. */
+.mn-cur { position: fixed; left: 0; top: 0; z-index: 2147483000; pointer-events: none; opacity: 0; transition: opacity .2s ease; display: none; }
+html.mn-cursor-on .mn-cur { display: block; }
+html.mn-cursor-seen .mn-cur { opacity: 1; }
+.mn-cur > i { position: absolute; display: block; border-radius: 9999px; }
+.mn-cur-dot > i { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #16a34a; box-shadow: 0 0 0 1.5px rgb(255 255 255 / .85); }
+.mn-cur-ring > i { width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 1.5px solid rgb(22 163 74 / .7); box-shadow: 0 0 0 1px rgb(255 255 255 / .45); transition: width .25s var(--ease-out), height .25s var(--ease-out), margin .25s var(--ease-out), background-color .25s ease, border-color .25s ease, transform .2s var(--ease-out), opacity .2s ease; }
+.mn-cur-ring.is-link > i { width: 58px; height: 58px; margin: -29px 0 0 -29px; background: rgb(34 197 94 / .14); border-color: rgb(22 163 74 / .9); }
+.mn-cur-ring.is-down > i { transform: scale(.82); }
+.mn-cur-ring.is-text > i, .mn-cur-ring.is-text ~ .mn-cur-dot > i { opacity: 0; }
+:where(html.dark) .mn-cur-dot > i { background: #bef264; box-shadow: 0 0 0 1.5px rgb(0 0 0 / .55); }
+:where(html.dark) .mn-cur-ring > i { border-color: rgb(190 242 100 / .75); box-shadow: 0 0 0 1px rgb(0 0 0 / .35); }
+:where(html.dark) .mn-cur-ring.is-link > i { background: rgb(190 242 100 / .14); border-color: rgb(190 242 100 / .95); }
+@media (prefers-reduced-motion: reduce) { .mn-cur { display: none !important; } [data-parallax], html.mn-fine [data-magnetic] { translate: none !important; } }
