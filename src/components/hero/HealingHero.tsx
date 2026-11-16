@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Pill, ShieldCheck, Truck, Upload } from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, Pill, ShieldCheck, Truck, Upload } from "lucide-react";
 import { displaySerif, heroSerif } from "@/lib/fonts";
+import { HeroQuick } from "./HeroQuick";
 import "./healing-hero.css";
 
 /*
@@ -78,8 +79,8 @@ const TEXTURE = Array.from({ length: 130 }, (_, i) => {
 
 const STEPS = [
   { label: "Order placed", sub: "Paracetamol 650 · Vitamin D3", pct: 18, icon: "pill" },
-  { label: "Pharmacist verified", sub: "Prescription checked and approved", pct: 42, icon: "shield" },
-  { label: "Packed", sub: "Sealed at your nearest MedNeed store", pct: 64, icon: "check" },
+  { label: "Pharmacist verified", sub: "Checked and approved", pct: 42, icon: "shield" },
+  { label: "Packed", sub: "Sealed at the MedNeed store", pct: 64, icon: "check" },
   { label: "Out for delivery", sub: "Arriving in about 20 minutes", pct: 86, icon: "truck" },
   { label: "Delivered", sub: "Get well soon!", pct: 100, icon: "check" },
 ] as const;
@@ -111,7 +112,7 @@ function StepIcon({ name }: { name: (typeof STEPS)[number]["icon"] }) {
   return <Check className={cls} aria-hidden />;
 }
 
-export function HealingHero() {
+export function HealingHero({ drugLicense }: { drugLicense?: string | null } = {}) {
   const root = useRef<HTMLDivElement>(null);
   const visible = useRef(true);
   const [step, setStep] = useState(1);
@@ -332,7 +333,7 @@ export function HealingHero() {
 
           {/* Neem tree (scaled down, anchored at its base on the right) */}
           <g style={depth(24)}>
-            <g transform="translate(1600 900) scale(0.86) translate(-1600 -900)">
+            <g transform="translate(1490 900) scale(0.8) translate(-1600 -900)">
               <g className="hh-tree">
                 <path className="hh-trunk" d="M1340 900 C1330 820 1320 760 1300 700 C1285 650 1240 610 1190 590 L1205 575 C1260 595 1300 630 1320 670 C1330 620 1350 560 1400 520 L1412 532 C1372 572 1356 630 1352 690 C1380 640 1430 610 1490 600 L1494 616 C1440 628 1398 660 1376 720 C1366 770 1372 840 1386 900Z" />
                 {CANOPY.filter((c) => c[3] === 0).map(([x, y, r], i) => (
@@ -462,10 +463,13 @@ export function HealingHero() {
             </Link>
           </div>
 
+          <div className="hh-in" style={{ "--d": "900ms" } as CSSProperties}><HeroQuick /></div>
+
           <ul className="hh-points">
-            <li style={{ "--d": "1000ms" } as CSSProperties}><ShieldCheck className="h-4 w-4" aria-hidden /> Pharmacist-verified</li>
-            <li style={{ "--d": "1120ms" } as CSSProperties}><Check className="h-4 w-4" aria-hidden /> Genuine medicines</li>
-            <li className="hidden sm:inline-flex" style={{ "--d": "1240ms" } as CSSProperties}><Truck className="h-4 w-4" aria-hidden /> Free delivery over ₹499</li>
+            <li style={{ "--d": "1000ms" } as CSSProperties}><ShieldCheck className="h-5 w-5" aria-hidden /> Pharmacist-verified</li>
+            <li style={{ "--d": "1120ms" } as CSSProperties}><Check className="h-5 w-5" aria-hidden /> Genuine medicines</li>
+            <li style={{ "--d": "1240ms" } as CSSProperties}><Truck className="h-5 w-5" aria-hidden /> Free delivery over ₹499</li>
+            {drugLicense ? <li style={{ "--d": "1360ms" } as CSSProperties}><BadgeCheck className="h-5 w-5" aria-hidden /> Licensed pharmacy · DL {drugLicense}</li> : null}
           </ul>
         </div>
       </div>

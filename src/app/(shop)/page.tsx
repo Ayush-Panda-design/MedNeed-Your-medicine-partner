@@ -33,7 +33,7 @@ export default async function Home() {
   const [categories, deals, newest, counts, business] = await Promise.all([listCategories(), listDeals(4), listNewest(8), categoryCounts(), businessInfo()]);
   return (
     <main>
-      <HealingHero />
+      <HealingHero drugLicense={business.drugLicense || null} />
 
       {/* Trust stats */}
       <section id="after-hero" className="scroll-mt-24 border-b border-slate-100 bg-white">
