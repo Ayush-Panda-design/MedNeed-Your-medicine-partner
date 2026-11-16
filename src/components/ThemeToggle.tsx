@@ -12,9 +12,8 @@ function wantsDark(): boolean {
   try {
     const saved = window.localStorage.getItem(KEY);
     if (saved === "dark" || saved === "light") return saved === "dark";
-  } catch { /* storage unavailable: use the default */ }
-  // Pharmacies read best light and clean, so light is the default; dark is one tap away and remembered once chosen.
-  return false;
+  } catch { /* storage unavailable: fall back to the system setting */ }
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
 }
 
 function apply(path: string) {
@@ -25,16 +24,18 @@ function apply(path: string) {
 }
 
 /** Runs before first paint (inlined in the root layout) so the page never flashes the wrong theme. */
-export const themeScript = `(function(){try{var p=location.pathname;if(p.indexOf("/admin")===0||p.indexOf("/delivery")===0)return;var r=document.documentElement,s=null;try{s=localStorage.getItem("${KEY}")}catch(e){}var d=s==="dark";r.classList.add("theme");if(d)r.classList.add("dark")}catch(e){}})();`;
+export const themeScript = `(function(){try{var p=location.pathname;if(p.indexOf("/admin")===0||p.indexOf("/delivery")===0)return;var r=document.documentElement,s=null;try{s=localStorage.getItem("${KEY}")}catch(e){}var d=s==="dark"||(s!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);r.classList.add("theme");if(d)r.classList.add("dark")}catch(e){}})();`;
 
-/** Keeps the theme classes right as the visitor moves between pages, and keeps the visitor's choice (light unless they pick dark). */
+/** Keeps the theme classes right as the visitor moves between pages, and follows the system setting until they choose. */
 export function ThemeSync() {
   const pathname = usePathname() ?? "/";
   useEffect(() => {
     apply(pathname);
+    const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
     const on = () => apply(pathname);
+    mq?.addEventListener?.("change", on);
     window.addEventListener("storage", on);
-    return () => window.removeEventListener("storage", on);
+    return () => { mq?.removeEventListener?.("change", on); window.removeEventListener("storage", on); };
   }, [pathname]);
   return null;
 }
