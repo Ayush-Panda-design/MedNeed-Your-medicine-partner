@@ -4,7 +4,10 @@ import {
   Brain,
   Droplet,
   Eye,
+  Apple,
   Flower2,
+  Heart,
+  Smile,
   HeartPulse,
   Leaf,
   Pill,
@@ -31,6 +34,10 @@ const icons: Record<string, LucideIcon> = {
   brain: Brain,
   eye: Eye,
   activity: Activity,
+  smile: Smile,
+  leaf: Leaf,
+  apple: Apple,
+  heart: Heart,
 };
 
 export function CategoryIcon({ name, className }: { name: string; className?: string }) {

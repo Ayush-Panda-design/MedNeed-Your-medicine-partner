@@ -25,5 +25,9 @@ export const CATEGORY_TILES: Record<string, TileStyle> = {
   "baby-care": { c1: "#9eeeff", c2: "#22c5e3", a: "#0b7f95", p: "#ffcd3c" },
   "womens-care": { c1: "#f8b4e0", c2: "#d65fd8", a: "#8a2794", p: "#ff6fb5" },
   "hormones-steroids": { c1: "#9ff5e2", c2: "#18b4a0", a: "#0b6f63", p: "#7c5cff" },
+  "personal-care": { c1: "#a8e6cf", c2: "#2bb39a", a: "#0b6b5b", p: "#ffd166" },
+  "ayurvedic-herbal": { c1: "#c5e99b", c2: "#6aa84f", a: "#2f5d1e", p: "#f6b73c" },
+  nutrition: { c1: "#ffe08a", c2: "#f0a020", a: "#a85a05", p: "#7bc47f" },
+  "sexual-wellness": { c1: "#ffb3c1", c2: "#e5546e", a: "#9d1f3a", p: "#ffd1dc" },
   devices: { c1: "#c9d3ff", c2: "#6c74f0", a: "#323aa6", p: "#ff6b6b" },
 };

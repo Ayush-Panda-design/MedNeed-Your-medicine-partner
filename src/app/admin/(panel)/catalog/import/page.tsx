@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireStaff } from "@/server/auth/session";
 import { ImportTool } from "./ImportTool";
+import { StoreItemsPanel } from "./StoreItemsPanel";
+import { storeItemCount } from "@/server/catalog/store-items";
 
 export const metadata: Metadata = { title: "Import medicines" };
 
 export default async function ImportPage() {
-  await requireStaff("/admin/catalog/import");
+  const { user } = await requireStaff("/admin/catalog/import");
   return (
     <div className="space-y-6">
       <div>
@@ -17,6 +19,7 @@ export default async function ImportPage() {
           Only import data you have the right to use, such as a licensed dataset or your own records.
         </p>
       </div>
+      {user.roles.includes("admin") && <StoreItemsPanel items={storeItemCount} />}
       <ImportTool />
     </div>
   );
