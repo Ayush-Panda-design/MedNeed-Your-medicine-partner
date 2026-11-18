@@ -21,17 +21,17 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
   return (
     <AuthCard title={result ? "Email confirmed" : "Link not valid"}>
       {result ? (
-        <p className="mt-4 flex items-start gap-2 text-slate-700">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-teal-600" aria-hidden />
+        <p className="au-msg">
+          <CheckCircle2 aria-hidden />
           <span>Thanks, <strong className="break-all">{result.email}</strong> is confirmed. We&apos;ll send your order updates there.</span>
         </p>
       ) : (
-        <p className="mt-4 flex items-start gap-2 text-slate-700">
-          <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" aria-hidden />
+        <p className="au-msg is-bad">
+          <XCircle aria-hidden />
           <span>This link has expired or was already used. You can send a new one from your account page.</span>
         </p>
       )}
-      <Link href="/account" className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-3 font-semibold text-white hover:bg-teal-700">Go to my account</Link>
+      <Link href="/account" className="au-btn">Go to my account</Link>
     </AuthCard>
   );
 }

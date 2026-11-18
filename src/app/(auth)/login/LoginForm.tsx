@@ -1,13 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { AlertCircle, ArrowLeft, BadgeCheck, Eye, EyeOff, Loader2, Mail, PackageCheck, Smartphone, ShieldCheck, Truck } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, ChevronDown, Eye, EyeOff, Headphones, Loader2, Lock, Mail, Pill, ShieldCheck, Smartphone, Truck } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { api } from "@/lib/api";
+import { heroSerif } from "@/lib/fonts";
 import { useAuth } from "@/lib/providers";
 import { useTurnstile } from "@/components/auth/Turnstile";
+import "@/components/auth/auth.css";
 
 const OTP_LEN = 6;
 const RESEND_SECONDS = 30;
@@ -27,6 +30,17 @@ export function LoginForm({ googleEnabled, smsEnabled = true, captchaSiteKey = n
   );
 }
 
+function GoogleMark() {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden>
+      <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z" />
+      <path fill="#FBBC05" d="M10.5 28.7c-.5-1.5-.8-3.1-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.9-6.1z" />
+      <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z" />
+    </svg>
+  );
+}
+
 function LoginInner({ googleEnabled, smsEnabled, captchaSiteKey }: { googleEnabled: boolean; smsEnabled: boolean; captchaSiteKey: string | null }) {
   const params = useSearchParams();
   const rawNext = params.get("next") ?? "/";
@@ -35,75 +49,83 @@ function LoginInner({ googleEnabled, smsEnabled, captchaSiteKey }: { googleEnabl
   const urlError = ERRORS[params.get("error") ?? ""] ?? "";
 
   return (
-    <main className="grid min-h-screen lg:grid-cols-2">
-      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-500 p-12 text-white lg:flex lg:flex-col lg:justify-between">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-white/10 blur-2xl" />
-        <Logo light tagline size="lg" />
-        <div className="relative">
-          <h1 className="text-4xl font-extrabold leading-tight">
-            Healthcare essentials,
-            <br />
+    <main className={`au ${heroSerif.variable}`}>
+      <div className="au-bg" aria-hidden />
+      <Image src="/auth/leaves-tr-v2.webp" alt="" width={381} height={266} priority className="au-leaf-tr" />
+      <Image src="/auth/leaves-bl.webp" alt="" width={280} height={288} className="au-leaf-bl" />
+
+      {/* Desktop: the story panel */}
+      <aside className="au-story">
+        <Logo size="lg" />
+        <h1 className="au-story-title">
+          Healthcare essentials,
+          <br />
+          <em className="au-em">
             one tap away.
-          </h1>
-          <ul className="mt-8 space-y-4 text-teal-50">
-            <li className="flex items-center gap-3"><BadgeCheck className="h-5 w-5" /> Genuine medicines from licensed sources</li>
-            <li className="flex items-center gap-3"><ShieldCheck className="h-5 w-5" /> Prescriptions verified by pharmacists</li>
-            <li className="flex items-center gap-3"><Truck className="h-5 w-5" /> Reliable doorstep delivery</li>
-            <li className="flex items-center gap-3"><PackageCheck className="h-5 w-5" /> Easy reordering of your regular medicines</li>
-          </ul>
-        </div>
-        <p className="relative text-xs text-teal-100">Your health information stays private and is never shared without your consent.</p>
+            <svg className="au-swash" viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden focusable="false"><path d="M3 10.5C38 4 86 2.5 128 5.5c26 1.9 48 4.6 68-1.5" /></svg>
+          </em>
+        </h1>
+        <ul className="au-feats">
+          <li><span className="au-ico"><ShieldCheck aria-hidden /></span><span>Genuine medicines<br />from licensed sources</span></li>
+          <li><span className="au-ico"><Pill aria-hidden /></span><span>Prescriptions verified<br />by pharmacists</span></li>
+          <li><span className="au-ico"><Truck aria-hidden /></span><span>Reliable doorstep delivery</span></li>
+          <li><span className="au-ico"><Headphones aria-hidden /></span><span>Easy reordering of your<br />regular medicines</span></li>
+        </ul>
+        <Image src="/auth/kit-v2.webp" alt="" width={720} height={510} priority className="au-kit" />
+        <p className="au-tagline">
+          <svg viewBox="0 0 56 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M0 12h16l3-6 5 14 4-10 3 2h6" /></svg>
+          Your health our priority <i aria-hidden />
+        </p>
       </aside>
 
-      <section className="flex flex-col justify-center px-6 py-10 sm:px-12">
-        <div className="mx-auto w-full max-w-md">
-          <div className="mb-8 lg:hidden"><Logo /></div>
-          <h2 className="text-3xl font-bold">Sign in or create account</h2>
-          <p className="mt-2 text-slate-600">Choose how you&apos;d like to continue.</p>
+      {/* Phones: logo, title and product art above the card */}
+      <header className="au-mhead">
+        <div className="au-logo"><Logo size="md" /></div>
+        <h1 className="au-title">Sign in or create <em>account</em></h1>
+        <p className="au-sub">Choose how you&apos;d like to continue.</p>
+        <Image src="/auth/jar.webp" alt="" width={566} height={544} priority className="au-mart" />
+      </header>
+
+      <section className="au-panel">
+        <div className="au-card">
+          <h2 className="au-card-title">Sign in or create account</h2>
+          <p className="au-card-sub">Choose how you&apos;d like to continue.</p>
+          <span className="au-card-rule" aria-hidden />
 
           {urlError && (
-            <p role="alert" className="mt-5 flex items-start gap-2 rounded-lg bg-rose-50 p-3 text-sm text-rose-700">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {urlError}
+            <p role="alert" className="au-alert">
+              <AlertCircle /> {urlError}
             </p>
           )}
 
-          {smsEnabled && <div role="tablist" aria-label="Sign-in method" className="mt-6 grid grid-cols-2 rounded-xl bg-slate-100 p-1 text-sm font-semibold">
-            {([["phone", "Mobile OTP", Smartphone], ["email", "Email", Mail]] as const).map(([key, label, Icon]) => (
-              <button
-                key={key}
-                role="tab"
-                aria-selected={tab === key}
-                onClick={() => setTab(key)}
-                className={`flex items-center justify-center gap-2 rounded-lg py-2.5 transition ${tab === key ? "bg-white text-teal-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
-              >
-                <Icon className="h-4 w-4" /> {label}
-              </button>
-            ))}
-          </div>}
+          {smsEnabled && (
+            <div role="tablist" aria-label="Sign-in method" className="au-tabs">
+              {([["phone", "Mobile OTP", Smartphone], ["email", "Email", Mail]] as const).map(([key, label, Icon]) => (
+                <button key={key} type="button" role="tab" aria-selected={tab === key} onClick={() => setTab(key)} className="au-tab">
+                  <Icon className="h-4 w-4" aria-hidden /> {label}
+                </button>
+              ))}
+            </div>
+          )}
 
-          <div className="mt-6">{smsEnabled && tab === "phone" ? <PhoneFlow next={next} captchaSiteKey={captchaSiteKey} /> : <EmailFlow next={next} />}</div>
+          <div>{smsEnabled && tab === "phone" ? <PhoneFlow next={next} captchaSiteKey={captchaSiteKey} /> : <EmailFlow next={next} />}</div>
 
-          <div className="my-6 flex items-center gap-3 text-xs text-slate-400">
-            <span className="h-px flex-1 bg-slate-200" /> OR <span className="h-px flex-1 bg-slate-200" />
-          </div>
+          <div className="au-or">OR</div>
 
           {googleEnabled ? (
-            <a
-              href={`/api/auth/google?next=${encodeURIComponent(next)}`}
-              className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white py-3 font-semibold text-slate-800 transition hover:bg-slate-50"
-            >
-              Continue with Google
+            <a href={`/api/auth/google?next=${encodeURIComponent(next)}`} className="au-google">
+              <GoogleMark /> Continue with Google
             </a>
           ) : (
-            <p className="rounded-xl border border-dashed border-slate-300 p-3 text-center text-xs text-slate-500">
-              Google sign-in activates once <code className="rounded bg-slate-100 px-1">GOOGLE_CLIENT_ID</code> and <code className="rounded bg-slate-100 px-1">GOOGLE_CLIENT_SECRET</code> are set.
+            <p className="au-note">
+              Google sign-in activates once <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> are set.
             </p>
           )}
 
-          <p className="mt-6 text-center text-xs leading-relaxed text-slate-500">By continuing you agree to our <Link href="/terms" className="underline hover:text-slate-700">Terms of Use</Link> and <Link href="/privacy" className="underline hover:text-slate-700">Privacy Policy</Link>.</p>
-          <p className="mt-6 text-center text-sm text-slate-500">
-            <Link href="/" className="font-medium text-teal-700 hover:underline">Continue browsing without signing in</Link>
+          <p className="au-legal">
+            By continuing you agree to our <Link href="/terms">Terms of Use</Link> and <Link href="/privacy">Privacy Policy</Link>.
           </p>
+          <Link href="/" className="au-browse">Continue browsing without signing in</Link>
         </div>
       </section>
     </main>
@@ -123,13 +145,13 @@ function useFinish(next: string) {
 
 function ErrorText({ id, children }: { id?: string; children: React.ReactNode }) {
   if (!children) return null;
-  return <p id={id} role="alert" className="mt-2 text-sm text-rose-600">{children}</p>;
+  return <p id={id} role="alert" className="au-err">{children}</p>;
 }
 
 function Submit({ busy, children }: { busy: boolean; children: React.ReactNode }) {
   return (
-    <button type="submit" disabled={busy} className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 py-3.5 font-semibold text-white transition hover:bg-teal-700 disabled:opacity-70">
-      {busy && <Loader2 className="h-4 w-4 animate-spin" />} {children}
+    <button type="submit" disabled={busy} className="au-btn">
+      {busy ? <Loader2 className="animate-spin" /> : null} {children} {!busy && <ArrowRight aria-hidden />}
     </button>
   );
 }
@@ -203,33 +225,33 @@ function PhoneFlow({ next, captchaSiteKey }: { next: string; captchaSiteKey: str
 
   // The bot-check widget sits outside both steps so it stays mounted for "Resend code".
   const body = step === "phone" ? (
-      <form onSubmit={sendOtp} noValidate>
-        <label htmlFor="phone" className="block text-sm font-medium">Mobile number</label>
-        <div className={`mt-2 flex items-center rounded-xl border bg-white focus-within:ring-2 ${error ? "border-rose-500 focus-within:ring-rose-100" : "border-slate-300 focus-within:border-teal-600 focus-within:ring-teal-100"}`}>
-          <span className="border-r border-slate-200 px-4 text-sm font-medium text-slate-600">+91</span>
-          <input
-            id="phone"
-            inputMode="numeric"
-            autoComplete="tel-national"
-            maxLength={10}
-            value={phone}
-            onChange={(e) => { setPhone(e.target.value.replace(/\D/g, "")); setError(""); }}
-            placeholder="10-digit mobile number"
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? "phone-error" : undefined}
-            className="w-full rounded-r-xl bg-transparent px-4 py-3.5 text-base outline-none"
-          />
-        </div>
-        <ErrorText id="phone-error">{error}</ErrorText>
-        <Submit busy={busy}>Get OTP</Submit>
-      </form>
+    <form onSubmit={sendOtp} noValidate>
+      <label htmlFor="phone" className="au-label">Mobile number</label>
+      <div className={`au-group ${error ? "is-error" : ""}`}>
+        <span className="au-cc">+91 <ChevronDown aria-hidden /></span>
+        <input
+          id="phone"
+          className="au-field"
+          inputMode="numeric"
+          autoComplete="tel-national"
+          maxLength={10}
+          value={phone}
+          onChange={(e) => { setPhone(e.target.value.replace(/\D/g, "")); setError(""); }}
+          placeholder="10-digit mobile number"
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? "phone-error" : undefined}
+        />
+      </div>
+      <ErrorText id="phone-error">{error}</ErrorText>
+      <Submit busy={busy}>Get OTP</Submit>
+    </form>
   ) : (
     <form onSubmit={verify} noValidate>
-      <button type="button" onClick={() => { setStep("phone"); setError(""); }} className="mb-4 flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-900">
-        <ArrowLeft className="h-4 w-4" /> Change number
+      <button type="button" onClick={() => { setStep("phone"); setError(""); }} className="au-back">
+        <ArrowLeft aria-hidden /> Change number
       </button>
-      <p className="text-slate-600">Enter the 6-digit code sent to <span className="font-semibold text-slate-900">+91 {phone}</span></p>
-      <div className="mt-5 flex gap-2 sm:gap-3" role="group" aria-label="One-time password">
+      <p style={{ margin: 0, color: "var(--au-muted)" }}>Enter the 6-digit code sent to <strong style={{ color: "var(--au-ink)" }}>+91 {phone}</strong></p>
+      <div className="au-otp" role="group" aria-label="One-time password">
         {digits.map((d, i) => (
           <input
             key={i}
@@ -239,6 +261,7 @@ function PhoneFlow({ next, captchaSiteKey }: { next: string; captchaSiteKey: str
             autoComplete={i === 0 ? "one-time-code" : "off"}
             aria-label={`Digit ${i + 1}`}
             maxLength={OTP_LEN}
+            className={error ? "is-error" : ""}
             onChange={(e) => { setDigit(i, e.target.value); setError(""); }}
             onKeyDown={(e) => {
               if (e.key === "Backspace" && !digits[i] && i > 0) refs.current[i - 1]?.focus();
@@ -246,22 +269,21 @@ function PhoneFlow({ next, captchaSiteKey }: { next: string; captchaSiteKey: str
               if (e.key === "ArrowRight" && i < OTP_LEN - 1) refs.current[i + 1]?.focus();
             }}
             onFocus={(e) => e.target.select()}
-            className={`h-14 w-full min-w-0 rounded-xl border bg-white text-center text-xl font-semibold outline-none focus:ring-2 ${error ? "border-rose-500 focus:ring-rose-100" : "border-slate-300 focus:border-teal-600 focus:ring-teal-100"}`}
           />
         ))}
       </div>
       <ErrorText>{error}</ErrorText>
       <Submit busy={busy}>Verify &amp; continue</Submit>
-      <p className="mt-4 text-center text-sm text-slate-600">
+      <p className="au-switch">
         {seconds > 0 ? (
-          <>Resend code in <span className="font-semibold">{seconds}s</span></>
+          <>Resend code in <strong>{seconds}s</strong></>
         ) : (
-          <button type="button" onClick={() => sendOtp()} className="font-semibold text-teal-700 hover:underline">Resend code</button>
+          <button type="button" onClick={() => sendOtp()}>Resend code</button>
         )}
       </p>
       {devOtp && (
-        <p className="mt-5 rounded-lg bg-amber-50 p-3 text-xs text-amber-900">
-          Development mode: no SMS is sent. Your code is <span className="font-mono text-sm font-bold" data-testid="dev-otp">{devOtp}</span>
+        <p className="au-devnote">
+          Development mode: no SMS is sent. Your code is <strong style={{ fontFamily: "monospace", fontSize: "0.95rem" }} data-testid="dev-otp">{devOtp}</strong>
         </p>
       )}
     </form>
@@ -304,49 +326,48 @@ function EmailFlow({ next }: { next: string }) {
     await finish(false);
   }
 
-  const field = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100";
-
   return (
     <form onSubmit={submit} noValidate>
       {mode === "signup" && (
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium">Full name</label>
-          <input id="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className={field} />
+        <div style={{ marginBottom: "1.25rem" }}>
+          <label htmlFor="name" className="au-label">Full name</label>
+          <input id="name" className="au-field" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
       )}
-      <div className="mb-4">
-        <label htmlFor="email" className="block text-sm font-medium">Email</label>
-        <input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} placeholder="you@example.com" />
-      </div>
       <div>
-        <div className="flex items-baseline justify-between gap-3">
-          <label htmlFor="password" className="block text-sm font-medium">Password</label>
+        <label htmlFor="email" className="au-label"><Mail aria-hidden /> Email</label>
+        <input id="email" type="email" className="au-field" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+      </div>
+      <div className="au-field-gap">
+        <div className="au-row">
+          <label htmlFor="password" className="au-label"><Lock aria-hidden /> Password</label>
           {mode === "signin" && (
-            <Link href={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ""}`} className="text-sm font-medium text-teal-700 hover:underline">
+            <Link href={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ""}`} className="au-link">
               Forgot password?
             </Link>
           )}
         </div>
-        <div className="relative">
+        <div className="au-pw">
           <input
             id="password"
             type={show ? "text" : "password"}
+            className="au-field"
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={`${field} pr-12`}
+            placeholder="Enter your password"
           />
-          <button type="button" onClick={() => setShow((s) => !s)} aria-label={show ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 mt-1 -translate-y-1/2 text-slate-400 hover:text-slate-700">
-            {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          <button type="button" onClick={() => setShow((s) => !s)} aria-label={show ? "Hide password" : "Show password"} className="au-eye">
+            {show ? <EyeOff /> : <Eye />}
           </button>
         </div>
-        {mode === "signup" && <p className="mt-1 text-xs text-slate-500">At least 8 characters. Avoid common passwords.</p>}
+        {mode === "signup" && <p className="au-hint">At least 8 characters. Avoid common passwords.</p>}
       </div>
       <ErrorText>{error}</ErrorText>
       <Submit busy={busy}>{mode === "signin" ? "Sign in" : "Create account"}</Submit>
-      <p className="mt-4 text-center text-sm text-slate-600">
+      <p className="au-switch">
         {mode === "signin" ? "New to MedNeed?" : "Already have an account?"}{" "}
-        <button type="button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }} className="font-semibold text-teal-700 hover:underline">
+        <button type="button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }}>
           {mode === "signin" ? "Create an account" : "Sign in"}
         </button>
       </p>
