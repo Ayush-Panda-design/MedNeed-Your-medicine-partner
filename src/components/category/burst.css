@@ -1,0 +1,35 @@
+/* Category grid "pill popper": tiles shoot out of a capsule, ~1 s total. */
+.cb { position: relative; }
+.cb-cap { position: absolute; left: 50%; top: 40%; z-index: 6; width: 56px; height: 56px; margin: -28px 0 0 -28px; display: none; pointer-events: none; }
+.cb-ready .cb-cap { display: block; opacity: 0; }
+.cb-go .cb-cap { animation: cb-cap 0.95s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.cb-cap svg { display: block; filter: drop-shadow(0 8px 10px rgb(12 54 64 / 0.3)); }
+.cb-cap i { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -3.5px; border-radius: 50%; background: #16a34a; opacity: 0; }
+.cb-cap i:nth-of-type(even) { background: #2f9e8f; width: 5px; height: 5px; }
+.cb-go .cb-cap i { animation: cb-spark 0.5s ease-out 0.1s both; }
+.cb-cap i:nth-of-type(1) { --sx: -46px; --sy: -30px; } .cb-cap i:nth-of-type(2) { --sx: 44px; --sy: -34px; }
+.cb-cap i:nth-of-type(3) { --sx: -52px; --sy: 14px; } .cb-cap i:nth-of-type(4) { --sx: 50px; --sy: 20px; }
+.cb-cap i:nth-of-type(5) { --sx: -14px; --sy: -50px; } .cb-cap i:nth-of-type(6) { --sx: 18px; --sy: 48px; }
+@keyframes cb-cap {
+  0% { opacity: 0; transform: scale(0.2) rotate(-30deg); }
+  16% { opacity: 1; transform: scale(1.15) rotate(0); }
+  28% { transform: scale(1) rotate(-6deg); }
+  40% { transform: scale(1.05) rotate(6deg); }
+  72% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.1) rotate(40deg); }
+}
+@keyframes cb-spark { from { opacity: 1; transform: translate(0, 0); } to { opacity: 0; transform: translate(var(--sx), var(--sy)); } }
+
+.cb-ready > ul > li { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.12) rotate(var(--rot)); position: relative; z-index: 1; }
+.cb-ready.cb-go > ul > li {
+  animation: cb-fly 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.12) calc(0.16s + var(--bi) * 22ms) both;
+}
+@keyframes cb-fly {
+  0% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.12) rotate(var(--rot)); }
+  25% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cb-cap { display: none !important; }
+  .cb-ready > ul > li { opacity: 1; transform: none; animation: none; }
+}

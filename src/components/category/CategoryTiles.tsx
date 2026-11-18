@@ -5,6 +5,7 @@ import type { Category } from "@/lib/catalog";
 import { CATEGORY_TILES, FALLBACK_TILE } from "@/lib/categoryTiles";
 import { SectionHead } from "../SectionHead";
 import { CategoryArt } from "./CategoryArt";
+import { CategoryBurst } from "./CategoryBurst";
 import "./tiles.css";
 
 /**
@@ -25,7 +26,8 @@ export function CategoryTiles({ categories, counts = {} }: { categories: Categor
           </Link>
         }
       />
-      <ul className="ct-grid" role="list" data-stagger>
+      <CategoryBurst>
+      <ul className="ct-grid" role="list">
         {categories.map((c, i) => {
           const t = CATEGORY_TILES[c.slug] ?? FALLBACK_TILE;
           const n = counts[c.slug] ?? 0;
@@ -51,6 +53,7 @@ export function CategoryTiles({ categories, counts = {} }: { categories: Categor
           );
         })}
       </ul>
+      </CategoryBurst>
       <Link href="/medicines" className="mt-5 flex items-center justify-center gap-1 rounded-xl border border-line bg-surface py-3 text-sm font-semibold text-teal-700 sm:hidden">
         View all medicines <ChevronRight className="h-4 w-4" aria-hidden />
       </Link>
