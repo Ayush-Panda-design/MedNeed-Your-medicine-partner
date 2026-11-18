@@ -82,7 +82,7 @@ export function Header({ categories }: { categories: Category[] }) {
     searchInput: "text-[#0c3640] placeholder:text-[#3f6c75]",
     ghost: "text-[#0c3640] hover:bg-white/55",
     uploadRx: "text-[#0f5f58] hover:bg-white/55",
-    cart: "bg-[#0f766e] text-white hover:bg-[#0b6b63]",
+    cart: "bg-[#14613a] text-white hover:bg-[#0f5230]",
     chevron: "text-[#2a5d66]",
   } : {
     searchBox: overlay

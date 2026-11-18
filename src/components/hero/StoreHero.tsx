@@ -3,7 +3,7 @@
 import { useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, Heart, Leaf, Pill, ShieldCheck, Sparkles, Truck, Upload } from "lucide-react";
+import { ArrowRight, Check, Heart, Leaf, Pill, ShieldCheck, Sparkles, Truck, Upload, UserCheck } from "lucide-react";
 import { heroSerif } from "@/lib/fonts";
 import "./store-hero.css";
 
@@ -93,6 +93,7 @@ export function StoreHero() {
     let raf = 0;
     let last = "";
     const flags = { v1: "", v2: "", v3: "", v4: "", drop: "", done: "" };
+    let scene = "";
     const setFlag = (k: keyof typeof flags, on: boolean) => {
       const v = on ? "1" : "0";
       if (flags[k] !== v) {
@@ -133,6 +134,8 @@ export function StoreHero() {
         s.setProperty("--c2", f3(win(0.38, 0.58, spin)));
         s.setProperty("--c3", f3(win(0.66, 0.86, spin)));
         s.setProperty("--prog", f3(p));
+        const dom = o1 >= Math.max(o2, o3, o4) ? "1" : o2 >= Math.max(o3, o4) ? "2" : o3 >= o4 ? "3" : "4";
+        if (dom !== scene) { scene = dom; el.dataset.scene = dom; }
         setFlag("v1", o1 > 0.02);
         setFlag("v2", o2 > 0.02);
         setFlag("v3", o3 > 0.02);
@@ -165,24 +168,25 @@ export function StoreHero() {
   }, []);
 
   return (
-    <section ref={root} id="mn-cine" data-tone="light" aria-labelledby="ms-title" className={`ms ${heroSerif.variable}`} data-v1="1" data-v2="0" data-v3="0" data-v4="0">
+    <section ref={root} id="mn-cine" data-tone="light" aria-labelledby="ms-title" className={`ms ${heroSerif.variable}`} data-scene="1" data-v1="1" data-v2="0" data-v3="0" data-v4="0">
       <div className="ms-stage">
-        {/* Photo: scene 1 hero, then a soft backdrop for the other scenes */}
-        <div className="ms-photo" aria-hidden>
-          {/* The one photo, drawn as separate layers so leaves, plant and bottles can move at different speeds on scroll */}
-          <div className="ms-pl ms-pl-base"><Image src="/hero/medicine-shelf.webp" alt="" fill priority sizes="100vw" quality={80} className="ms-photo-img" /></div>
-          <div className="ms-pl ms-pl-l"><span className="ms-sway ms-sway-a"><Image src="/hero/medicine-shelf.webp" alt="" fill sizes="100vw" quality={80} className="ms-photo-img" /></span></div>
-          <div className="ms-pl ms-pl-c"><Image src="/hero/medicine-shelf.webp" alt="" fill sizes="100vw" quality={80} className="ms-photo-img" /></div>
-          <div className="ms-pl ms-pl-r"><span className="ms-sway ms-sway-b"><Image src="/hero/medicine-shelf.webp" alt="" fill sizes="100vw" quality={80} className="ms-photo-img" /></span></div>
+        <div className="ms-bg" aria-hidden />
+
+        {/* Product scene (right side): drifts up and away as the story moves on */}
+        <div className="ms-prod" aria-hidden>
+          <div className="ms-prod-in">
+            <Image src="/hero/medicine-podium.webp" alt="" fill priority sizes="(max-width: 900px) 112vw, 60vw" quality={85} className="ms-prod-img" />
+          </div>
         </div>
-        <div className="ms-light" aria-hidden />
 
         {/* Scene 1: entrance + headline */}
         <div className="ms-scene ms-s1">
           <div className="ms-copy">
             <h1 id="ms-title" className="ms-title">
               <span className="ms-line"><span className="ms-line-in" style={{ "--d": "450ms" } as CSSProperties}>Your trusted medicine store,</span></span>
-              <span className="ms-line"><span className="ms-line-in" style={{ "--d": "650ms" } as CSSProperties}><em>delivered</em> to your door.</span></span>
+              <span className="ms-line"><span className="ms-line-in" style={{ "--d": "650ms" } as CSSProperties}>
+                <em className="ms-em">delivered<svg className="ms-swash" viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden focusable="false"><path pathLength={1} d="M3 10.5C38 4 86 2.5 128 5.5c26 1.9 48 4.6 68-1.5" /></svg></em> to your door.
+              </span></span>
             </h1>
             <p className="ms-sub ms-in" style={{ "--d": "900ms" } as CSSProperties}>
               Genuine medicines, wellness and personal care, checked by a registered pharmacist and brought to you between 7&nbsp;AM and 10&nbsp;PM.
@@ -196,9 +200,9 @@ export function StoreHero() {
               </Link>
             </div>
             <ul className="ms-points ms-in" style={{ "--d": "1200ms" } as CSSProperties}>
-              <li><ShieldCheck className="h-4 w-4" aria-hidden /> Pharmacist-verified</li>
-              <li><Check className="h-4 w-4" aria-hidden /> Genuine medicines</li>
-              <li className="ms-hide-sm"><Truck className="h-4 w-4" aria-hidden /> Free delivery over ₹499</li>
+              <li><ShieldCheck aria-hidden /><span>Genuine medicines</span></li>
+              <li><Truck aria-hidden /><span>Free delivery over ₹499</span></li>
+              <li><UserCheck aria-hidden /><span>Pharmacist verified</span></li>
             </ul>
           </div>
         </div>
@@ -310,7 +314,6 @@ export function StoreHero() {
           ))}
         </ol>
         <a href="#after-hero" className="ms-skip">Skip intro <ArrowRight className="h-3.5 w-3.5" aria-hidden /></a>
-        <a href="#after-hero" className="ms-cue" aria-label="Scroll to explore"><span><i /></span></a>
       </div>
     </section>
   );

@@ -37,7 +37,7 @@ export default async function Home() {
       <StoreHero />
 
       {/* Hero sky melts into the stats row */}
-      <SectionDivider variant="wave" from="#b8dde4" to="var(--bg-surface)" />
+      <SectionDivider variant="wave" from="#edf0e8" to="var(--bg-surface)" />
 
       {/* Trust stats */}
       <section id="after-hero" className="scroll-mt-24 border-b border-slate-100 bg-white">
