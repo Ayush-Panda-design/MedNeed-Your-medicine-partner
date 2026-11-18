@@ -79,6 +79,16 @@ export function CheckoutForm({ initialAddresses }: { initialAddresses: Address[]
   const contactOk = !needsContact || (contact.name.trim().length >= 2 && /^[6-9]\d{9}$/.test(contact.phone));
   const canPlace = !!quote && quote.canCheckout && !loading && !busy && contactOk && (fulfilment === "pickup" || !!addressId) && (!slotDate === !slotWindow) && (!rxHint?.required || rxHint.state === "verified" || rxHint.state === "pending");
   const problems = quote?.problems ?? [];
+  const phoneBad = needsContact && contact.phone.length > 0 && !/^[6-9]\d{9}$/.test(contact.phone);
+  // Say why the button is grey instead of leaving the customer to guess (a missing pickup phone number was the usual reason).
+  const blockers: string[] = [];
+  if (quote && !loading) {
+    if (needsContact && contact.name.trim().length < 2) blockers.push("Enter the name of the person collecting the order.");
+    if (needsContact && !/^[6-9]\d{9}$/.test(contact.phone)) blockers.push("Enter a 10-digit mobile number (starting with 6, 7, 8 or 9) so the store can reach you about your pickup.");
+    if (fulfilment === "delivery" && !addressId) blockers.push("Choose or add a delivery address.");
+    if (!slotDate !== !slotWindow) blockers.push("Choose both a day and a time for your slot, or leave both empty.");
+    if (rxHint?.required && !(rxHint.state === "verified" || rxHint.state === "pending")) blockers.push("Select or upload a prescription for the prescription medicines in your cart.");
+  }
 
   async function place() {
     if (!quote) return;
@@ -175,7 +185,7 @@ export function CheckoutForm({ initialAddresses }: { initialAddresses: Address[]
               {settings && <p className="mt-1 text-sm text-slate-600">Collect from {settings.shopName}. We will keep it ready for you.</p>}
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
                 <div><label htmlFor="c-name" className="text-sm font-medium">Name</label><input id="c-name" className={`${field} mt-1.5`} value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} autoComplete="name" /></div>
-                <div><label htmlFor="c-phone" className="text-sm font-medium">Mobile number</label><input id="c-phone" inputMode="numeric" maxLength={10} className={`${field} mt-1.5`} value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value.replace(/\D/g, "") })} autoComplete="tel-national" /></div>
+                <div><label htmlFor="c-phone" className="text-sm font-medium">Mobile number</label><input id="c-phone" inputMode="numeric" maxLength={10} required aria-invalid={phoneBad} aria-describedby={phoneBad ? "c-phone-err" : undefined} placeholder="10-digit mobile number" className={`${field} mt-1.5 ${phoneBad ? "!border-rose-500" : ""}`} value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value.replace(/\D/g, "") })} autoComplete="tel-national" />{phoneBad && <p id="c-phone-err" className="mt-1.5 text-xs text-rose-700">Enter a valid 10-digit mobile number.</p>}</div>
               </div>
             </section>
           )}
@@ -286,6 +296,11 @@ export function CheckoutForm({ initialAddresses }: { initialAddresses: Address[]
               </ul>
             )}
             {error && <p role="alert" className="mt-4 rounded-xl bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
+            {!canPlace && !busy && blockers.length > 0 && (
+              <ul className="mt-4 space-y-1 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" aria-live="polite">
+                {blockers.map((b) => <li key={b} className="flex items-start gap-2"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {b}</li>)}
+              </ul>
+            )}
             <button type="button" onClick={place} disabled={!canPlace} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 py-3.5 font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-slate-300">
               {busy && <Loader2 className="h-4 w-4 animate-spin" />} {busy ? "Placing order…" : payment === "online" ? "Continue to payment" : "Place order"}
             </button>
