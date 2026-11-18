@@ -13,12 +13,23 @@ const SELECTOR = "[data-reveal],[data-stagger],[data-words]";
  * The hiding only happens once this runs, so with JavaScript off (or before hydration) everything is fully
  * visible — safe for SEO. Re-scans on every navigation and for content added later. Reduced motion: no effect.
  */
+let hydratedOnce = false;
+
 export function RevealOnScroll() {
   const pathname = usePathname();
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce || !("IntersectionObserver" in window)) return;
+
+    // The first run waits until the page has loaded and the browser is idle: this component sits in the layout, so its
+    // effect would otherwise run before the streamed page below has hydrated and edit the server HTML under React
+    // (a hydration mismatch). Later client-side navigations have nothing left to hydrate and start at once.
+    let cleanup = () => {};
+    let cancelled = false;
+    const run = () => {
+    if (cancelled) return;
+    hydratedOnce = true;
     document.documentElement.classList.add("mn-reveal-ready"); // activates the "hidden until seen" CSS
 
     const io = new IntersectionObserver(
@@ -47,7 +58,7 @@ export function RevealOnScroll() {
       }
       // Anything already on screen reveals at once; the rest when scrolled to.
       const r = el.getBoundingClientRect();
-      if (r.top < window.innerHeight * 0.92 && r.bottom > 0) requestAnimationFrame(() => el.classList.add("mn-in"));
+      if (r.top < window.innerHeight * 0.92 && r.bottom > 0) el.classList.add("mn-in");
       else io.observe(el);
     };
 
@@ -62,9 +73,28 @@ export function RevealOnScroll() {
     });
     mo.observe(document.body, { childList: true, subtree: true });
 
-    return () => {
+    cleanup = () => {
       io.disconnect();
       mo.disconnect();
+    };
+    };
+
+    let timer = 0;
+    const schedule = () => {
+      if (hydratedOnce) return run();
+      const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+      timer = ric ? ric(run, { timeout: 1500 }) : window.setTimeout(run, 250);
+    };
+    if (hydratedOnce || document.readyState === "complete") schedule();
+    else window.addEventListener("load", schedule, { once: true });
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("load", schedule);
+      const cic = (window as unknown as { cancelIdleCallback?: (n: number) => void }).cancelIdleCallback;
+      if (cic) cic(timer);
+      window.clearTimeout(timer);
+      cleanup();
     };
   }, [pathname]);
 
