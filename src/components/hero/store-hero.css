@@ -2,7 +2,7 @@
 
 .ms {
   --o1: 1; --o2: 0; --o3: 0; --o4: 0;
-  --lid: 0; --rise: 0; --spin: 0; --x12: 0; --x23: 0; --x34: 0;
+  --lid: 0; --spin: 0; --op: 1; --x12: 0; --x23: 0; --x34: 0;
   --c1: 0; --c2: 0; --c3: 0; --prog: 0;
   --ink: #10281d;
   --teal: #14613a;
@@ -32,14 +32,19 @@
     radial-gradient(40% 42% at 0% 100%, rgb(126 178 146 / 0.42), transparent 70%),
     radial-gradient(45% 45% at 100% 0%, rgb(255 255 255 / 0.9), transparent 70%);
 }
-.ms-prod {
+/* The box fixes where the product scene sits; the scene itself (inside it) is what moves and fades, so the hero jar can be
+   placed over the photo's jar from the box's untouched position. */
+.ms-prod-box {
   position: absolute; z-index: 1; right: 0; bottom: 5svh;
   width: min(60vw, 860px); aspect-ratio: 1200 / 774;
-  opacity: var(--o1);
+  pointer-events: none;
+}
+.ms-prod {
+  position: absolute; inset: 0;
+  opacity: var(--op);
   /* the product scene packs down toward the middle, where the box rises to meet it */
   transform: translate3d(calc(var(--x12) * -14%), calc(var(--x12) * 30%), 0) scale(calc(1 - var(--x12) * 0.55));
   transform-origin: 50% 100%;
-  pointer-events: none;
   animation: ms-slide 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s backwards;
 }
 /* The soft edges are baked into the image (transparent alpha), so no CSS mask has to be redrawn while it floats. */
@@ -178,21 +183,6 @@
   clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%);
   opacity: calc(var(--lid) * var(--lid));
 }
-.ms-items { position: absolute; left: 50%; top: 0; width: 0; height: 0; z-index: 1; }
-.ms-item {
-  position: absolute; top: 0;
-  left: calc(var(--dx) * 0.5 - var(--w) / 2);
-  width: var(--w); height: var(--h);
-  /* x23: the products draw in toward the middle and shrink, to become the spotlight bottle */
-  transform: translate3d(calc(var(--rise) * var(--dx) * 0.5 * (1 - var(--x23))), calc(var(--rise) * var(--rs) * -1 * (1 - var(--x23)) - var(--x23) * 70px), 0) rotate(calc(var(--rise) * var(--rot) * (1 - var(--x23)))) scale(calc(1 - var(--x23) * 0.5));
-  filter: drop-shadow(0 10px 8px rgb(12 54 64 / 0.22));
-}
-.ms-item-in { width: 100%; height: 100%; animation: ms-float 3.2s ease-in-out var(--fd, 0s) infinite alternate; }
-@keyframes ms-float {
-  from { transform: translateY(calc(var(--rise) * -6px)) rotate(-2deg); }
-  to { transform: translateY(calc(var(--rise) * 6px)) rotate(2deg); }
-}
-
 /* Scene 3: spotlight */
 .ms-s3 { opacity: var(--o3); padding-top: 9svh; }
 /* grows out of the gathered products (x23), then shrinks toward the route's start (x34), where the parcel is loaded */
@@ -204,17 +194,6 @@
 .ms-podium { position: absolute; left: 50%; bottom: 0; width: 250px; height: 62px; translate: -50% 0; }
 .ms-podium::before { content: ""; position: absolute; left: 0; right: 0; top: 20px; bottom: 0; border-radius: 0 0 50% 50% / 0 0 22px 22px; background: linear-gradient(90deg, #a5d3da, #e5f4f7 45%, #94c5ce); }
 .ms-podium i { position: absolute; left: 0; right: 0; top: 0; height: 40px; border-radius: 50%; background: radial-gradient(ellipse at 50% 40%, #fff, #d2ebf0); box-shadow: 0 0 0 1px #b6d8df inset; }
-.ms-bottle { position: absolute; left: 50%; bottom: 40px; width: 132px; translate: -50% 0; display: flex; flex-direction: column; align-items: center; animation: ms-bob 4.5s ease-in-out infinite alternate; }
-@keyframes ms-bob { to { transform: translateY(-7px); } }
-.ms-bcap { width: 74px; height: 28px; border-radius: 8px 8px 4px 4px; background: linear-gradient(90deg, #1d7d73, #46b8a9 40%, #1d7d73); }
-.ms-bneck { width: 64px; height: 12px; background: #eef7f9; border-left: 1px solid #c4dde2; border-right: 1px solid #c4dde2; }
-.ms-bbody { position: relative; width: 132px; height: 178px; border-radius: 28px 28px 22px 22px; background: #fff; overflow: hidden; border: 1px solid #c4dde2; box-shadow: 0 22px 30px -18px rgb(12 54 64 / 0.5); }
-.ms-blabel { position: absolute; left: 0; right: 0; top: 50px; height: 84px; background: linear-gradient(180deg, #9bd6dd, #7cc5ce); overflow: hidden; display: flex; align-items: center; }
-.ms-btrack { display: flex; width: max-content; margin-left: calc(var(--spin) * -240px); animation: ms-spin 9s linear infinite; }
-.ms-btrack span { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0 18px; font-size: 0.9rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #0c3640; white-space: nowrap; }
-.ms-btrack b { color: #16a34a; font-size: 1.25rem; }
-@keyframes ms-spin { to { transform: translateX(-50%); } }
-.ms-bshade { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(12 54 64 / 0.38), rgb(12 54 64 / 0) 24%, rgb(255 255 255 / 0.5) 38%, rgb(255 255 255 / 0) 56%, rgb(12 54 64 / 0.32)); }
 .ms-pill {
   position: absolute; z-index: 1;
   display: inline-flex; align-items: center; gap: 0.45rem;
@@ -304,7 +283,7 @@
   .ms-points li span { max-width: none; }
   .ms-points svg { width: 1.5rem; height: 1.5rem; }
 
-  .ms-prod {
+  .ms-prod-box {
     right: auto; left: 50%; translate: -50% 0;
     bottom: calc(4.1rem + env(safe-area-inset-bottom, 0px));
     width: min(130vw, 36rem, max(14rem, calc((100svh - var(--ms-x)) * 1.55)));
@@ -360,3 +339,16 @@
 .ms-s2 .ms-cap { opacity: calc(var(--o2) * var(--o2) * var(--o2)); }
 .ms-s3 .ms-cap { opacity: calc(var(--o3) * var(--o3) * var(--o3)); }
 .ms-s4 .ms-cap { opacity: calc(var(--o4) * var(--o4) * var(--o4)); }
+
+/* ---------- The hero jar: one medicine that travels through every scene ----------
+   StoreHero places it each frame from measured positions (the photo's jar, the box, the podium, the scooter's crate, the door),
+   so the same jar is packed, unboxed, spotlighted, loaded on the scooter and delivered. */
+.ms-jar { position: absolute; left: 0; top: 0; z-index: 4; width: 100px; height: 135px; opacity: 0; pointer-events: none; will-change: transform; transform-origin: 50% 50%; }
+.ms-jar-in { width: 100%; height: 100%; animation: ms-jar-sway 5s ease-in-out infinite alternate; }
+.ms-jar svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 8px 8px rgb(12 54 64 / 0.22)); }
+.ms-sheen { animation: ms-sheen 4.2s ease-in-out infinite; }
+@keyframes ms-sheen { from { transform: translateX(-34px); } to { transform: translateX(120px); } }
+@keyframes ms-jar-sway { from { transform: rotate(-1.6deg); } to { transform: rotate(1.6deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .ms-jar { display: none; }
+}
