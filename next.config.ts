@@ -45,7 +45,8 @@ const nextConfig: NextConfig = {
       // The homepage is the same for everyone (cart, sign-in and prices-on-cards are read separately by the browser), so the
       // CDN may keep it for a minute and serve a slightly older copy while it refreshes. Customers in India are then served
       // from the nearby edge instead of waiting on a round trip to the server's region.
-      { source: "/", headers: [{ key: "Cache-Control", value: "public, s-maxage=60, stale-while-revalidate=600" }] },
+      // (Next forces "no-store" on pages rendered per request, so this uses Vercel's CDN-only header; browsers still always revalidate.)
+      { source: "/", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=60, stale-while-revalidate=600" }] },
     ];
   },
 };
