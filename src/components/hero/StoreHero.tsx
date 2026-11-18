@@ -108,17 +108,24 @@ export function StoreHero() {
       const travel = Math.max(1, r.height - window.innerHeight);
       const p = clamp01(-r.top / travel);
 
-      const o1 = 1 - win(0.17, 0.27, p);
-      const o2 = win(0.24, 0.33, p) * (1 - win(0.5, 0.58, p));
-      const o3 = win(0.52, 0.6, p) * (1 - win(0.75, 0.83, p));
-      const o4 = win(0.78, 0.87, p);
-      const lid = ease(win(0.3, 0.38, p));
-      const rise = ease(win(0.34, 0.5, p));
-      const spin = win(0.55, 0.77, p);
-      const ride = win(0.84, 0.97, p);
-      const ph = win(0, 0.3, p);
+      // One continuous timeline. Neighbouring scenes overlap and hand objects to each other:
+      //   x12  the product scene packs down into the box, which rises into place and opens
+      //   x23  the products rise out of the box and gather into the spotlight bottle
+      //   x34  the bottle shrinks away toward the start of the route, where the parcel rides off
+      // The scenes cross-fade as complements (one fades in exactly as the other fades out), so there is never an empty moment.
+      const x12 = ease(win(0.08, 0.26, p));
+      const x23 = ease(win(0.42, 0.56, p));
+      const x34 = ease(win(0.66, 0.8, p));
+      const o1 = 1 - win(0.14, 0.26, p);
+      const o2 = win(0.14, 0.26, p) * (1 - win(0.48, 0.56, p));
+      const o3 = win(0.48, 0.56, p) * (1 - win(0.73, 0.81, p));
+      const o4 = win(0.7, 0.79, p);
+      const lid = ease(win(0.2, 0.3, p));
+      const rise = ease(win(0.25, 0.4, p));
+      const spin = win(0.5, 0.72, p);
+      const ride = win(0.8, 0.97, p);
 
-      const key = [o1, o2, o3, o4, lid, rise, spin, ride, ph].map(f3).join("|");
+      const key = [o1, o2, o3, o4, lid, rise, spin, ride, x12, x23, x34].map(f3).join("|");
       if (key !== last) {
         last = key;
         const s = el.style;
@@ -129,7 +136,9 @@ export function StoreHero() {
         s.setProperty("--lid", f3(lid));
         s.setProperty("--rise", f3(rise));
         s.setProperty("--spin", f3(spin));
-        s.setProperty("--ph", f3(ph));
+        s.setProperty("--x12", f3(x12));
+        s.setProperty("--x23", f3(x23));
+        s.setProperty("--x34", f3(x34));
         s.setProperty("--c1", f3(win(0.1, 0.3, spin)));
         s.setProperty("--c2", f3(win(0.38, 0.58, spin)));
         s.setProperty("--c3", f3(win(0.66, 0.86, spin)));

@@ -2,7 +2,7 @@
 
 .ms {
   --o1: 1; --o2: 0; --o3: 0; --o4: 0;
-  --lid: 0; --rise: 0; --spin: 0; --ph: 0;
+  --lid: 0; --rise: 0; --spin: 0; --x12: 0; --x23: 0; --x34: 0;
   --c1: 0; --c2: 0; --c3: 0; --prog: 0;
   --ink: #10281d;
   --teal: #14613a;
@@ -10,7 +10,7 @@
   --sky: #eef1e8;
 
   position: relative;
-  height: 440svh;
+  height: 360svh;
   background: var(--sky);
   color: var(--ink);
 }
@@ -36,8 +36,9 @@
   position: absolute; z-index: 1; right: 0; bottom: 5svh;
   width: min(60vw, 860px); aspect-ratio: 1200 / 774;
   opacity: var(--o1);
-  transform: translate3d(calc(var(--ph) * 9%), calc(var(--ph) * -10%), 0) scale(calc(1 + var(--ph) * 0.1));
-  transform-origin: 60% 70%;
+  /* the product scene packs down toward the middle, where the box rises to meet it */
+  transform: translate3d(calc(var(--x12) * -14%), calc(var(--x12) * 30%), 0) scale(calc(1 - var(--x12) * 0.55));
+  transform-origin: 50% 100%;
   pointer-events: none;
   animation: ms-slide 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s backwards;
 }
@@ -147,7 +148,8 @@
 
 /* Scene 2: unboxing */
 .ms-s2 { opacity: var(--o2); padding-top: 12svh; }
-.ms-box { position: relative; width: 260px; height: 150px; perspective: 900px; margin-top: 4svh; }
+/* rises in from below as the product scene packs down, then sinks away while its products gather into the spotlight */
+.ms-box { position: relative; width: 260px; height: 150px; perspective: 900px; margin-top: 4svh; translate: 0 calc((1 - var(--x12)) * 110px + var(--x23) * 130px); }
 .ms-box-shadow { position: absolute; left: -20px; right: -20px; bottom: -22px; height: 34px; border-radius: 50%; background: radial-gradient(closest-side, rgb(12 54 64 / 0.28), transparent); }
 .ms-front {
   position: absolute; inset: 0; z-index: 2;
@@ -181,7 +183,8 @@
   position: absolute; top: 0;
   left: calc(var(--dx) * 0.5 - var(--w) / 2);
   width: var(--w); height: var(--h);
-  transform: translate3d(calc(var(--rise) * var(--dx) * 0.5), calc(var(--rise) * var(--rs) * -1), 0) rotate(calc(var(--rise) * var(--rot)));
+  /* x23: the products draw in toward the middle and shrink, to become the spotlight bottle */
+  transform: translate3d(calc(var(--rise) * var(--dx) * 0.5 * (1 - var(--x23))), calc(var(--rise) * var(--rs) * -1 * (1 - var(--x23)) - var(--x23) * 70px), 0) rotate(calc(var(--rise) * var(--rot) * (1 - var(--x23)))) scale(calc(1 - var(--x23) * 0.5));
   filter: drop-shadow(0 10px 8px rgb(12 54 64 / 0.22));
 }
 .ms-item-in { width: 100%; height: 100%; animation: ms-float 3.2s ease-in-out var(--fd, 0s) infinite alternate; }
@@ -192,7 +195,12 @@
 
 /* Scene 3: spotlight */
 .ms-s3 { opacity: var(--o3); padding-top: 9svh; }
-.ms-spot { position: relative; width: min(520px, 94vw); height: min(400px, 50svh); min-height: 330px; margin-top: 3svh; }
+/* grows out of the gathered products (x23), then shrinks toward the route's start (x34), where the parcel is loaded */
+.ms-spot {
+  position: relative; width: min(520px, 94vw); height: min(400px, 50svh); min-height: 330px; margin-top: 3svh;
+  transform: translateY(calc((1 - var(--x23)) * 40px)) scale(calc((0.55 + 0.45 * var(--x23)) * (1 - 0.6 * var(--x34))));
+  translate: calc(var(--x34) * -26%) calc(var(--x34) * 34%);
+}
 .ms-podium { position: absolute; left: 50%; bottom: 0; width: 250px; height: 62px; translate: -50% 0; }
 .ms-podium::before { content: ""; position: absolute; left: 0; right: 0; top: 20px; bottom: 0; border-radius: 0 0 50% 50% / 0 0 22px 22px; background: linear-gradient(90deg, #a5d3da, #e5f4f7 45%, #94c5ce); }
 .ms-podium i { position: absolute; left: 0; right: 0; top: 0; height: 40px; border-radius: 50%; background: radial-gradient(ellipse at 50% 40%, #fff, #d2ebf0); box-shadow: 0 0 0 1px #b6d8df inset; }
@@ -216,15 +224,16 @@
   box-shadow: 0 10px 22px -14px rgb(12 54 64 / 0.6);
 }
 .ms-pill svg { color: var(--teal); }
-.ms-pill-1 { left: 0; top: 18%; opacity: var(--c1); transform: translateX(calc((1 - var(--c1)) * 40px)); }
-.ms-pill-2 { right: 0; top: 40%; opacity: var(--c2); transform: translateX(calc((1 - var(--c2)) * -40px)); }
-.ms-pill-3 { left: 3%; bottom: 26%; opacity: var(--c3); transform: translateX(calc((1 - var(--c3)) * 40px)); }
+.ms-pill-1 { left: 0; top: 18%; opacity: calc(var(--c1) * (1 - var(--x34) * 2)); transform: translateX(calc((1 - var(--c1)) * 40px)); }
+.ms-pill-2 { right: 0; top: 40%; opacity: calc(var(--c2) * (1 - var(--x34) * 2)); transform: translateX(calc((1 - var(--c2)) * -40px)); }
+.ms-pill-3 { left: 3%; bottom: 26%; opacity: calc(var(--c3) * (1 - var(--x34) * 2)); transform: translateX(calc((1 - var(--c3)) * 40px)); }
 .ms-spark { position: absolute; left: calc(50% + 62px); top: 14%; color: #f0b429; animation: ms-twinkle 2.2s ease-in-out infinite; }
 @keyframes ms-twinkle { 50% { transform: scale(1.35) rotate(18deg); opacity: 0.7; } }
 
 /* Scene 4: delivery */
 .ms-s4 { opacity: var(--o4); padding-top: 9svh; gap: 0.4rem; }
-.ms-route { position: relative; width: min(820px, 96vw); margin-top: 3.2rem; }
+/* rises into view while the bottle shrinks toward its left end */
+.ms-route { position: relative; width: min(820px, 96vw); margin-top: 3.2rem; translate: 0 calc((1 - var(--x34)) * 60px); }
 .ms-route svg { display: block; width: 100%; height: auto; overflow: visible; }
 .ms-pin-in { transform: translateY(-130px); opacity: 0; transition: transform 0.6s cubic-bezier(0.3, 1.7, 0.5, 1), opacity 0.2s; }
 .ms[data-drop="1"] .ms-pin-in { transform: none; opacity: 1; }
@@ -346,3 +355,8 @@
   .ms-line-in, .ms-in { animation: none; opacity: 1; transform: none; }
   .ms-swash path { animation: none; stroke-dashoffset: 0; }
 }
+
+/* Scene captions change quickly instead of overprinting each other while two scenes cross-fade. */
+.ms-s2 .ms-cap { opacity: calc(var(--o2) * var(--o2) * var(--o2)); }
+.ms-s3 .ms-cap { opacity: calc(var(--o3) * var(--o3) * var(--o3)); }
+.ms-s4 .ms-cap { opacity: calc(var(--o4) * var(--o4) * var(--o4)); }
