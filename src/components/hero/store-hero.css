@@ -34,19 +34,17 @@
 }
 .ms-prod {
   position: absolute; z-index: 1; right: 0; bottom: 5svh;
-  width: min(60vw, 860px); aspect-ratio: 1200 / 776;
+  width: min(60vw, 860px); aspect-ratio: 1200 / 774;
   opacity: var(--o1);
   transform: translate3d(calc(var(--ph) * 9%), calc(var(--ph) * -10%), 0) scale(calc(1 + var(--ph) * 0.1));
   transform-origin: 60% 70%;
   pointer-events: none;
   animation: ms-slide 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s backwards;
 }
+/* The soft edges are baked into the image (transparent alpha), so no CSS mask has to be redrawn while it floats. */
 .ms-prod-in {
   position: absolute; inset: 0;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 93%, transparent), linear-gradient(180deg, transparent, #000 14%, #000 90%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(90deg, transparent, #000 22%, #000 93%, transparent), linear-gradient(180deg, transparent, #000 14%, #000 90%, transparent);
-  mask-composite: intersect;
+  will-change: transform;
   animation: ms-bob 7s ease-in-out infinite alternate;
 }
 .ms-prod-img { object-fit: cover; }

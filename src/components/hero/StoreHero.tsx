@@ -175,7 +175,7 @@ export function StoreHero() {
         {/* Product scene (right side): drifts up and away as the story moves on */}
         <div className="ms-prod" aria-hidden>
           <div className="ms-prod-in">
-            <Image src="/hero/medicine-podium.webp" alt="" fill priority sizes="(max-width: 900px) 112vw, 60vw" quality={85} className="ms-prod-img" />
+            <Image src="/hero/medicine-podium-fade.webp" alt="" fill priority sizes="(max-width: 900px) 112vw, 60vw" quality={85} className="ms-prod-img" />
           </div>
         </div>
 

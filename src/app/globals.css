@@ -95,7 +95,7 @@ body {
 }
 
 /* Page enter: each navigation fades the new page up gently (see src/app/template.tsx). */
-@keyframes mn-pagefade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes mn-pagefade { from { opacity: 0; } to { opacity: 1; } }
 .mn-page { animation: mn-pagefade .28s var(--ease-out); }
 
 /* Cart badge pops whenever the count changes. */
