@@ -1,0 +1,43 @@
+/* Section dividers. Light/dark come from these tokens (the storefront sets html.dark). */
+:root {
+  --sd-tint: #e7f4f1;
+  --sd-line: rgb(15 118 110 / 0.55);
+  --sd-soft: rgb(15 118 110 / 0.28);
+  --sd-tab-bg: #fff;
+  --sd-perf: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Crect x='4' y='3' width='16' height='6' rx='3'/%3E%3C/svg%3E");
+  --sd-chain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='14'%3E%3Crect x='2' y='3' width='22' height='8' rx='4'/%3E%3Ccircle cx='36' cy='7' r='2.6'/%3E%3Ccircle cx='47' cy='7' r='1.5'/%3E%3C/svg%3E");
+}
+html.dark {
+  --sd-tint: #13211d;
+  --sd-line: rgb(94 234 212 / 0.55);
+  --sd-soft: rgb(94 234 212 / 0.26);
+  --sd-tab-bg: #161d19;
+}
+
+/* Tinted band that a wave opens and closes */
+.sd-band { background: var(--sd-tint); padding-bottom: 3.5rem; }
+.sd-band > section { padding-top: 1.25rem; }
+
+/* Soft curve: the box is the "from" colour, the curve is the "to" colour */
+.sd-wave { display: block; background: var(--from); line-height: 0; margin-top: -1px; height: clamp(28px, 4.2vw, 56px); }
+.sd-wave svg { display: block; width: 100%; height: 100%; }
+.sd-wave path { fill: var(--to); }
+
+/* ECG heartbeat */
+.sd-ecg { display: flex; justify-content: center; padding: 1.75rem 1rem 0.25rem; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+.sd-ecg svg { width: min(100%, 980px); height: 44px; overflow: visible; }
+.sd-ecg path { fill: none; stroke: var(--sd-line); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
+/* The line starts undrawn only when the scroll-reveal helper is running, so no-JS and reduced motion show it complete */
+.mn-reveal-ready .sd-ecg path { stroke-dashoffset: 1; transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s; }
+.mn-reveal-ready .sd-ecg.mn-in path { stroke-dashoffset: 0; }
+
+/* Blister-pack perforation */
+.sd-perf { display: flex; align-items: center; gap: 0.75rem; margin: 3.5rem auto 0; max-width: 80rem; padding: 0 1rem; }
+@media (min-width: 640px) { .sd-perf { padding: 0 1.5rem; } }
+.sd-perf-row { flex: 1; height: 12px; background: var(--sd-soft); -webkit-mask: var(--sd-perf) repeat-x left center / 24px 12px; mask: var(--sd-perf) repeat-x left center / 24px 12px; }
+.sd-perf-left { -webkit-mask-position: right center; mask-position: right center; }
+.sd-perf-tab { display: inline-flex; align-items: center; gap: 0.35rem; flex: none; padding: 0.25rem 0.7rem; border-radius: 999px; border: 1px dashed var(--sd-line); background: var(--sd-tab-bg); color: var(--sd-line); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* Capsule chain */
+.sd-caps { margin: 3.5rem auto 0; max-width: 56rem; padding: 0 1rem; -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent); mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent); }
+.sd-caps span { display: block; height: 14px; background: var(--sd-soft); -webkit-mask: var(--sd-chain) repeat-x center / 56px 14px; mask: var(--sd-chain) repeat-x center / 56px 14px; }

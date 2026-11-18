@@ -13,6 +13,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { StoreHero } from "@/components/hero/StoreHero";
+import { SectionDivider } from "@/components/SectionDivider";
 import { HowItWorks } from "@/components/HowItWorks";
 import { SectionHead } from "@/components/SectionHead";
 import { FaqChat } from "@/components/home/FaqChat";
@@ -35,6 +36,9 @@ export default async function Home() {
     <main>
       <StoreHero />
 
+      {/* Hero sky melts into the stats row */}
+      <SectionDivider variant="wave" from="#b8dde4" to="var(--bg-surface)" />
+
       {/* Trust stats */}
       <section id="after-hero" className="scroll-mt-24 border-b border-slate-100 bg-white">
         <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-8 text-center sm:px-6 md:grid-cols-4">
@@ -47,10 +51,14 @@ export default async function Home() {
 
       <PromiseBand />
 
+      <SectionDivider variant="ecg" />
+
       {/* Categories */}
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
         <CategoryTiles categories={categories} counts={counts} />
       </section>
+
+      <SectionDivider variant="perforation" />
 
       {/* Upload prescription */}
       <section id="upload" className="mx-auto mt-14 max-w-7xl scroll-mt-40 px-4 sm:px-6">
@@ -85,6 +93,9 @@ export default async function Home() {
 
       {/* Deals */}
       {deals.length > 0 && (
+      <>
+      <SectionDivider variant="wave" className="mt-14" />
+      <div className="sd-band">
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
         <SectionHead display eyebrow="Offers" title="Deals of the day" sub="Biggest savings on everyday essentials"
           action={<Link href="/medicines?sort=discount" className="flex items-center gap-1 text-sm font-semibold text-teal-700 hover:underline">See all deals <ChevronRight className="h-4 w-4" /></Link>} />
@@ -94,6 +105,9 @@ export default async function Home() {
           ))}
         </div>
       </section>
+      </div>
+      <SectionDivider variant="wave" from="var(--sd-tint)" to="var(--bg-page)" />
+      </>
       )}
 
       {/* Health concerns: picture cards */}
@@ -101,6 +115,9 @@ export default async function Home() {
 
       {/* New arrivals */}
       {newest.length > 0 && (
+      <>
+      <SectionDivider variant="wave" className="mt-14" />
+      <div className="sd-band">
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
         <SectionHead display eyebrow="New" title="New arrivals" sub="Recently added to our catalogue"
           action={<Link href="/medicines" className="flex items-center gap-1 text-sm font-semibold text-teal-700 hover:underline">View all <ChevronRight className="h-4 w-4" /></Link>} />
@@ -110,7 +127,12 @@ export default async function Home() {
           ))}
         </div>
       </section>
+      </div>
+      <SectionDivider variant="wave" from="var(--sd-tint)" to="var(--bg-page)" />
+      </>
       )}
+
+      <SectionDivider variant="ecg" />
 
       {/* Why MedNeed */}
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6">
@@ -139,6 +161,8 @@ export default async function Home() {
 
       {/* Visit our store */}
       <VisitStore phone={business.phone} hoursLabel={business.hoursLabel} />
+
+      <SectionDivider variant="capsules" />
 
       {/* FAQ: a conversation with our pharmacist */}
       <FaqChat faqs={faqs} />
