@@ -193,10 +193,10 @@ export function StoreHero() {
             </p>
             <div className="ms-actions ms-in" style={{ "--d": "1050ms" } as CSSProperties}>
               <Link href="/medicines" className="ms-btn ms-btn-primary group">
-                Order medicines <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                <span className="ms-l-long">Order medicines</span><span className="ms-l-short">Order now</span> <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
               </Link>
               <Link href="/account/prescriptions/new" className="ms-btn ms-btn-ghost">
-                <Upload className="h-4 w-4" aria-hidden /> Upload prescription
+                <Upload className="h-4 w-4" aria-hidden /> <span className="ms-l-long">Upload prescription</span><span className="ms-l-short">Upload Rx</span>
               </Link>
             </div>
             <ul className="ms-points ms-in" style={{ "--d": "1200ms" } as CSSProperties}>
