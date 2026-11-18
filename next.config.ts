@@ -40,7 +40,13 @@ const nextConfig: NextConfig = {
   // Loaded by Node at runtime instead of being bundled (pg and PGlite ship WASM/optional native paths).
   serverExternalPackages: ["pg", "@electric-sql/pglite", "@aws-sdk/client-s3"],
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // The homepage is the same for everyone (cart, sign-in and prices-on-cards are read separately by the browser), so the
+      // CDN may keep it for a minute and serve a slightly older copy while it refreshes. Customers in India are then served
+      // from the nearby edge instead of waiting on a round trip to the server's region.
+      { source: "/", headers: [{ key: "Cache-Control", value: "public, s-maxage=60, stale-while-revalidate=600" }] },
+    ];
   },
 };
 
