@@ -97,11 +97,18 @@ async function listBrandsNow(limit: number): Promise<string[]> {
 }
 
 export async function listDeals(limit = 4): Promise<Product[]> {
+  // Homepage block: kept for a minute (admin edits clear it at once on this server). Cart and checkout always re-check price and stock.
+  return cached(`deals:${limit}`, 60_000, () => listDealsNow(limit));
+}
+async function listDealsNow(limit: number): Promise<Product[]> {
   const rows = await query(`${MEDICINE_SELECT} where m.status = 'active' and ${inStockSql()} and m.price < m.mrp order by (m.mrp - m.price) / m.mrp desc, m.name limit ${limit}`);
   return rows.map((r) => toProduct(mapMedicine(r)));
 }
 
 export async function listNewest(limit = 8): Promise<Product[]> {
+  return cached(`newest:${limit}`, 60_000, () => listNewestNow(limit));
+}
+async function listNewestNow(limit: number): Promise<Product[]> {
   const rows = await query(`${MEDICINE_SELECT} where m.status = 'active' and ${inStockSql()} order by m.created_at desc, m.name limit ${limit}`);
   return rows.map((r) => toProduct(mapMedicine(r)));
 }

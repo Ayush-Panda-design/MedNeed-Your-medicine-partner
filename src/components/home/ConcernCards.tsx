@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { CONCERNS } from "@/lib/homeMedia";
 import { heroSerif } from "@/lib/fonts";
 import { searchProducts } from "@/server/catalog/queries";
+import { cached } from "@/server/cache";
 import "./home.css";
 
 /** Popular generic picks shown on hover (search terms, not product claims). */
@@ -30,7 +31,8 @@ function roughCount(n: number) {
  */
 export async function ConcernCards() {
   const counts = await Promise.all(
-    CONCERNS.map((c) => searchProducts({ q: c.q, page: 1, pageSize: 1 }).then((r) => r.total).catch(() => 0)),
+    // Each count runs a full search, so they are kept for five minutes rather than recomputed on every homepage view.
+    CONCERNS.map((c) => cached(`concern:${c.q}`, 300_000, () => searchProducts({ q: c.q, page: 1, pageSize: 1 }).then((r) => r.total)).catch(() => 0)),
   );
   return (
     <section aria-labelledby="hc-title" className={`mx-auto max-w-7xl px-4 pt-14 sm:px-6 ${heroSerif.variable}`}>

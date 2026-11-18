@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { audit } from "../auth/users";
 import { query } from "../db";
+import { cached, clearCache } from "../cache";
 
 const money = z.number().min(0).max(1_000_000);
 const optEmail = z.string().trim().max(254).refine((v) => v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Enter a valid email address, or leave blank");
@@ -123,6 +124,7 @@ export async function getSettings(q: Q = query): Promise<StoreSettings & { locat
 
 export async function saveSettings(actor: { id: string; ip?: string }, input: StoreSettings) {
   await query(`update store_settings set data = $1::jsonb, updated_at = now(), updated_by = $2 where id = 1`, [JSON.stringify(input), actor.id]);
+  clearCache("business:"); // the footer and policy pages pick up the change straight away on this server
   await audit(actor.id, "orders.settings.updated", { delivery: input.delivery, pickup: input.pickup, payments: input.payments, shop: { lat: input.shop.lat, lng: input.shop.lng } }, actor.ip);
 }
 
@@ -146,7 +148,7 @@ const ampm = (hhmm: string) => {
 };
 
 /** Business details for the footer and policy pages. Blank values are shown as "to be added" only on the pages that need them. */
-export async function businessInfo() {
+async function businessInfoNow() {
   const s = await getSettings();
   return {
     name: s.shop.name,
@@ -170,5 +172,9 @@ export async function businessInfo() {
     cod: { enabled: s.payments.codEnabled, max: s.payments.codMax },
     rxValidityDays: s.prescriptions.validityDays,
   };
+}
+/** Read on every storefront page (footer, policies), so it is kept for a minute instead of hitting the database each time. */
+export function businessInfo() {
+  return cached("business:info", 60_000, businessInfoNow);
 }
 export type BusinessInfo = Awaited<ReturnType<typeof businessInfo>>;
