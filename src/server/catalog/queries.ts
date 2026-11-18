@@ -28,7 +28,9 @@ export async function categoryCounts(): Promise<Record<string, number>> {
 }
 async function categoryCountsNow(): Promise<Record<string, number>> {
   const rows = await query<{ slug: string; n: string }>(
-    `select c.slug, count(m.id) as n from categories c join medicines m on m.category_id = c.id and m.status in ('active','catalog') where c.is_active group by c.slug`,
+    // Count per section id first (one pass over the products), then attach the few section names.
+    `select c.slug, t.n from (select category_id, count(*) as n from medicines where status in ('active','catalog') group by category_id) t
+     join categories c on c.id = t.category_id where c.is_active`,
   );
   return Object.fromEntries(rows.map((r) => [r.slug, Number(r.n)]));
 }
@@ -86,12 +88,14 @@ export async function getRelated(p: { id: string; category: string }, limit = 4)
 }
 
 export async function listBrands(limit = 30): Promise<string[]> {
-  return cached(`brands:${limit}`, 600_000, () => listBrandsNow(limit));
+  // The biggest makers hardly ever change, so this is kept for an hour (it scans the whole catalogue).
+  return cached(`brands:${limit}`, 3_600_000, () => listBrandsNow(limit));
 }
 async function listBrandsNow(limit: number): Promise<string[]> {
+  // Count per maker id first (index only), then look up the names of just the top few, instead of joining every product.
   const rows = await query<{ name: string }>(
-    `select mf.name from medicines m join manufacturers mf on mf.id = m.manufacturer_id where m.status in ('active','catalog')
-     group by mf.name order by count(*) desc, mf.name limit ${limit}`,
+    `select mf.name from (select manufacturer_id, count(*) as n from medicines where status in ('active','catalog') group by manufacturer_id order by n desc limit ${limit}) t
+     join manufacturers mf on mf.id = t.manufacturer_id order by t.n desc, mf.name`,
   );
   return rows.map((r) => r.name);
 }
@@ -207,7 +211,9 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean, symptomSalts?: string[
   // Sorting never removes anything: it only changes the order (see below).
   const where: string[] = [needsConfirmedPrice(c) ? `m.status = 'active'` : `m.status in ('active','catalog')`];
 
-  if (c.category) where.push(`c.slug = ${add(c.category)}`);
+  // The section is matched by id through a one-row sub-select, so the database can walk the (category, order) index straight
+  // to the first page instead of joining all 250k products to the category table first.
+  if (c.category) where.push(`m.category_id = (select id from categories where slug = ${add(c.category)})`);
   if (c.brands?.length) where.push(`mf.name in (${c.brands.map((b) => add(b)).join(",")})`);
   if (c.maxPrice) where.push(`m.price <= ${add(c.maxPrice)}`);
   if (c.otcOnly) where.push(`m.schedule = 'OTC'`);
@@ -259,7 +265,8 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean, symptomSalts?: string[
 
   // Totals change rarely and counting tens of thousands of rows is the slowest part of a page, so they are cached briefly.
   const total = await cached(`count:${clause}:${JSON.stringify(whereParams)}`, 120_000, async () =>
-    Number((await query<{ n: string }>(`select count(*) as n ${MEDICINE_JOINS} ${clause}`, whereParams))[0].n),
+    // Counts only need the products table (plus the maker table when filtering by brand), not the full joins.
+    Number((await query<{ n: string }>(`select count(*) as n from medicines m${c.brands?.length ? " join manufacturers mf on mf.id = m.manufacturer_id" : ""} ${clause}`, whereParams))[0].n),
   );
   const limit = add(c.pageSize);
   const offset = add((c.page - 1) * c.pageSize);

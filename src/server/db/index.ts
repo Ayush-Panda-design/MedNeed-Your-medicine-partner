@@ -125,7 +125,10 @@ async function upToDate(db: Db): Promise<boolean> {
     if (!migrations.every((m) => applied.has(m.id))) return false;
     const admins = await db.query<{ n: number }>(`select count(*)::int as n from user_roles where role = 'admin'`);
     if (!admins[0]?.n) return false;
-    if (process.env.MEDNEED_DEMO_DATA === "1") return false; // demo deployments keep the seed-if-empty check
+    // Demo deployments only need start-up work while the catalogue is still empty. A cheap "any row?" check answers that, so a
+    // populated demo site takes the fast path too (before, every cold start took the database-wide lock and counted all rows,
+    // and cold starts arriving together queued behind each other).
+    if (process.env.MEDNEED_DEMO_DATA === "1" && !(await db.query(`select 1 from medicines limit 1`)).length) return false;
     return true;
   } catch {
     return false; // fresh database (no tables yet)

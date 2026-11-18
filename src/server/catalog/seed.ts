@@ -55,8 +55,7 @@ const seeds: Seed[] = [
 ];
 
 export async function seedSampleCatalogIfEmpty(db: Db) {
-  const count = await db.query<{ n: string }>(`select count(*) as n from medicines`);
-  if (Number(count[0].n) > 0) return;
+  if ((await db.query(`select 1 from medicines limit 1`)).length > 0) return; // "any row?" is instant; counting 250k rows is not
 
   const cats = await db.query<{ id: string; slug: string }>(`select id, slug from categories`);
   const catId = new Map(cats.map((c) => [c.slug, c.id]));
