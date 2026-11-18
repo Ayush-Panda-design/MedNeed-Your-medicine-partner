@@ -307,13 +307,15 @@ export function StoreHero() {
           </div>
         </div>
 
-        {/* Progress + skip */}
-        <ol className="ms-dots" aria-hidden>
-          {[1, 2, 3, 4].map((n) => (
-            <li key={n} style={{ "--n": n } as CSSProperties} />
-          ))}
-        </ol>
-        <a href="#after-hero" className="ms-skip">Skip intro <ArrowRight className="h-3.5 w-3.5" aria-hidden /></a>
+        {/* Progress + skip (one bar, so they always line up; on desktop the bar steps aside and each sits in its own corner) */}
+        <div className="ms-bar">
+          <a href="#after-hero" className="ms-skip">Skip intro <ArrowRight className="h-3.5 w-3.5" aria-hidden /></a>
+          <ol className="ms-dots" aria-hidden>
+            {[1, 2, 3, 4].map((n) => (
+              <li key={n} style={{ "--n": n } as CSSProperties} />
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   );

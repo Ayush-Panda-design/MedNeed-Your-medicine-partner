@@ -125,7 +125,7 @@ export function Header({ categories }: { categories: Category[] }) {
             <span className="mn-hdr-logo"><Logo light={white} size="nav" /></span>
 
             <div className={compact ? "hidden" : "lg:hidden"}>
-              <CategoryMenu categories={categories} overlay={white} />
+              <CategoryMenu categories={categories} overlay={white} ink={ink} />
             </div>
 
             {/* search: full row on phones, inline on desktop; inside the phone pill it opens on demand */}
@@ -143,7 +143,7 @@ export function Header({ categories }: { categories: Category[] }) {
                   }}
                   aria-label={searchOpen ? "Close search" : "Search"}
                   aria-expanded={searchOpen}
-                  className={`grid h-[36px] w-[36px] place-items-center rounded-full lg:hidden ${cls.ghost}`}
+                  className={`grid h-10 w-10 place-items-center rounded-full lg:hidden ${cls.ghost}`}
                 >
                   {searchOpen ? <X className="h-[19px] w-[19px]" /> : <Search className="h-[19px] w-[19px]" />}
                 </button>
@@ -189,15 +189,15 @@ export function Header({ categories }: { categories: Category[] }) {
               )}
             </div>
           ) : (
-            <Link href="/login" aria-label="Sign in" className={`flex h-[36px] items-center gap-2 rounded-lg px-[8px] text-sm font-semibold sm:h-auto sm:px-3 sm:py-2 ${cls.ghost}`}>
+            <Link href="/login" aria-label="Sign in" className={`flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg px-[8px] text-sm font-semibold sm:h-auto sm:min-w-0 sm:justify-start sm:px-3 sm:py-2 ${cls.ghost}`}>
               <User className="h-[20px] w-[20px]" />
               <span className={compact ? "hidden" : "hidden sm:inline"}>Sign in</span>
             </Link>
           )}
 
-          <ThemeToggle className={`${cls.ghost} max-sm:h-[36px] max-sm:w-[36px] max-[359px]:hidden ${compact ? "rounded-full" : ""}`} />
+          <ThemeToggle className={`${cls.ghost} max-[359px]:hidden ${compact ? "rounded-full" : ""}`} />
 
-              <Link href="/cart" aria-label="Cart" className={`relative ml-[4px] flex h-[36px] items-center gap-2 rounded-lg px-[10px] text-sm font-semibold sm:ml-0 sm:h-auto sm:px-4 sm:py-2 ${cls.cart} ${compact ? "!rounded-full sm:!px-3" : ""}`}>
+              <Link href="/cart" aria-label="Cart" className={`relative ml-[4px] flex h-10 items-center gap-2 rounded-lg px-[10px] text-sm font-semibold sm:ml-0 sm:h-auto sm:px-4 sm:py-2 ${cls.cart} ${compact ? "!rounded-full sm:!px-3" : ""}`}>
                 <ShoppingCart className="h-[20px] w-[20px]" />
                 <span className={compact ? "hidden" : "hidden sm:inline"}>Cart</span>
                 {cart.count > 0 && (
@@ -214,7 +214,7 @@ export function Header({ categories }: { categories: Category[] }) {
             <div>
               <div className={`border-t ${white ? "border-white/15" : ink ? "border-[#0f766e]/15" : "border-slate-200/80"}`}>
                 <div className="mx-auto flex h-11 max-w-7xl items-center gap-2 px-6 text-[13px]">
-                  <CategoryMenu categories={categories} overlay={white} />
+                  <CategoryMenu categories={categories} overlay={white} ink={ink} />
                   <span aria-hidden className={`h-5 w-px ${white ? "bg-white/25" : ink ? "bg-[#0f766e]/20" : "bg-slate-200"}`} />
                   <PincodePicker overlay={white} />
                 </div>

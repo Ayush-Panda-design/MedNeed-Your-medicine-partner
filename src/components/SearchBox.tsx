@@ -18,6 +18,8 @@ const HINTS = [
   "Looking for baby care?",
   "Upload a prescription instead",
 ];
+// Phones: the same ideas in words short enough to fit the field without being cut off.
+const SHORT_HINTS = ["Search medicines", "Try “Dolo 650”", "Search by symptom", "Vitamins & supplements", "Baby care", "Upload a prescription"];
 const PLAIN_HINT = HINTS[0];
 const RECENT_KEY = "medneed_recent_searches";
 const POPULAR = ["Dolo 650", "Paracetamol", "Vitamin D", "ORS", "Cetirizine", "Pantoprazole"];
@@ -74,14 +76,15 @@ export function SearchBox({ styles, overlay }: { styles: Styles; overlay: boolea
   // ── typewriter placeholder (only while idle and empty; static for reduced-motion) ──
   useEffect(() => {
     if (q || open) return;
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setPh(PLAIN_HINT); return; }
+    const hints = window.matchMedia?.("(max-width: 480px)").matches ? SHORT_HINTS : HINTS;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { setPh(hints[0]); return; }
     let i = 0, n = 0, dir = 1, timer: ReturnType<typeof setTimeout>;
     const tick = () => {
-      const text = HINTS[i];
+      const text = hints[i];
       n += dir;
       setPh(text.slice(0, n) || " ");
       if (dir === 1 && n >= text.length) { dir = -1; timer = setTimeout(tick, 1700); return; }
-      if (dir === -1 && n <= 0) { dir = 1; i = (i + 1) % HINTS.length; timer = setTimeout(tick, 350); return; }
+      if (dir === -1 && n <= 0) { dir = 1; i = (i + 1) % hints.length; timer = setTimeout(tick, 350); return; }
       timer = setTimeout(tick, dir === 1 ? 55 : 24);
     };
     timer = setTimeout(tick, 600);
@@ -224,7 +227,7 @@ export function SearchBox({ styles, overlay }: { styles: Styles; overlay: boolea
               </button>
             )}
             {!q && !open && <kbd aria-hidden className={`mr-2 hidden h-6 min-w-6 shrink-0 place-items-center rounded-md border px-1.5 text-xs font-semibold md:grid ${overlay ? "border-white/40 text-white/80" : "border-slate-300 text-slate-500"}`}>/</kbd>}
-            <button type="submit" data-fx="ripple" className="mn-fx-ripple m-1 shrink-0 rounded-lg bg-teal-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-teal-700">
+            <button type="submit" data-fx="ripple" className="mn-fx-ripple m-1 shrink-0 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white sm:py-1.5 hover:bg-teal-700">
               Search
             </button>
           </div>

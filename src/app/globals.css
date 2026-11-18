@@ -170,6 +170,10 @@ html.mn-reveal-ready [data-reveal].mn-in {
 /* The chat launcher and the scroll-to-top button used to sit on the same spot. When the chat is on the page (body.mn-has-chat, set by SupportChat), scroll-to-top sits above it, and hides while the chat panel is open. */
 body.mn-has-chat .mn-fab { bottom: 6.25rem; }
 body.mn-chat-open .mn-fab { display: none; }
+/* Phones: a smaller launcher tucked into the corner, on the same line as page controls such as the homepage's skip/dots bar. */
+@media (max-width: 639px) {
+  .mn-chat-fab { width: 3rem; height: 3rem; right: 0.9rem; bottom: calc(1.15rem + env(safe-area-inset-bottom, 0px)); }
+}
 @keyframes mn-veil { from { opacity: 0; } to { opacity: 1; } }
 /* While the chat is open the page behind it goes quiet: animations pause, the custom cursor hides, and a soft veil (see SupportChat) keeps it out of focus. */
 body.mn-chat-open :where(header, main, footer) *,

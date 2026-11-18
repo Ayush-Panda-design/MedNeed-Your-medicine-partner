@@ -13,7 +13,7 @@ import { ThemeToggle } from "./ThemeToggle";
  * Header "Categories" button: opens a visual menu of every category (the same illustrations as the homepage tiles),
  * instead of a long strip of plain links. Closes on outside click, Escape, or after choosing.
  */
-export function CategoryMenu({ categories, overlay, className = "" }: { categories: Category[]; overlay: boolean; className?: string }) {
+export function CategoryMenu({ categories, overlay, ink = false, className = "" }: { categories: Category[]; overlay: boolean; ink?: boolean; className?: string }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -47,11 +47,11 @@ export function CategoryMenu({ categories, overlay, className = "" }: { categori
         aria-expanded={open}
         aria-label="Categories"
         aria-controls={id}
-        className={`flex h-[36px] items-center gap-2 rounded-lg px-[8px] text-sm sm:h-auto sm:px-3 sm:py-2 font-semibold transition-colors ${overlay ? "text-white hover:bg-white/10" : "text-slate-800 hover:bg-teal-50 hover:text-teal-800"}`}
+        className={`flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg px-[8px] text-sm sm:h-auto sm:min-w-0 sm:justify-start sm:px-3 sm:py-2 font-semibold transition-colors ${overlay ? "text-white hover:bg-white/10" : ink ? "text-[#0c3640] hover:bg-white/55" : "text-slate-800 hover:bg-teal-50 hover:text-teal-800"}`}
       >
         <LayoutGrid className="h-[20px] w-[20px]" aria-hidden />
         <span className="hidden sm:inline">Categories</span>
-        <ChevronDown className={`hidden h-4 w-4 transition-transform sm:block ${open ? "rotate-180" : ""} ${overlay ? "text-white/70" : "text-slate-400"}`} aria-hidden />
+        <ChevronDown className={`hidden h-4 w-4 transition-transform sm:block ${open ? "rotate-180" : ""} ${overlay ? "text-white/70" : ink ? "text-[#2a5d66]" : "text-slate-400"}`} aria-hidden />
       </button>
 
       {open && (
