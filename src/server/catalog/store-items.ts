@@ -98,6 +98,46 @@ export function pickSection(name: string, form: string, excelCat: string, compan
   return { slug: null, nonDrug: false };
 }
 
+/**
+ * Plain words customers type for these products ("sanitary pad", "diaper", "glucometer") that are not in the product name.
+ * They are added to the hidden search text only, never shown.
+ */
+const SEARCH_WORDS: [RegExp, string][] = [
+  [/\b(sanitary|napkins?|stayfree|whisper|sofy|comfy|pantyliner)\b/i, "sanitary pad sanitary napkin pads periods menstrual hygiene women"],
+  [/\b(diapers?|pampers|huggies|mamy ?poko)\b/i, "diaper diapers nappy baby diaper pants"],
+  [/\b(condoms?|durex|manforce|skore|moods)\b/i, "condom condoms contraceptive protection"],
+  [/\b(lubricants?|lube|kamasutra)\b/i, "lubricant lube personal lubricant"],
+  [/\b(pregnancy|prega ?news|i know)\b/i, "pregnancy test kit"],
+  [/\b(glucometer|gluco ?meter)\b/i, "glucometer blood sugar meter glucose monitor diabetes"],
+  [/\b(test strips?|glucose strips?)\b/i, "test strips glucose strips blood sugar diabetes"],
+  [/\blancets?\b/i, "lancet needle glucometer"],
+  [/\b(bp monitor|blood pressure)\b/i, "bp monitor blood pressure machine apparatus"],
+  [/\bthermometer\b/i, "thermometer fever temperature"],
+  [/\b(nebuli[sz]er|spacer)\b/i, "nebulizer spacer asthma"],
+  [/\b(bandage|plaster|gauze|cotton|dressing)\b/i, "bandage plaster dressing first aid wound"],
+  [/\b(gloves?|mask|sanitizer)\b/i, "gloves mask sanitizer hygiene"],
+  [/\b(tooth ?paste)\b/i, "toothpaste tooth paste dental oral care"],
+  [/\b(mouth ?wash|gargle)\b/i, "mouthwash gargle oral care"],
+  [/\b(tooth ?brush)\b/i, "toothbrush dental"],
+  [/\bsoap\b/i, "soap bathing soap"],
+  [/\bshampoo\b/i, "shampoo hair care dandruff"],
+  [/\b(face ?wash|cleanser)\b/i, "face wash cleanser facewash skin care"],
+  [/\b(sunscreen|sun screen)\b/i, "sunscreen sun protection spf"],
+  [/\bmoisturi/i, "moisturiser moisturizer skin care"],
+  [/\b(horlicks|bournvita|complan|protein|whey|ensure|pediasure)\b/i, "health drink protein nutrition supplement"],
+  [/\b(ors|electral)\b/i, "ors oral rehydration electrolyte dehydration"],
+  [/\b(inhaler|rotacaps?|respules?)\b/i, "inhaler asthma breathing"],
+  [/\b(eye drops?|ophthalmic)\b/i, "eye drops eye care"],
+  [/\bear drops?\b/i, "ear drops ear care"],
+  [/\binsulin\b/i, "insulin diabetes sugar"],
+  [/\b(cerelac|lactogen|nan ?pro)\b/i, "baby food infant formula"],
+  [/\bbaby (oil|lotion|powder|soap|cream|shampoo|wipes?)\b/i, "baby care"],
+  [/\b(ayurved|baidyanath|patanjali|zandu|himalaya|dabur|aimil)/i, "ayurvedic herbal ayurveda"],
+];
+export function searchWords(name: string) {
+  return SEARCH_WORDS.filter(([re]) => re.test(name)).map(([, w]) => w).join(" ");
+}
+
 const EXPAND: [RegExp, string][] = [[/\btab$/i, "Tablet"], [/\bcap$/i, "Capsule"], [/\bsyp$/i, "Syrup"], [/\binj$/i, "Injection"], [/\boint$/i, "Ointment"]];
 function tidyName(name: string) {
   let n = squash(name);
@@ -118,6 +158,7 @@ export type StoreImportReport = {
   added: number;
   bySection: Record<string, number>;
   unsorted: number;
+  keywordsRefreshed: number;
   newSections: string[];
   sample: { name: string; company: string; section: string }[];
 };
@@ -166,7 +207,7 @@ export async function runStoreImport(actor: Actor, commit: boolean, database?: D
     return name;
   };
 
-  const report: StoreImportReport = { committed: false, totalInFile: ITEMS.length, alreadyInCatalogue: 0, alreadyAddedBefore: 0, toAdd: 0, added: 0, bySection: {}, unsorted: 0, newSections: [], sample: [] };
+  const report: StoreImportReport = { committed: false, totalInFile: ITEMS.length, alreadyInCatalogue: 0, alreadyAddedBefore: 0, toAdd: 0, added: 0, bySection: {}, unsorted: 0, keywordsRefreshed: 0, newSections: [], sample: [] };
   type Prepared = { name: string; mf: string; form: string; pack: string; slugCat: string; schedule: string; ref: string };
   const prepared: Prepared[] = [];
   const seenKeys = new Set<string>();
@@ -217,7 +258,7 @@ export async function runStoreImport(actor: Actor, commit: boolean, database?: D
           const base = slug;
           while (taken.has(slug)) slug = `${base}-${n++}`;
           taken.add(slug);
-          return { ...p, slug, search: buildSearchText({ name: p.name, manufacturer: p.mf, salts: [], uses: [], category: "" }) };
+          return { ...p, slug, search: `${buildSearchText({ name: p.name, manufacturer: p.mf, salts: [], uses: [], category: "" })} ${searchWords(p.name)}`.trim() };
         });
         await t.query(`insert into manufacturers (name) select distinct m from unnest($1::text[]) m on conflict (lower(name)) do nothing`, [[...new Set(chunk.map((c) => c.mf))]]);
         const res = await t.query<{ slug: string }>(
@@ -232,6 +273,19 @@ export async function runStoreImport(actor: Actor, commit: boolean, database?: D
         );
         report.added += res.length;
       }
+      // Add the plain-word search keywords to every store item, including ones added by an earlier run.
+      const mine = await t.query<{ id: string; name: string; mf: string }>(
+        `select m.id, m.name, mf.name as mf from medicines m join manufacturers mf on mf.id = m.manufacturer_id where m.source = $1`,
+        [STORE_SOURCE],
+      );
+      for (let i = 0; i < mine.length; i += 1000) {
+        const part = mine.slice(i, i + 1000);
+        await t.query(
+          `update medicines m set search_text = x.t from unnest($1::uuid[], $2::text[]) as x(id, t) where m.id = x.id and m.search_text is distinct from x.t`,
+          [part.map((r) => r.id), part.map((r) => `${buildSearchText({ name: r.name, manufacturer: r.mf, salts: [], uses: [], category: "" })} ${searchWords(r.name)}`.trim())],
+        );
+      }
+      report.keywordsRefreshed = mine.length;
       if (!commit) throw new Rollback();
     });
     report.committed = true;

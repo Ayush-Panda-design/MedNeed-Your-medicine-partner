@@ -127,7 +127,8 @@ export type CatalogQuery = {
  * Search matches every word of the query against name, salts, manufacturer, category and uses.
  * A word matches if it appears in the text OR is close enough to a word in it (pg_trgm), so "paracetmol" still finds Paracetamol.
  */
-export async function searchProducts(c: CatalogQuery): Promise<{ items: Product[]; total: number }> {
+export async function searchProducts(input: CatalogQuery): Promise<{ items: Product[]; total: number }> {
+  const c = input.q ? { ...input, q: normalizeQuery(input.q) } : input;
   // Exact word matches first. Only when nothing matches exactly do we allow close spellings, so a correct
   // search is not diluted by thousands of loosely similar products while a typo still finds its target.
   const exact = await runSearch(c, false);
@@ -141,6 +142,21 @@ export async function searchProducts(c: CatalogQuery): Promise<{ items: Product[
   }
   if (exact.total > 0) return exact;
   return runSearch(c, true);
+}
+
+/** Common Hindi/Hinglish health words customers type, mapped to the English words the catalogue uses. */
+const HINGLISH: [RegExp, string][] = [
+  [/\b(sir|sar|head) ?dard\b/g, "headache"], [/\bbukh?aar\b/g, "fever"], [/\bpet (dard|mein dard)\b/g, "stomach pain"], [/\bkh?ansi\b/g, "cough"],
+  [/\bzukh?am\b|\bzukaam\b/g, "cold"], [/\bdast\b/g, "diarrhoea"], [/\bulti\b/g, "vomiting"], [/\bjalan\b/g, "acidity"], [/\bchakkar\b/g, "dizziness"],
+  [/\bkamzori\b/g, "weakness"], [/\bdaant dard\b/g, "toothache"], [/\bbadan dard\b/g, "body pain"], [/\bneend\b/g, "sleep"], [/\bkabz\b/g, "constipation"],
+];
+/** Words that carry no meaning for a product search ("medicine for acidity in the morning"); dropped unless nothing else is left. */
+const FILLER = new Set(["for", "and", "the", "of", "in", "with", "to", "a", "an", "my", "me", "best", "buy", "medicine", "medicines", "need", "want", "please", "on", "at", "is"]);
+
+export function normalizeQuery(q: string) {
+  let s = q.toLowerCase().trim();
+  for (const [re, to] of HINGLISH) s = s.replace(re, to);
+  return s;
 }
 
 /** Below this many keyword hits, a search is widened with ingredient-based (symptom) matches. */
@@ -190,7 +206,9 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean, symptomSalts?: string[
   if (c.otcOnly) where.push(`m.schedule = 'OTC'`);
   if (c.inStockOnly) where.push(`${inStockSql()}`);
 
-  const tokens = (c.q ?? "").toLowerCase().split(/\s+/).filter(Boolean).slice(0, 6);
+  const typed = (c.q ?? "").toLowerCase().split(/\s+/).filter(Boolean).slice(0, 8);
+  const meaningful = typed.filter((t) => !FILLER.has(t));
+  const tokens = (meaningful.length ? meaningful : typed).slice(0, 6);
   const likes: string[] = [];
   for (const t of tokens) {
     const like = add(`%${escapeLike(t)}%`);
@@ -226,7 +244,10 @@ async function runSearch(c: CatalogQuery, fuzzy: boolean, symptomSalts?: string[
   } else if (tokens.length) {
     const scores = tokens.map((t, i) => `greatest(word_similarity(${add(t)}, lower(m.name)), (case when m.search_text like ${likes[i]} then 0.5 else 0 end))`);
     const prefix = add(`${escapeLike(tokens.join(" "))}%`);
-    order = `((${scores.join(" + ")}) + (case when lower(m.name) like ${prefix} then 1 else 0 end)) desc, (m.status = 'active') desc, ${inStockSql()} desc, m.name`;
+    // Scores are grouped in quarter steps so near-equal matches tie; then the plainer product wins (fewer ingredients, shorter name):
+    // "paracetamol" lists Paracetamol tablets before a Tramadol+Paracetamol combination.
+    const score = `round((((${scores.join(" + ")}) + (case when lower(m.name) like ${prefix} then 1 else 0 end))::numeric) * 4)`;
+    order = `${score} desc, (m.status = 'active') desc, ${inStockSql()} desc, length(m.composition_key), length(m.name), m.name`;
   }
 
   // Totals change rarely and counting tens of thousands of rows is the slowest part of a page, so they are cached briefly.

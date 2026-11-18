@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 
 type Report = {
   committed: boolean; totalInFile: number; alreadyInCatalogue: number; alreadyAddedBefore: number; toAdd: number; added: number;
-  bySection: Record<string, number>; unsorted: number; newSections: string[];
+  bySection: Record<string, number>; unsorted: number; keywordsRefreshed: number; newSections: string[];
   sample: { name: string; company: string; section: string }[];
 };
 
@@ -63,7 +63,8 @@ export function StoreItemsPanel({ items }: { items: number }) {
             <li className="rounded-lg bg-slate-50 p-3"><b className="block text-lg">{report.toAdd.toLocaleString("en-IN")}</b> {report.committed ? "new" : "to add"}</li>
             <li className="rounded-lg bg-amber-50 p-3"><b className="block text-lg">{report.unsorted.toLocaleString("en-IN")}</b> left in Uncategorised for a person to place</li>
           </ul>
-          {report.newSections.length > 0 && <p>New sections {report.committed ? "created" : "that would be created"}: <b>{report.newSections.join(", ")}</b>.</p>}
+          <p>Search keywords (plain words like &quot;sanitary pad&quot; or &quot;diaper&quot;) {report.committed ? "refreshed for" : "would be refreshed for"} <b>{report.keywordsRefreshed.toLocaleString("en-IN")}</b> store items, including ones added earlier.</p>
+          {report.newSections.length > 0 &&<p>New sections {report.committed ? "created" : "that would be created"}: <b>{report.newSections.join(", ")}</b>.</p>}
           <div>
             <p className="mb-1 font-semibold">By section</p>
             <ul className="flex flex-wrap gap-2">
