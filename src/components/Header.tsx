@@ -25,6 +25,8 @@ export function Header({ categories }: { categories: Category[] }) {
   const [overHero, setOverHero] = useState(false);
   // The header only floats over the page when a full-bleed cinematic hero (#mn-cine) is present.
   const [floatOverHero, setFloatOverHero] = useState(false);
+  // A light hero (data-tone="light") gets dark header text instead of white.
+  const [lightHero, setLightHero] = useState(false);
   // Scrolled down: the whole header condenses into a floating pill.
   const [compact, setCompact] = useState(false);
   // Phones, compact pill: the search field opens on demand inside the pill.
@@ -40,6 +42,7 @@ export function Header({ categories }: { categories: Category[] }) {
       raf = 0;
       const hero = isHome ? document.getElementById("mn-cine") : null;
       setFloatOverHero(Boolean(hero));
+      setLightHero(hero?.dataset.tone === "light");
       const y = window.scrollY;
       const over = hero ? hero.getBoundingClientRect().bottom > 120 : false;
       setOverHero(over);
@@ -70,7 +73,18 @@ export function Header({ categories }: { categories: Category[] }) {
   }, [compact, auth.user]);
 
   const overlay = overHero && !compact;
-  const cls = {
+  // Over a light hero the header stays transparent but uses dark ink; the shared children get their plain (non-white) styling.
+  const ink = overlay && lightHero;
+  const white = overlay && !lightHero;
+  const cls = ink ? {
+    searchBox: "border-[#0f766e]/30 bg-white/60 backdrop-blur focus-within:border-[#0f766e] focus-within:bg-white",
+    searchIcon: "text-[#2a5d66]",
+    searchInput: "text-[#0c3640] placeholder:text-[#3f6c75]",
+    ghost: "text-[#0c3640] hover:bg-white/55",
+    uploadRx: "text-[#0f5f58] hover:bg-white/55",
+    cart: "bg-[#0f766e] text-white hover:bg-[#0b6b63]",
+    chevron: "text-[#2a5d66]",
+  } : {
     searchBox: overlay
       ? "border-white/40 bg-white/15 backdrop-blur focus-within:border-white focus-within:bg-white/25"
       : "border-slate-300 bg-slate-50 focus-within:border-teal-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-teal-100",
@@ -88,9 +102,11 @@ export function Header({ categories }: { categories: Category[] }) {
       <header
         ref={headerRef}
         data-compact={compact || undefined}
-        className={`mn-hdr fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow,color] duration-300 ${overlay ? "text-white [text-shadow:0_1px_2px_rgb(0_0_0/0.4)]" : "text-slate-900"} ${solid ? "bg-white/85 shadow-sm shadow-slate-900/5 backdrop-blur-md" : ""}`}
+        data-tone={ink ? "ink" : undefined}
+        className={`mn-hdr fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow,color] duration-300 ${white ? "text-white [text-shadow:0_1px_2px_rgb(0_0_0/0.4)]" : ink ? "text-[#0c3640]" : "text-slate-900"} ${solid ? "bg-white/85 shadow-sm shadow-slate-900/5 backdrop-blur-md" : ""}`}
       >
-        {overlay && <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/30 to-transparent" />}
+        {white && <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/30 to-transparent" />}
+        {ink && <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-white/55 via-white/20 to-transparent" />}
 
         <div className="mn-collapse" data-open={solid}>
           <div>
@@ -106,15 +122,15 @@ export function Header({ categories }: { categories: Category[] }) {
         {/* The bar itself: full width at the top, a floating pill once scrolled. */}
         <div className="mn-hdr-shell">
           <div className={`mx-auto flex max-w-7xl flex-wrap items-center gap-x-[6px] gap-y-[10px] transition-[padding] duration-500 sm:gap-x-4 lg:flex-nowrap lg:gap-x-6 ${compact ? "px-2.5 py-1.5 sm:px-3 lg:px-3 lg:py-1.5" : "px-[12px] py-[10px] sm:px-6 sm:py-3 lg:py-2.5"}`}>
-            <span className="mn-hdr-logo"><Logo light={overlay} size="nav" /></span>
+            <span className="mn-hdr-logo"><Logo light={white} size="nav" /></span>
 
             <div className={compact ? "hidden" : "lg:hidden"}>
-              <CategoryMenu categories={categories} overlay={overlay} />
+              <CategoryMenu categories={categories} overlay={white} />
             </div>
 
             {/* search: full row on phones, inline on desktop; inside the phone pill it opens on demand */}
             <div className={`order-last min-w-0 basis-full lg:order-none lg:mx-auto lg:max-w-2xl lg:flex-1 lg:basis-0 ${compact && !searchOpen ? "max-lg:hidden" : ""} ${compact ? "mn-hdr-search" : ""}`}>
-              <SearchBox overlay={overlay} styles={{ box: cls.searchBox, icon: cls.searchIcon, input: cls.searchInput }} />
+              <SearchBox overlay={white} styles={{ box: cls.searchBox, icon: cls.searchIcon, input: cls.searchInput }} />
             </div>
 
             <div className="ml-auto flex items-center gap-[2px] sm:gap-2 md:ml-0">
@@ -196,11 +212,11 @@ export function Header({ categories }: { categories: Category[] }) {
           {/* Row 2 (desktop): categories and delivery check; folds away in the pill */}
           <div className="mn-collapse max-lg:!hidden" data-open={!compact}>
             <div>
-              <div className={`border-t ${overlay ? "border-white/15" : "border-slate-200/80"}`}>
+              <div className={`border-t ${white ? "border-white/15" : ink ? "border-[#0f766e]/15" : "border-slate-200/80"}`}>
                 <div className="mx-auto flex h-11 max-w-7xl items-center gap-2 px-6 text-[13px]">
-                  <CategoryMenu categories={categories} overlay={overlay} />
-                  <span aria-hidden className={`h-5 w-px ${overlay ? "bg-white/25" : "bg-slate-200"}`} />
-                  <PincodePicker overlay={overlay} />
+                  <CategoryMenu categories={categories} overlay={white} />
+                  <span aria-hidden className={`h-5 w-px ${white ? "bg-white/25" : ink ? "bg-[#0f766e]/20" : "bg-slate-200"}`} />
+                  <PincodePicker overlay={white} />
                 </div>
               </div>
             </div>

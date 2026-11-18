@@ -402,7 +402,10 @@ html.theme .mn-tile { background-image: var(--bg-image-tile); }
 /* The dark-forest "Med" of the logo would vanish on a dark header, so it uses the logo's existing light variant colours. */
 html.dark .mn-logo:not(.mn-light) .mn-med { color: #fff; }
 html.dark .mn-logo:not(.mn-light) .mn-tag { color: rgba(255,255,255,.75); }
-html.dark .mn-fade-l { background: linear-gradient(90deg, rgba(22,29,25,.95) 30%, transparent); }
+/* Over the light homepage hero the header is transparent with dark ink, in dark mode too. */
+html.dark .mn-hdr[data-tone="ink"] .mn-logo:not(.mn-light) .mn-med { color: #0b5a2b; }
+html.dark .mn-hdr[data-tone="ink"] .mn-logo:not(.mn-light) .mn-tag { color: #0b5a2b; }
+.mn-hdr[data-tone="ink"] .mn-collapse button, .mn-hdr[data-tone="ink"] .mn-collapse button span { color: #0c3640 !important; }html.dark .mn-fade-l { background: linear-gradient(90deg, rgba(22,29,25,.95) 30%, transparent); }
 html.dark .mn-fade-r { background: linear-gradient(270deg, rgba(22,29,25,.95) 30%, transparent); }
 :where(html.dark) .from-teal-50\/40 { --tw-gradient-from: rgba(34,160,78,.06) var(--tw-gradient-from-position); --tw-gradient-to: rgba(34,160,78,0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
 :where(html.dark) .border-teal-100\/70 { border-color: var(--border); }

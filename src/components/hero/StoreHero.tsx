@@ -115,7 +115,7 @@ export function StoreHero() {
       const rise = ease(win(0.34, 0.5, p));
       const spin = win(0.55, 0.77, p);
       const ride = win(0.84, 0.97, p);
-      const ph = win(0.15, 0.3, p);
+      const ph = win(0, 0.3, p);
 
       const key = [o1, o2, o3, o4, lid, rise, spin, ride, ph].map(f3).join("|");
       if (key !== last) {
@@ -165,11 +165,15 @@ export function StoreHero() {
   }, []);
 
   return (
-    <section ref={root} id="mn-store-hero" aria-labelledby="ms-title" className={`ms ${heroSerif.variable}`} data-v1="1" data-v2="0" data-v3="0" data-v4="0">
+    <section ref={root} id="mn-cine" data-tone="light" aria-labelledby="ms-title" className={`ms ${heroSerif.variable}`} data-v1="1" data-v2="0" data-v3="0" data-v4="0">
       <div className="ms-stage">
         {/* Photo: scene 1 hero, then a soft backdrop for the other scenes */}
         <div className="ms-photo" aria-hidden>
-          <Image src="/hero/medicine-shelf.webp" alt="" fill priority sizes="100vw" quality={80} className="ms-photo-img" />
+          {/* The one photo, drawn as separate layers so leaves, plant and bottles can move at different speeds on scroll */}
+          <div className="ms-pl ms-pl-base"><Image src="/hero/medicine-shelf.webp" alt="" fill priority sizes="100vw" quality={80} className="ms-photo-img" /></div>
+          <div className="ms-pl ms-pl-l"><span className="ms-sway ms-sway-a"><Image src="/hero/medicine-shelf.webp" alt="" fill sizes="100vw" quality={80} className="ms-photo-img" /></span></div>
+          <div className="ms-pl ms-pl-c"><Image src="/hero/medicine-shelf.webp" alt="" fill sizes="100vw" quality={80} className="ms-photo-img" /></div>
+          <div className="ms-pl ms-pl-r"><span className="ms-sway ms-sway-b"><Image src="/hero/medicine-shelf.webp" alt="" fill sizes="100vw" quality={80} className="ms-photo-img" /></span></div>
         </div>
         <div className="ms-light" aria-hidden />
 

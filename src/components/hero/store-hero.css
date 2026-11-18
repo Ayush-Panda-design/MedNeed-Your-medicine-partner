@@ -30,13 +30,31 @@
   inset: auto 0 0 0;
   height: min(66%, 62vw + 140px);
   z-index: 0;
-  transform: translateY(calc(var(--ph) * 7%)) scale(calc(1 + var(--ph) * 0.08));
-  opacity: calc(1 - var(--ph) * 0.74);
-  transform-origin: 50% 100%;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 42%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 42%);
   animation: ms-slide 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
+.ms-pl { position: absolute; inset: 0; will-change: transform; }
+.ms-pl-base { opacity: max(0, calc(1 - var(--ph) * 30)); }
+.ms-pl-l, .ms-pl-c, .ms-pl-r { opacity: calc(1 - var(--ph) * 0.6); }
+.ms-pl-l {
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 20%, transparent 34%); mask-image: linear-gradient(90deg, #000 0, #000 20%, transparent 34%);
+  transform: translate(calc(var(--ph) * -9%), calc(var(--ph) * -7%)) rotate(calc(var(--ph) * -3deg));
+  transform-origin: 0% 100%;
+}
+.ms-pl-r {
+  -webkit-mask-image: linear-gradient(90deg, transparent 66%, #000 80%); mask-image: linear-gradient(90deg, transparent 66%, #000 80%);
+  transform: translate(calc(var(--ph) * 9%), calc(var(--ph) * -9%)) rotate(calc(var(--ph) * 3deg));
+  transform-origin: 100% 100%;
+}
+.ms-pl-c {
+  -webkit-mask-image: linear-gradient(90deg, transparent 18%, #000 32%, #000 68%, transparent 82%); mask-image: linear-gradient(90deg, transparent 18%, #000 32%, #000 68%, transparent 82%);
+  transform: translateY(calc(var(--ph) * 14%)) scale(calc(1 + var(--ph) * 0.12));
+  transform-origin: 50% 100%;
+}
+.ms-sway { position: absolute; inset: 0; display: block; transform-origin: 50% 100%; animation: ms-sway 6s ease-in-out infinite alternate; }
+.ms-sway-b { animation-duration: 7.5s; animation-delay: -2s; }
+@keyframes ms-sway { from { transform: rotate(-0.6deg) translateY(2px); } to { transform: rotate(0.8deg) translateY(-3px); } }
 .ms-photo-img {
   object-fit: cover;
   object-position: 42% 100%;
@@ -75,7 +93,7 @@
 
 .ms-cap {
   position: absolute;
-  top: clamp(5.2rem, 14svh, 8rem);
+  top: clamp(8rem, 18svh, 10rem);
   left: 50%;
   translate: -50% 0;
   display: inline-flex;
@@ -100,7 +118,7 @@
 /* Scene 1 */
 .ms-s1 {
   justify-content: flex-start;
-  padding: clamp(4.6rem, 10.5svh, 7rem) 1rem 0;
+  padding: clamp(7.4rem, 17svh, 9.5rem) 1rem 0;
   opacity: var(--o1);
   transform: translateY(calc((1 - var(--o1)) * -34px));
 }
@@ -301,6 +319,7 @@
   .ms { height: auto; }
   .ms-stage { position: relative; }
   .ms-s2, .ms-s3, .ms-s4, .ms-dots, .ms-skip { display: none; }
-  .ms-photo, .ms-photo-img, .ms-light, .ms-live, .ms-cue i { animation: none; }
+  .ms-photo, .ms-photo-img, .ms-light, .ms-live, .ms-cue i, .ms-sway { animation: none; }
+  .ms-pl { transform: none !important; }
   .ms-line-in, .ms-in { animation: none; opacity: 1; transform: none; }
 }
