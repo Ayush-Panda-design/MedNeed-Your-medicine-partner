@@ -180,9 +180,6 @@ export function StoreHero() {
         {/* Scene 1: entrance + headline */}
         <div className="ms-scene ms-s1">
           <div className="ms-copy">
-            <p className="ms-chip ms-in" style={{ "--d": "250ms" } as CSSProperties}>
-              <span className="ms-live" aria-hidden /> Now delivering across Bhubaneswar
-            </p>
             <h1 id="ms-title" className="ms-title">
               <span className="ms-line"><span className="ms-line-in" style={{ "--d": "450ms" } as CSSProperties}>Your trusted medicine store,</span></span>
               <span className="ms-line"><span className="ms-line-in" style={{ "--d": "650ms" } as CSSProperties}><em>delivered</em> to your door.</span></span>
