@@ -16,12 +16,12 @@ export const GET = handle(async (req) => {
   const params = req.nextUrl.searchParams;
   if (params.get("error")) return to("/login?error=google_denied");
 
-  const flow = stored ? await verifyPurpose<{ state: string; nonce: string; verifier: string; next: string }>("oauth", stored) : null;
+  const flow = stored ? await verifyPurpose<{ state: string; nonce: string; verifier: string; redirectUri?: string; next: string }>("oauth", stored) : null;
   const code = params.get("code");
   if (!flow || !code || params.get("state") !== flow.state) return to("/login?error=google_failed");
 
   try {
-    const profile = await exchangeGoogleCode(code, flow.verifier, flow.nonce);
+    const profile = await exchangeGoogleCode(code, flow.verifier, flow.nonce, flow.redirectUri);
     const user = await resolveGoogleUser(profile, clientIp(req));
     if (user.status !== "active") return to("/login?error=account_disabled");
     await startSession(user);

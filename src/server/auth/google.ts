@@ -15,19 +15,25 @@ const AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const JWKS = createRemoteJWKSet(new URL("https://www.googleapis.com/oauth2/v3/certs"));
 
-export const googleRedirectUri = () => `${appUrl()}/api/auth/google/callback`;
+/**
+ * The callback must return to the same address the sign-in started from: the short-lived oauth cookie only exists on that
+ * address. So the redirect URI follows the address the visitor used (medneed.in or the vercel.app address), and every
+ * address in use must be listed as an Authorized redirect URI in Google Cloud Console. Google refuses any unlisted one.
+ */
+export const googleRedirectUri = (origin?: string) => `${(origin ?? appUrl()).replace(/\/$/, "")}/api/auth/google/callback`;
 
-export function buildGoogleAuthUrl() {
+export function buildGoogleAuthUrl(origin?: string) {
   const cfg = googleConfig();
   if (!cfg) return null;
   const state = randomToken(24);
   const nonce = randomToken(24);
   const verifier = randomToken(48);
   const challenge = createHash("sha256").update(verifier).digest("base64url");
+  const redirectUri = googleRedirectUri(origin);
   const url = new URL(AUTH_URL);
   url.search = new URLSearchParams({
     client_id: cfg.clientId,
-    redirect_uri: googleRedirectUri(),
+    redirect_uri: redirectUri,
     response_type: "code",
     scope: "openid email profile",
     state,
@@ -36,12 +42,12 @@ export function buildGoogleAuthUrl() {
     code_challenge_method: "S256",
     prompt: "select_account",
   }).toString();
-  return { url: url.toString(), state, nonce, verifier };
+  return { url: url.toString(), state, nonce, verifier, redirectUri };
 }
 
 type GoogleProfile = { sub: string; email?: string; emailVerified: boolean; name?: string; picture?: string };
 
-export async function exchangeGoogleCode(code: string, verifier: string, nonce: string): Promise<GoogleProfile> {
+export async function exchangeGoogleCode(code: string, verifier: string, nonce: string, redirectUri: string = googleRedirectUri()): Promise<GoogleProfile> {
   const cfg = googleConfig();
   if (!cfg) throw new Error("Google sign-in is not configured");
 
@@ -52,7 +58,7 @@ export async function exchangeGoogleCode(code: string, verifier: string, nonce: 
       code,
       client_id: cfg.clientId,
       client_secret: cfg.clientSecret,
-      redirect_uri: googleRedirectUri(),
+      redirect_uri: redirectUri,
       grant_type: "authorization_code",
       code_verifier: verifier,
     }),
