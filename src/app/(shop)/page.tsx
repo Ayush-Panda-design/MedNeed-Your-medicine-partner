@@ -12,7 +12,7 @@ import {
   Upload,
   UserCheck,
 } from "lucide-react";
-import { HealingHero } from "@/components/hero/HealingHero";
+import { StoreHero } from "@/components/hero/StoreHero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { SectionHead } from "@/components/SectionHead";
 import { FaqChat } from "@/components/home/FaqChat";
@@ -33,7 +33,7 @@ export default async function Home() {
   const [categories, deals, newest, counts, business] = await Promise.all([listCategories(), listDeals(4), listNewest(8), categoryCounts(), businessInfo()]);
   return (
     <main>
-      <HealingHero />
+      <StoreHero />
 
       {/* Trust stats */}
       <section id="after-hero" className="scroll-mt-24 border-b border-slate-100 bg-white">

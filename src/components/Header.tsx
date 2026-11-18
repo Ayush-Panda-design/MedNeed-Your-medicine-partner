@@ -21,9 +21,10 @@ export function Header({ categories }: { categories: Category[] }) {
   const [menu, setMenu] = useState(false);
   const isHome = pathname === "/";
   // On the homepage the header floats transparently over the cinematic hero and turns solid once scrolled past it.
-  const [overHero, setOverHero] = useState(isHome);
+  // Starts solid: the current homepage hero is light, so a white floating header would flash unreadable on first paint.
+  const [overHero, setOverHero] = useState(false);
   // The header only floats over the page when a full-bleed cinematic hero (#mn-cine) is present.
-  const [floatOverHero, setFloatOverHero] = useState(isHome);
+  const [floatOverHero, setFloatOverHero] = useState(false);
   // Scrolled down: the whole header condenses into a floating pill.
   const [compact, setCompact] = useState(false);
   // Phones, compact pill: the search field opens on demand inside the pill.
