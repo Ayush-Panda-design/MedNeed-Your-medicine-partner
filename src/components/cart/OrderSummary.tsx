@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { BadgeCheck, Lock, PillBottle, Sparkles } from "lucide-react";
+import { BadgeCheck, Lock, MessageCircle, PillBottle, Sparkles } from "lucide-react";
 import { formatINR } from "@/lib/catalog";
 import { AnimatedNumber } from "./AnimatedNumber";
 import "./cart.css";
@@ -17,6 +17,8 @@ type Props = {
   /** True when the server reports a problem with a line, so checkout is blocked. */
   blocked: boolean;
   onClear: () => void;
+  /** Click-to-chat link carrying the cart; omitted when the shop number is not available. */
+  whatsappHref?: string | null;
 };
 
 function Cta({ signedIn, blocked, className = "" }: { signedIn: boolean; blocked: boolean; className?: string }) {
@@ -38,7 +40,7 @@ function Cta({ signedIn, blocked, className = "" }: { signedIn: boolean; blocked
   );
 }
 
-export function OrderSummary({ mrpTotal, savings, deliveryFee, total, signedIn, blocked, onClear }: Props) {
+export function OrderSummary({ mrpTotal, savings, deliveryFee, total, signedIn, blocked, onClear, whatsappHref }: Props) {
   const [confirming, setConfirming] = useState(false);
   return (
     <aside className="mc-in h-fit rounded-card border border-line bg-surface p-6 lg:sticky lg:top-44" style={{ animationDelay: "140ms", boxShadow: "var(--mc-shadow-3)" }}>
@@ -61,6 +63,16 @@ export function OrderSummary({ mrpTotal, savings, deliveryFee, total, signedIn, 
       )}
 
       <div className="mt-5"><Cta signedIn={signedIn} blocked={blocked} /></div>
+      {whatsappHref && (
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-600 bg-white py-3 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        >
+          <MessageCircle className="h-4 w-4" aria-hidden="true" /> Order this cart on WhatsApp
+        </a>
+      )}
 
       <ul className="mt-5 grid grid-cols-3 gap-2 text-center text-[11px] font-medium leading-tight text-slate-600">
         <li className="flex flex-col items-center gap-1"><PillBottle className="h-5 w-5 text-teal-600" /> Genuine medicines</li>

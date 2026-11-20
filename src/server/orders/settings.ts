@@ -131,6 +131,7 @@ export async function saveSettings(actor: { id: string; ip?: string }, input: St
 /** What the storefront may know (no internal limits beyond what the customer needs). */
 export const publicSettings = (s: StoreSettings) => ({
   shopName: s.shop.name,
+  phone: s.shop.phone, // already public (footer and contact page); used for the "Order on WhatsApp" link
   deliveryEnabled: s.delivery.enabled,
   pickupEnabled: s.pickup.enabled,
   minOrder: s.delivery.minOrder,

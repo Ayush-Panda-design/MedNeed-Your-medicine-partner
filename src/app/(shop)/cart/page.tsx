@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { ShieldAlert, Undo2, Upload } from "lucide-react";
 import { useAuth, useCart } from "@/lib/providers";
-import type { Product } from "@/lib/catalog";
+import { formatINR, type Product } from "@/lib/catalog";
+import { whatsappLink } from "@/lib/whatsapp";
 import { useQuote } from "@/lib/useQuote";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CartItemCard } from "@/components/cart/CartItemCard";
@@ -143,6 +144,10 @@ export default function CartPage() {
           signedIn={!!auth.user}
           blocked={blocking.length > 0}
           onClear={cart.clear}
+          whatsappHref={whatsappLink(
+            settings?.phone,
+            `Hello ${settings?.shopName ?? "MED NEED"}, I would like to order:\n${cart.lines.map((l) => `• ${l.product.name} × ${l.qty}`).join("\n")}\nEstimated total: ${formatINR(total)}`,
+          )}
         />
       </div>
 

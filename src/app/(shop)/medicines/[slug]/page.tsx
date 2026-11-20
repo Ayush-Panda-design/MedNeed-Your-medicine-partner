@@ -11,6 +11,8 @@ import { MedicineQA } from "@/components/MedicineQA";
 import { discountPercent, formatINR } from "@/lib/catalog";
 import { appUrl, aiEnabled } from "@/server/env";
 import { getProductBySlug, getRelated, getSubstitutes } from "@/server/catalog/queries";
+import { businessInfo } from "@/server/orders/settings";
+import { WhatsAppOrderButton } from "@/components/WhatsAppOrderButton";
 
 function summary(p: { name: string; composition: string; manufacturer: string; packSize: string; rx: boolean; orderable: boolean }) {
   const text = `${p.name}${p.composition ? ` (${p.composition})` : ""} by ${p.manufacturer}. ${p.packSize}. ${p.rx ? "Prescription required." : "No prescription needed."} ${p.orderable ? "Order online from MedNeed." : "Available on request from MedNeed."}`;
@@ -42,9 +44,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!product) notFound();
 
   const off = product.orderable ? discountPercent(product) : 0;
-  const [subs, related] = await Promise.all([getSubstitutes(product, 6), getRelated(product, 4)]);
+  const [subs, related, biz] = await Promise.all([getSubstitutes(product, 6), getRelated(product, 4), businessInfo().catch(() => null)]);
   const base = appUrl();
   const productUrl = `${base}/medicines/${product.slug}`;
+  const waMessage = `Hello ${biz?.name ?? "MED NEED"}, I would like to ${product.orderable ? "order" : "ask about"}: ${product.name}${product.packSize ? ` (${product.packSize})` : ""}\n${productUrl}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -158,6 +161,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
             <div className="mt-5">
               <AddToCartButton slug={product.slug} product={product} disabled={!product.inStock} />
+              <WhatsAppOrderButton phone={biz?.phone} message={waMessage} className="mt-3" />
             </div>
             <p className={`mt-3 text-sm font-medium ${product.inStock ? "text-emerald-600" : "text-rose-600"}`}>
               {product.inStock ? (product.availableQty <= 5 ? `Only ${product.availableQty} left` : "In stock") : "Currently out of stock"}
@@ -196,6 +200,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   {product.rx && " A valid prescription will be needed."}
                 </p>
                 <RequestMedicine slug={product.slug} />
+                <WhatsAppOrderButton phone={biz?.phone} message={waMessage} label="Ask on WhatsApp" className="mt-3" />
               </>
             )}
           </aside>

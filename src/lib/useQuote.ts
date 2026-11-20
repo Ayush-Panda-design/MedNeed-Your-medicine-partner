@@ -5,7 +5,7 @@ import { api } from "./api";
 import type { Quote } from "@/server/orders/quote";
 
 export type QuoteSettings = {
-  shopName: string; deliveryEnabled: boolean; pickupEnabled: boolean; minOrder: number; freeRadiusKm: number; maxRadiusKm: number; perKmRate: number;
+  shopName: string; phone?: string; deliveryEnabled: boolean; pickupEnabled: boolean; minOrder: number; freeRadiusKm: number; maxRadiusKm: number; perKmRate: number;
   feeBands: { below: number; fee: number }[]; slots: string[]; maxQtyPerLine: number; [k: string]: unknown;
 };
 export type PrescriptionHint = { required: boolean; state: "none" | "pending" | "verified" | "short"; message: string | null };
