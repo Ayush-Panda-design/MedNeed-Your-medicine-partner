@@ -41,11 +41,32 @@ export function ThemeSync() {
 }
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
-  const toggle = () => {
-    const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
+  const toggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const root = document.documentElement;
+    const next = root.classList.contains("dark") ? "light" : "dark";
     try { window.localStorage.setItem(KEY, next); } catch { /* still switches for this page view */ }
-    document.documentElement.classList.add("theme");
-    document.documentElement.classList.toggle("dark", next === "dark");
+    const flip = () => {
+      root.classList.add("theme");
+      root.classList.toggle("dark", next === "dark");
+    };
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> } };
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (!doc.startViewTransition || reduce) { flip(); return; }
+
+    // One whole-page snapshot cross-reveal: the new theme grows as a circle from the button,
+    // so every element changes together instead of piece by piece.
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    root.classList.add("theme-vt");
+    const t = doc.startViewTransition(flip);
+    t.ready.then(() => {
+      root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        { duration: 650, easing: "cubic-bezier(.4,0,.2,1)", pseudoElement: "::view-transition-new(root)" },
+      );
+    }).catch(() => {});
+    t.finished.finally(() => root.classList.remove("theme-vt"));
   };
   return (
     <button type="button" onClick={toggle} aria-label="Switch between light and dark theme" title="Light / dark theme" className={`grid h-10 w-10 place-items-center rounded-lg ${className}`}>

@@ -349,7 +349,13 @@ html.dark {
   --chip-bg: rgba(34,160,78,.18); --chip-fg: #7DD9A0;
 }
 
-html.theme body { background: var(--bg-page); color: var(--text-primary); transition: background-color .2s ease-out, color .2s ease-out; }
+html.theme body { background: var(--bg-page); color: var(--text-primary); }
+/* Theme switch: a single snapshot reveal (see ThemeToggle) replaces per-element colour fades, which changed unevenly. */
+html.theme-vt *, html.theme-vt *::before, html.theme-vt *::after { transition: none !important; }
+::view-transition-group(root) { animation: none; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
 /* Placeholder artwork for products without a photo. */
 html.theme .mn-tile { background-image: var(--bg-image-tile); }
 
