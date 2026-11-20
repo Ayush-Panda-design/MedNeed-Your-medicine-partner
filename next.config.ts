@@ -47,6 +47,13 @@ const nextConfig: NextConfig = {
       // from the nearby edge instead of waiting on a round trip to the server's region.
       // (Next forces "no-store" on pages rendered per request, so this uses Vercel's CDN-only header; browsers still always revalidate.)
       { source: "/", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=60, stale-while-revalidate=600" }] },
+      // Medicine lists and product pages, and the search-as-you-type lookup, are also identical for every visitor (nothing on them
+      // reads a cookie; sign-in state and the cart are fetched by the browser). Keeping them at the edge for a minute means most
+      // browsing never reaches the server or the database, which matters on a small database that sleeps when idle.
+      // Prices and stock can be up to a minute (and, while refreshing, a few minutes) old; the cart and checkout always re-check them on the server.
+      { source: "/medicines", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=60, stale-while-revalidate=300" }] },
+      { source: "/medicines/:slug", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=60, stale-while-revalidate=300" }] },
+      { source: "/api/catalog/suggest", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=60, stale-while-revalidate=300" }] },
     ];
   },
 };

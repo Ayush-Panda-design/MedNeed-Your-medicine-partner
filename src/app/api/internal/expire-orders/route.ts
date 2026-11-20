@@ -8,13 +8,31 @@ import { backfillEmbeddings } from "@/server/ai/vector-index";
 
 // Called by a scheduler (cron, uptime pinger) every few minutes. Orders are also expired when anyone places an order,
 // so this only keeps stock from staying held on a quiet store. It also retries refunds and sends any queued customer messages. Disabled unless CRON_SECRET is set.
-export async function POST(req: NextRequest) {
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
+
+/** The secret comes either in the x-cron-secret header (any scheduler) or as "Authorization: Bearer ..." (what Vercel Cron sends). */
+function denied(req: NextRequest): NextResponse | null {
   const secret = process.env.CRON_SECRET;
-  const given = req.headers.get("x-cron-secret") ?? "";
   if (!secret || secret.length < 16) return new NextResponse(null, { status: 404 });
+  const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+  const given = req.headers.get("x-cron-secret") ?? bearer;
   const a = Buffer.from(given);
   const b = Buffer.from(secret);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return new NextResponse(null, { status: 401 });
+  return null;
+}
+
+// Vercel Cron calls with GET; other schedulers may keep using POST. Both do the same work.
+export async function GET(req: NextRequest) {
+  return denied(req) ?? run();
+}
+
+export async function POST(req: NextRequest) {
+  return denied(req) ?? run();
+}
+
+async function run() {
   const expired = await expirePendingOrders();
   const refunds = await processDueRefunds();
   const notifications = await processDueNotifications(50);

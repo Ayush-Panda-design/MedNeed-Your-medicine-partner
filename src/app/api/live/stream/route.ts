@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const LIFETIME_MS = 50_000;
-const TICK_MS = 2_000;
+const TICK_MS = 4_000; // same pace as the polling fallback; halves the database reads per signed-in visitor
 const HEARTBEAT_MS = 15_000;
 
 /**
