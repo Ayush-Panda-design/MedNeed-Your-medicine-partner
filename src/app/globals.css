@@ -201,6 +201,30 @@ body.mn-has-chat:has(.mn-wa-fab) .mn-fab { bottom: 9.25rem; }
 }
 @media (prefers-reduced-motion: reduce) { .mn-wa-fab { animation: none; } }
 
+/* Header "Health hub" call-out. On arrival it pops in, a ring ripples outward a few times and the heart beats;
+   afterwards only the heartbeat and an occasional soft shine remain. Always a green pill with white text so it reads on any header tone. */
+.mn-health { position: relative; isolation: isolate; border-radius: 999px; color: #fff !important; text-shadow: none !important; font-weight: 700; white-space: nowrap;
+  background: linear-gradient(135deg, #25a853, #0e6b36); box-shadow: 0 8px 18px -8px rgba(14, 107, 54, .8), inset 0 1px 0 rgba(255, 255, 255, .35);
+  animation: mn-health-pop .7s cubic-bezier(.34, 1.56, .64, 1) .35s both; transition: transform .2s ease, box-shadow .2s ease; }
+.mn-health:hover { transform: translateY(-1px) scale(1.04); box-shadow: 0 12px 22px -8px rgba(14, 107, 54, .9), inset 0 1px 0 rgba(255, 255, 255, .4); }
+.mn-health::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; border: 2px solid rgba(37, 168, 83, .75); pointer-events: none; opacity: 0; animation: mn-health-ring 1.9s ease-out 1.1s 4; }
+.mn-health::after { content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(110deg, transparent 38%, rgba(255, 255, 255, .6) 50%, transparent 62%) 160% 0 / 250% 100% no-repeat; animation: mn-health-shine 5.5s ease-in-out 3s infinite; }
+.mn-health > * { position: relative; z-index: 1; }
+.mn-health-beat { animation: mn-health-beat 1.7s ease-in-out infinite; transform-origin: center; }
+.mn-health-new { position: absolute !important; top: -.55rem; right: -.35rem; z-index: 2 !important; border-radius: 999px; padding: .08rem .38rem; font-size: 9px; font-weight: 800; letter-spacing: .05em; line-height: 1.3; color: #422006; background: #fbbf24; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); animation: mn-health-wobble 3.4s ease-in-out 2s infinite; }
+.mn-health-dot { position: absolute !important; top: -1px; right: -1px; z-index: 2 !important; width: 10px; height: 10px; border-radius: 999px; background: #fbbf24; box-shadow: 0 0 0 2px #fff; animation: mn-health-dot 1.6s ease-in-out infinite; }
+@keyframes mn-health-dot { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+/* the version on the green announcement strip (phones): a white pill so it stands out from the green */
+.mn-health-strip { color: #0e5a2d !important; background: #fff; box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .35); }
+.mn-health-strip::before { border-color: rgba(255, 255, 255, .9); }
+.mn-health-strip::after { background: linear-gradient(110deg, transparent 38%, rgba(37, 168, 83, .35) 50%, transparent 62%) 160% 0 / 250% 100% no-repeat; }
+@keyframes mn-health-pop { from { opacity: 0; transform: scale(.6) translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes mn-health-ring { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.3, 1.9); } }
+@keyframes mn-health-shine { 0%, 62% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
+@keyframes mn-health-beat { 0%, 40%, 100% { transform: scale(1); } 10% { transform: scale(1.28); } 22% { transform: scale(1); } 30% { transform: scale(1.16); } }
+@keyframes mn-health-wobble { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-9deg); } 94% { transform: rotate(8deg); } 97% { transform: rotate(-4deg); } }
+@media (prefers-reduced-motion: reduce) { .mn-health, .mn-health::before, .mn-health::after, .mn-health-beat, .mn-health-new, .mn-health-dot { animation: none; } .mn-health:hover { transform: none; } }
+
 /* Order tracker: the active step pulses; the delivery truck bobs along. */
 @keyframes mn-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(27,127,51,.35); } 70% { box-shadow: 0 0 0 9px rgba(27,127,51,0); } 100% { box-shadow: 0 0 0 0 rgba(27,127,51,0); } }
 .mn-pulse { animation: mn-pulse-ring 1.9s ease-out infinite; }

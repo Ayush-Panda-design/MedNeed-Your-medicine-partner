@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChevronDown, LayoutDashboard, LogOut, Package, Search, ShoppingCart, Truck, Upload, User, UserCircle, X } from "lucide-react";
+import { ChevronDown, HeartPulse, LayoutDashboard, LogOut, Package, Search, ShoppingCart, Truck, Upload, User, UserCircle, X } from "lucide-react";
 import { displayName } from "@/lib/api";
 import type { Category } from "@/lib/catalog";
 import { useAuth, useCart } from "@/lib/providers";
@@ -114,6 +114,10 @@ export function Header({ categories }: { categories: Category[] }) {
               <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs sm:px-6">
                 <p className="truncate">Free delivery on orders above ₹499 · Genuine medicines, verified by pharmacists</p>
                 <p className="hidden shrink-0 sm:block">Need help? Support 8am–10pm</p>
+                <Link href="/health" aria-label="Health hub" className="mn-health mn-health-strip hidden shrink-0 items-center gap-1.5 px-2.5 py-0.5 text-[11px] max-[371px]:inline-flex">
+                  <HeartPulse className="mn-health-beat h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Health hub</span>
+                </Link>
               </div>
             </div>
           </div>
@@ -127,6 +131,14 @@ export function Header({ categories }: { categories: Category[] }) {
             <div className={compact ? "hidden" : "lg:hidden"}>
               <CategoryMenu categories={categories} overlay={white} ink={ink} />
             </div>
+
+            {/* Phones: a round, beating "Health hub" button beside the categories icon (only where the row has room; narrower screens use the announcement strip) */}
+            {!compact && (
+              <Link href="/health" aria-label="Health hub" title="Health hub" className="mn-health hidden h-8 w-8 items-center justify-center min-[372px]:inline-flex lg:hidden">
+                <HeartPulse className="mn-health-beat h-4 w-4" aria-hidden="true" />
+                <span aria-hidden="true" className="mn-health-dot" />
+              </Link>
+            )}
 
             {/* search: full row on phones, inline on desktop; inside the phone pill it opens on demand */}
             <div className={`order-last min-w-0 basis-full lg:order-none lg:mx-auto lg:max-w-2xl lg:flex-1 lg:basis-0 ${compact && !searchOpen ? "max-lg:hidden" : ""} ${compact ? "mn-hdr-search" : ""}`}>
@@ -147,6 +159,12 @@ export function Header({ categories }: { categories: Category[] }) {
                 >
                   {searchOpen ? <X className="h-[19px] w-[19px]" /> : <Search className="h-[19px] w-[19px]" />}
                 </button>
+              )}
+
+              {compact && (
+                <Link href="/health" aria-label="Health hub" title="Health hub" className="mn-health hidden h-9 w-9 items-center justify-center lg:inline-flex">
+                  <HeartPulse className="mn-health-beat h-[18px] w-[18px]" aria-hidden="true" />
+                </Link>
               )}
 
               <Link href="/account/prescriptions/new" aria-label="Upload prescription" className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold lg:flex ${cls.uploadRx} ${compact ? "rounded-full px-2.5" : ""}`}>
@@ -217,7 +235,11 @@ export function Header({ categories }: { categories: Category[] }) {
                   <CategoryMenu categories={categories} overlay={white} ink={ink} />
                   <span aria-hidden className={`h-5 w-px ${white ? "bg-white/25" : ink ? "bg-[#0f766e]/20" : "bg-slate-200"}`} />
                   <PincodePicker overlay={white} />
-                  <Link href="/health" className={`ml-auto rounded-lg px-3 py-1.5 text-[13px] font-semibold transition-colors ${white ? "text-white hover:bg-white/15" : ink ? "text-[#0c3640] hover:bg-[#0f766e]/10" : "text-slate-700 hover:bg-slate-100"}`}>Health hub</Link>
+                  <Link href="/health" aria-label="Health hub: seasonal alerts, first aid and health topics" className="mn-health ml-auto inline-flex items-center gap-[0.45rem] px-3.5 py-1.5 text-[13px]">
+                    <HeartPulse className="mn-health-beat h-4 w-4" aria-hidden="true" />
+                    <span>Health hub</span>
+                    <span aria-hidden="true" className="mn-health-new">NEW</span>
+                  </Link>
                 </div>
               </div>
             </div>
