@@ -187,6 +187,20 @@ body.mn-chat-open .mn-cur { display: none !important; }
   body.mn-has-chat.mn-has-buybar .mn-fab { bottom: 10rem; }
 }
 
+/* Home page WhatsApp launcher: sits directly above the chat launcher, and scroll-to-top moves up above it. Hides while the chat panel is open. */
+.mn-wa-fab { right: 1.5rem; bottom: 1.25rem; animation: mn-fab-in .25s var(--ease-out); }
+body.mn-has-chat .mn-wa-fab { bottom: 5.5rem; }
+body.mn-chat-open .mn-wa-fab { display: none; }
+body:has(.mn-wa-fab) .mn-fab { bottom: 6.25rem; }
+body.mn-has-chat:has(.mn-wa-fab) .mn-fab { bottom: 9.25rem; }
+@media (max-width: 639px) {
+  .mn-wa-fab { right: 0.9rem; bottom: calc(1.15rem + env(safe-area-inset-bottom, 0px)); }
+  body.mn-has-chat .mn-wa-fab { bottom: calc(4.85rem + env(safe-area-inset-bottom, 0px)); }
+  body:has(.mn-wa-fab) .mn-fab { bottom: 5.9rem; }
+  body.mn-has-chat:has(.mn-wa-fab) .mn-fab { bottom: calc(8.5rem + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) { .mn-wa-fab { animation: none; } }
+
 /* Order tracker: the active step pulses; the delivery truck bobs along. */
 @keyframes mn-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(27,127,51,.35); } 70% { box-shadow: 0 0 0 9px rgba(27,127,51,0); } 100% { box-shadow: 0 0 0 0 rgba(27,127,51,0); } }
 .mn-pulse { animation: mn-pulse-ring 1.9s ease-out infinite; }
