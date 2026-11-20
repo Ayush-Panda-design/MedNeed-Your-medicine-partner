@@ -53,6 +53,9 @@ const nextConfig: NextConfig = {
       // Prices and stock can be up to a minute (and, while refreshing, a few minutes) old; the cart and checkout always re-check them on the server.
       { source: "/medicines", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=60, stale-while-revalidate=300" }] },
       { source: "/medicines/:slug", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=60, stale-while-revalidate=300" }] },
+      // The health hub is the same for everyone, so keep it at the edge for an hour (it also spares the outside article service).
+      { source: "/health/:path*", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=3600, stale-while-revalidate=86400" }] },
+      { source: "/health", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=3600, stale-while-revalidate=86400" }] },
       { source: "/api/catalog/suggest", headers: [{ key: "Vercel-CDN-Cache-Control", value: "max-age=60, stale-while-revalidate=300" }] },
     ];
   },

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { appUrl } from "@/server/env";
+import { FIRST_AID } from "@/lib/health/firstAid";
 import { listAllActiveSlugs, listCategories } from "@/server/catalog/queries";
 
 // Built per request from the database. One sitemap holds up to 50,000 URLs; switch to generateSitemaps() beyond that.
@@ -11,6 +12,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: base, changeFrequency: "daily", priority: 1 },
     { url: `${base}/medicines`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${base}/health`, changeFrequency: "weekly", priority: 0.6 },
+    ...FIRST_AID.map((g) => ({ url: `${base}/health/first-aid/${g.slug}`, changeFrequency: "monthly" as const, priority: 0.5 })),
     ...["about", "contact", "privacy", "terms", "refunds", "shipping"].map((p) => ({ url: `${base}/${p}`, changeFrequency: "monthly" as const, priority: 0.3 })),
     ...categories.map((c) => ({ url: `${base}/medicines?category=${c.slug}`, changeFrequency: "daily" as const, priority: 0.8 })),
     ...products.slice(0, 49000).map((p) => ({ url: `${base}/medicines/${p.slug}`, lastModified: p.updatedAt, changeFrequency: "daily" as const, priority: 0.7 })),

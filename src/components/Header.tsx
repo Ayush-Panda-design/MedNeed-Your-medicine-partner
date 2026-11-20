@@ -217,6 +217,7 @@ export function Header({ categories }: { categories: Category[] }) {
                   <CategoryMenu categories={categories} overlay={white} ink={ink} />
                   <span aria-hidden className={`h-5 w-px ${white ? "bg-white/25" : ink ? "bg-[#0f766e]/20" : "bg-slate-200"}`} />
                   <PincodePicker overlay={white} />
+                  <Link href="/health" className={`ml-auto rounded-lg px-3 py-1.5 text-[13px] font-semibold transition-colors ${white ? "text-white hover:bg-white/15" : ink ? "text-[#0c3640] hover:bg-[#0f766e]/10" : "text-slate-700 hover:bg-slate-100"}`}>Health hub</Link>
                 </div>
               </div>
             </div>

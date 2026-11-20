@@ -24,6 +24,7 @@ import { ConcernCards } from "@/components/home/ConcernCards";
 import { OfferBanners } from "@/components/home/OfferBanners";
 import { VisitStore } from "@/components/home/VisitStore";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { HealthStrip } from "@/components/home/HealthStrip";
 import { businessInfo } from "@/server/orders/settings";
 import { CountUp } from "@/components/motion/CountUp";
 import { ProductCard } from "@/components/ProductCard";
@@ -159,6 +160,9 @@ export default async function Home() {
           </ul>
         </div>
       </section>
+
+      {/* Health hub teaser: this season's alert */}
+      <HealthStrip />
 
       {/* Visit our store */}
       <VisitStore phone={business.phone} hoursLabel={business.hoursLabel} />
