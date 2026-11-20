@@ -114,10 +114,6 @@ export function Header({ categories }: { categories: Category[] }) {
               <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs sm:px-6">
                 <p className="truncate">Free delivery on orders above ₹499 · Genuine medicines, verified by pharmacists</p>
                 <p className="hidden shrink-0 sm:block">Need help? Support 8am–10pm</p>
-                <Link href="/health" aria-label="Health hub" className="mn-health mn-health-strip hidden shrink-0 items-center gap-1.5 px-2.5 py-0.5 text-[11px] max-[371px]:inline-flex">
-                  <HeartPulse className="mn-health-beat h-3.5 w-3.5" aria-hidden="true" />
-                  <span>Health hub</span>
-                </Link>
               </div>
             </div>
           </div>
@@ -132,9 +128,9 @@ export function Header({ categories }: { categories: Category[] }) {
               <CategoryMenu categories={categories} overlay={white} ink={ink} />
             </div>
 
-            {/* Phones: a round, beating "Health hub" button beside the categories icon (only where the row has room; narrower screens use the announcement strip) */}
+            {/* Phones and small tablets: a round, beating "Health hub" button beside the categories icon. On screens under 390px the logo is drawn a little smaller (see globals.css) so this always fits on the same row. */}
             {!compact && (
-              <Link href="/health" aria-label="Health hub" title="Health hub" className="mn-health hidden h-8 w-8 items-center justify-center min-[372px]:inline-flex lg:hidden">
+              <Link href="/health" aria-label="Health hub" title="Health hub" className="mn-health inline-flex h-8 w-8 shrink-0 items-center justify-center lg:hidden">
                 <HeartPulse className="mn-health-beat h-4 w-4" aria-hidden="true" />
                 <span aria-hidden="true" className="mn-health-dot" />
               </Link>
