@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { X } from "lucide-react";
 import { FIRST_AID, firstAidBySlug } from "@/lib/health/firstAid";
-import { EmergencyBox, FirstAidIconView, HealthDisclaimer, ProductChips } from "@/components/health/HealthBits";
+import { EmergencyBanner, FirstAidIconView, HealthDisclaimer, HealthShell, ProductChips } from "@/components/health/HealthBits";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -22,52 +23,54 @@ export default async function FirstAidPage({ params }: { params: Promise<{ slug:
   const others = FIRST_AID.filter((x) => x.slug !== g.slug).slice(0, 6);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-ink-muted">
-        <Link href="/" className="hover:text-teal-700">Home</Link> / <Link href="/health" className="hover:text-teal-700">Health hub</Link> / <Link href="/health#first-aid" className="hover:text-teal-700">First aid</Link> / <span className="text-ink">{g.title}</span>
-      </nav>
+    <HealthShell>
+      <main className="mx-auto max-w-3xl px-4 pb-16 pt-8 sm:px-6 sm:pt-10">
+        <nav aria-label="Breadcrumb" className="mb-6 text-sm" style={{ color: "var(--hh-muted)" }}>
+          <Link href="/" className="hover:underline">Home</Link> / <Link href="/health" className="hover:underline">Health hub</Link> / <Link href="/health/first-aid" className="hover:underline">First aid</Link> / <span style={{ color: "var(--hh-ink)" }}>{g.title}</span>
+        </nav>
 
-      <header className="flex items-start gap-4">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-chip text-chip-fg"><FirstAidIconView icon={g.icon} className="h-6 w-6" /></span>
-        <div>
-          <h1 className="text-3xl font-bold text-ink">{g.title}</h1>
-          <p className="mt-2 text-ink-2">{g.summary}</p>
-        </div>
-      </header>
+        <header className="flex items-start gap-4">
+          <span className="hh-tile hh-tile-lg"><FirstAidIconView icon={g.icon} className="h-8 w-8" /></span>
+          <div>
+            <h1 className="hh-title text-3xl sm:text-4xl">{g.title}</h1>
+            <p className="mt-2 text-base leading-relaxed" style={{ color: "var(--hh-ink2)" }}>{g.summary}</p>
+          </div>
+        </header>
 
-      <div className="mt-8"><EmergencyBox items={g.emergency} /></div>
+        <div className="mt-8"><EmergencyBanner items={g.emergency} /></div>
 
-      <section aria-labelledby="steps" className="mt-8">
-        <h2 id="steps" className="text-xl font-bold text-ink">What to do</h2>
-        <ol className="mt-4 space-y-3">
-          {g.steps.map((s, i) => (
-            <li key={s} className="flex gap-3 rounded-xl border border-line bg-surface p-4 text-ink">
-              <span aria-hidden="true" className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-teal-700 text-sm font-bold text-white">{i + 1}</span>
-              <span className="text-sm leading-relaxed">{s}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
+        <section aria-labelledby="steps" className="mt-9">
+          <h2 id="steps" className="text-xl font-extrabold" style={{ color: "var(--hh-ink)" }}>What to do</h2>
+          <ol className="mt-4 space-y-3">
+            {g.steps.map((s, i) => (
+              <li key={s} className="hh-step">
+                <span aria-hidden="true" className="hh-num">{i + 1}</span>
+                <span className="text-[0.95rem] leading-relaxed" style={{ color: "var(--hh-ink)" }}>{s}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
 
-      <section aria-labelledby="avoid" className="mt-8">
-        <h2 id="avoid" className="text-xl font-bold text-ink">What not to do</h2>
-        <ul className="mt-3 list-disc space-y-1.5 pl-6 text-sm text-ink-2">
-          {g.avoid.map((s) => <li key={s}>{s}</li>)}
-        </ul>
-      </section>
+        <section aria-labelledby="avoid" className="hh-card mt-9 p-5 sm:p-6">
+          <h2 id="avoid" className="text-xl font-extrabold" style={{ color: "var(--hh-ink)" }}>What not to do</h2>
+          <ul className="mt-3 space-y-2.5">
+            {g.avoid.map((s) => <li key={s} className="hh-no"><X className="h-4 w-4" aria-hidden="true" /> <span>{s}</span></li>)}
+          </ul>
+        </section>
 
-      {g.products.length > 0 && <div className="mt-8"><ProductChips items={g.products} title="Helpful to keep at home" /></div>}
+        {g.products.length > 0 && <div className="hh-card mt-9 p-5 sm:p-6"><ProductChips items={g.products} title="Helpful to keep at home" /></div>}
 
-      <div className="mt-10"><HealthDisclaimer /></div>
+        <div className="mt-9"><HealthDisclaimer /></div>
 
-      <section aria-labelledby="more" className="mt-12">
-        <h2 id="more" className="text-lg font-bold text-ink">More first-aid guides</h2>
-        <ul className="mt-3 flex flex-wrap gap-2">
-          {others.map((o) => (
-            <li key={o.slug}><Link href={`/health/first-aid/${o.slug}`} className="inline-flex rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink hover:border-teal-600 hover:text-teal-700">{o.title}</Link></li>
-          ))}
-        </ul>
-      </section>
-    </main>
+        <section aria-labelledby="more" className="mt-12">
+          <h2 id="more" className="text-lg font-extrabold" style={{ color: "var(--hh-ink)" }}>More first-aid guides</h2>
+          <ul className="mt-3 flex flex-wrap gap-2.5">
+            {others.map((o) => (
+              <li key={o.slug}><Link href={`/health/first-aid/${o.slug}`} className="hh-chip">{o.title}</Link></li>
+            ))}
+          </ul>
+        </section>
+      </main>
+    </HealthShell>
   );
 }

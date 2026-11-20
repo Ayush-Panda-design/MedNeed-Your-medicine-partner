@@ -5,7 +5,7 @@
 
 export const REVIEWED = false;
 
-export type FirstAidIcon = "flame" | "droplets" | "thermometer" | "sun" | "bug" | "activity" | "footprints" | "bandage" | "siren";
+export type FirstAidIcon = "flame" | "droplets" | "thermometer" | "sun" | "bug" | "activity" | "footprints" | "bandage" | "siren" | "snake";
 
 export type FirstAidGuide = {
   slug: string;
@@ -218,7 +218,7 @@ export const FIRST_AID: FirstAidGuide[] = [
   {
     slug: "snake-bite",
     title: "Snake bite",
-    icon: "siren",
+    icon: "snake",
     summary: "Stay calm, keep still and get to a hospital with anti-venom at once.",
     emergency: [
       "Any bite from a snake you cannot be sure is harmless is a medical emergency. Call 112 or 108 and go to a hospital at once.",
