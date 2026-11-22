@@ -23,8 +23,10 @@ export const appUrl = () => (process.env.APP_URL ?? "http://localhost:3000").rep
 /**
  * Postgres connection string. DATABASE_URL is the standard name; POSTGRES_URL is what some hosting integrations
  * (Vercel Postgres, Supabase) set instead, so either works.
+ * MEDNEED_DATABASE_URL wins when set: a hosting integration (Vercel's Neon integration) can re-inject DATABASE_URL on
+ * every deploy and overwrite a hand-set value, so this name lets us pin the database it must not touch.
  */
-export const databaseUrl = () => process.env.DATABASE_URL || process.env.POSTGRES_URL || undefined;
+export const databaseUrl = () => process.env.MEDNEED_DATABASE_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL || undefined;
 
 // Dev database lives outside the project so OneDrive does not sync live database files.
 export const pgliteDir = () => process.env.PGLITE_DIR || path.join(os.homedir(), ".medneed", "pglite");
