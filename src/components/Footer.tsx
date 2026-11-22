@@ -4,7 +4,7 @@ import type { BusinessInfo } from "@/server/orders/settings";
 import { displaySerif } from "@/lib/fonts";
 import { Logo } from "./Logo";
 
-type FooterBusiness = Pick<BusinessInfo, "legalName" | "phone" | "email" | "hoursLabel" | "drugLicense" | "gstin" | "pharmacistName" | "pharmacistRegNo">;
+type FooterBusiness = Pick<BusinessInfo, "address" | "legalName" | "phone" | "email" | "hoursLabel" | "drugLicense" | "gstin" | "pharmacistName" | "pharmacistRegNo">;
 
 export function Footer({ categories, business: b }: { categories: Category[]; business: FooterBusiness }) {
   const tel = b.phone.replace(/[^\d+]/g, "");
@@ -22,7 +22,7 @@ export function Footer({ categories, business: b }: { categories: Category[]; bu
           <p className="text-sm leading-relaxed text-slate-400">
             Genuine medicines and health products, delivered to your doorstep. Prescription medicines are dispensed only after verification by a registered pharmacist.
           </p>
-          <p className="text-xs leading-relaxed text-slate-500">Two branches: Nakhara, DPS Road (751032) and Rudhrapur, Puri Canal Road (751035), Bhubaneswar.</p>
+          {b.address && <p className="text-xs leading-relaxed text-slate-500">{b.address}</p>}
         </div>
         <div>
           <h3 className="mb-3 text-sm font-semibold text-white">Shop</h3>
@@ -58,7 +58,7 @@ export function Footer({ categories, business: b }: { categories: Category[]; bu
           </ul>
           <dl className="mt-4 space-y-1 text-xs text-slate-500">
             <div>{b.legalName}</div>
-            <div>Drug licence no.: {b.drugLicense || "to be added"}</div>
+            {b.drugLicense && <div>Drug licence no.: {b.drugLicense}</div>}
             {b.gstin && <div>GSTIN: {b.gstin}</div>}
             {b.pharmacistName && <div>Pharmacist: {b.pharmacistName}{b.pharmacistRegNo ? ` (Reg. ${b.pharmacistRegNo})` : ""}</div>}
           </dl>
