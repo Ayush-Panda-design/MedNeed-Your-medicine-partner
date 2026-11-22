@@ -231,6 +231,13 @@ export function Header({ categories }: { categories: Category[] }) {
                   <CategoryMenu categories={categories} overlay={white} ink={ink} />
                   <span aria-hidden className={`h-5 w-px ${white ? "bg-white/25" : ink ? "bg-[#0f766e]/20" : "bg-slate-200"}`} />
                   <PincodePicker overlay={white} />
+                  {solid && (
+                    <nav aria-label="Popular categories" className="ml-3 hidden items-center gap-0.5 text-[13px] xl:flex">
+                      {categories.filter((c) => c.slug !== "uncategorised").slice(0, 5).map((c) => (
+                        <Link key={c.slug} href={`/medicines?category=${c.slug}`} className="mn-navlink">{c.name}</Link>
+                      ))}
+                    </nav>
+                  )}
                   <Link href="/health" aria-label="Health hub: seasonal alerts, first aid and health topics" className="mn-health ml-auto inline-flex items-center gap-[0.45rem] px-3.5 py-1.5 text-[13px]">
                     <HeartPulse className="mn-health-beat h-4 w-4" aria-hidden="true" />
                     <span>Health hub</span>
@@ -244,7 +251,6 @@ export function Header({ categories }: { categories: Category[] }) {
           <div aria-hidden className="mn-progress" />
         </div>
 
-        {solid && <div aria-hidden className="h-[2px] bg-gradient-to-r from-teal-600 via-lime-400 to-emerald-500" />}
       </header>
       {/* keeps the page content below the fixed header (the homepage hero sits under it on purpose) */}
       {!floatOverHero && <div aria-hidden className="mn-hdr-spacer" style={spacer ? { height: spacer } : undefined} />}
