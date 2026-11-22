@@ -47,7 +47,7 @@ export function CategoryMenu({ categories, overlay, ink = false, className = "" 
         aria-expanded={open}
         aria-label="Categories"
         aria-controls={id}
-        className={`flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg px-[8px] text-sm sm:h-auto sm:min-w-0 sm:justify-start sm:px-3 sm:py-2 font-semibold transition-colors ${overlay ? "text-white hover:bg-white/10" : ink ? "text-[#0c3640] hover:bg-white/55" : "text-slate-800 hover:bg-teal-50 hover:text-teal-800"}`}
+        className={`flex h-10 min-w-10 items-center justify-center gap-2 rounded-lg px-[8px] text-sm sm:h-auto sm:min-w-0 sm:justify-start sm:px-3 sm:py-2 font-semibold transition-colors ${overlay ? "text-white hover:bg-white/10" : ink ? "text-[#0c3640] hover:bg-white/55" : "mn-catbtn text-slate-800"}`}
       >
         <LayoutGrid className="h-[20px] w-[20px]" aria-hidden />
         <span className="hidden sm:inline">Categories</span>

@@ -60,7 +60,7 @@ export function PincodePicker({ overlay }: { overlay: boolean }) {
         onClick={() => { setOpen((o) => !o); setPin(saved?.pincode ?? ""); setResult(null); setError(""); }}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-left text-[13px] transition-colors ${overlay ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-slate-100"}`}
+        className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-left text-[13px] transition-colors ${overlay ? "text-white hover:bg-white/10" : "mn-pinbtn text-slate-700"}`}
       >
         <MapPin className={`h-4 w-4 ${overlay ? "text-lime-300" : "text-teal-600"}`} aria-hidden />
         <span className={overlay ? "text-white/75" : "text-slate-500"}>Deliver to</span>

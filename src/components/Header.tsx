@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChevronDown, HeartPulse, LayoutDashboard, LogOut, Package, Search, ShoppingCart, Truck, Upload, User, UserCircle, X } from "lucide-react";
+import { ChevronDown, Headphones, HeartPulse, LayoutDashboard, LogOut, Package, Search, ShoppingCart, Truck, Upload, User, UserCircle, X } from "lucide-react";
 import { displayName } from "@/lib/api";
 import type { Category } from "@/lib/catalog";
 import { useAuth, useCart } from "@/lib/providers";
@@ -87,12 +87,12 @@ export function Header({ categories }: { categories: Category[] }) {
   } : {
     searchBox: overlay
       ? "border-white/40 bg-white/15 backdrop-blur focus-within:border-white focus-within:bg-white/25"
-      : "border-slate-300 bg-slate-50 focus-within:border-teal-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-teal-100",
-    searchIcon: overlay ? "text-white/70" : "text-slate-400",
+      : "mn-srch",
+    searchIcon: overlay ? "text-white/70" : "text-emerald-600",
     searchInput: overlay ? "text-white placeholder:text-white/70" : "placeholder:text-slate-400",
-    ghost: overlay ? "text-white hover:bg-white/10" : "hover:bg-slate-100",
-    uploadRx: overlay ? "text-white hover:bg-white/10" : "text-teal-700 hover:bg-teal-50",
-    cart: overlay ? "bg-white text-slate-900 hover:bg-white/90" : "bg-slate-900 text-white hover:bg-slate-800",
+    ghost: overlay ? "text-white hover:bg-white/10" : "mn-ghost",
+    uploadRx: overlay ? "text-white hover:bg-white/10" : "mn-upl",
+    cart: overlay ? "bg-white text-slate-900 hover:bg-white/90" : "mn-cartbtn",
     chevron: overlay ? "text-white/70" : "text-slate-400",
   };
   const solid = !overlay && !compact;
@@ -110,10 +110,10 @@ export function Header({ categories }: { categories: Category[] }) {
 
         <div className="mn-collapse" data-open={solid}>
           <div>
-            <div className="bg-teal-700 text-teal-50">
+            <div className="mn-strip text-teal-50">
               <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs sm:px-6">
-                <p className="truncate">Free delivery on orders above ₹499 · Genuine medicines, verified by pharmacists</p>
-                <p className="hidden shrink-0 sm:block">Need help? Support 8am–10pm</p>
+                <p className="flex min-w-0 items-center gap-2"><Truck className="h-3.5 w-3.5 shrink-0 text-lime-300" aria-hidden /><span className="truncate">Free delivery on orders above ₹499 · Genuine medicines, verified by pharmacists</span></p>
+                <p className="hidden shrink-0 items-center gap-1.5 sm:flex"><Headphones className="h-3.5 w-3.5 text-lime-300" aria-hidden /> Need help? Support 8am–10pm</p>
               </div>
             </div>
           </div>
@@ -226,7 +226,7 @@ export function Header({ categories }: { categories: Category[] }) {
           {/* Row 2 (desktop): categories and delivery check; folds away in the pill */}
           <div className="mn-collapse max-lg:!hidden" data-open={!compact}>
             <div>
-              <div className={`border-t ${white ? "border-white/15" : ink ? "border-[#0f766e]/15" : "border-slate-200/80"}`}>
+              <div className={`border-t ${white ? "border-white/15" : ink ? "border-[#0f766e]/15" : "mn-row2 border-emerald-100"}`}>
                 <div className="mx-auto flex h-11 max-w-7xl items-center gap-2 px-6 text-[13px]">
                   <CategoryMenu categories={categories} overlay={white} ink={ink} />
                   <span aria-hidden className={`h-5 w-px ${white ? "bg-white/25" : ink ? "bg-[#0f766e]/20" : "bg-slate-200"}`} />

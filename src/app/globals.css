@@ -618,6 +618,34 @@ html.mn-fine .mn-spot:hover::after { opacity: 1; }
   .mn-hdr[data-compact] .mn-hdr-shell, .mn-hdr[data-compact] .mn-hdr-search { animation: none; }
 }
 .mn-hdr-shell { position: relative; }
+
+/* ───────── Header polish: richer top strip, pill search, tinted second row, gradient cart ───────── */
+.mn-strip { background: linear-gradient(90deg, #0a5a38 0%, #0f766e 50%, #0a5a38 100%); border-bottom: 1px solid rgb(190 242 100 / .25); letter-spacing: .01em; }
+.mn-srch { border-radius: 999px !important; border-color: #a7f3d0; background: #fff; box-shadow: 0 2px 12px -6px rgb(15 118 110 / .45); transition: border-color .2s, box-shadow .2s; }
+.mn-srch:hover { border-color: #34d399; }
+.mn-srch:focus-within { border-color: #059669; box-shadow: 0 0 0 4px rgb(16 185 129 / .15), 0 6px 18px -8px rgb(15 118 110 / .5); }
+.mn-hdr .mn-sb-inner button[type="submit"] { border-radius: 999px; padding-inline: 1.3rem; background: linear-gradient(135deg, #16a34a, #0f766e); box-shadow: 0 4px 10px -4px rgb(15 118 110 / .6); transition: filter .2s, transform .2s; }
+.mn-hdr .mn-sb-inner button[type="submit"]:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.mn-ghost { border-radius: 999px !important; transition: background-color .2s, color .2s; }
+.mn-ghost:hover { background: #ecfdf5; color: #065f46; }
+.mn-upl { border-radius: 999px !important; border: 1px solid #a7f3d0; background: #ecfdf5; color: #047857; transition: background-color .2s, border-color .2s, transform .2s; }
+.mn-upl:hover { background: #d1fae5; border-color: #6ee7b7; transform: translateY(-1px); }
+.mn-cartbtn { border-radius: 999px !important; color: #fff; background: linear-gradient(135deg, #16a34a, #0f766e); box-shadow: 0 8px 18px -8px rgb(15 118 110 / .75), inset 0 1px 0 rgb(255 255 255 / .25); transition: filter .2s, transform .2s; }
+.mn-cartbtn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.mn-row2 { background: linear-gradient(90deg, rgb(236 253 245 / .95), rgb(255 255 255 / .6) 50%, rgb(240 253 250 / .95)); }
+.mn-catbtn:hover { background: #ecfdf5; color: #065f46; }
+.mn-pinbtn:hover { background: #fff; box-shadow: 0 1px 6px -2px rgb(15 118 110 / .35); }
+@media (min-width: 1024px) {
+  .mn-catbtn { border: 1px solid #a7f3d0; background: #fff; border-radius: 999px !important; padding: .35rem .95rem !important; box-shadow: 0 1px 4px -2px rgb(15 118 110 / .3); }
+  .mn-pinbtn { border-radius: 999px !important; }
+}
+:where(html.dark) .mn-strip { background: linear-gradient(90deg, #063d27, #0b5a55 50%, #063d27); }
+:where(html.dark) .mn-srch { background: rgb(255 255 255 / .06); border-color: rgb(52 211 153 / .3); box-shadow: none; }
+:where(html.dark) .mn-ghost:hover, :where(html.dark) .mn-catbtn:hover { background: rgb(52 211 153 / .12); color: #a7f3d0; }
+:where(html.dark) .mn-upl { background: rgb(52 211 153 / .12); border-color: rgb(52 211 153 / .35); color: #6ee7b7; }
+:where(html.dark) .mn-row2 { background: rgb(255 255 255 / .03); border-color: rgb(255 255 255 / .08); }
+:where(html.dark) .mn-catbtn { background: rgb(255 255 255 / .06); border-color: rgb(52 211 153 / .3); }
+:where(html.dark) .mn-pinbtn:hover { background: rgb(255 255 255 / .08); }
 .mn-hdr[data-compact] .mn-progress { left: 1.75rem; right: 1.75rem; bottom: -1px; border-radius: 2px; }
 
 /* ───────── Lovable-concept design language: serif display headings, floating product cards ───────── */
