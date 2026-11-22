@@ -64,13 +64,26 @@ export async function loadDataset(db: Db, file: string, limit: number) {
   const [{ n }] = await db.query<{ n: string }>(`select count(*)::text n from medicines where source = $1`, [DATASET_SOURCE]);
   if (Number(n) >= limit) return console.log(`[dataset] ${n} dataset medicines already staged. Nothing to do.`);
   const started = Date.now();
-  const items = readDataset(file, limit);
-  console.log(`[dataset] Staging ${items.length} medicines from ${file} (catalog-only, unverified)...`);
+  let all = readDataset(file, limit);
+  // Optional: keep only the products of the N manufacturers with the most products in the file (fits small databases).
+  const topN = Number(process.env.DATASET_TOP_MANUFACTURERS) || 0;
+  if (topN) {
+    const cnt = new Map<string, number>();
+    for (const it of all) cnt.set(it.manufacturer, (cnt.get(it.manufacturer) ?? 0) + 1);
+    const keep = new Set([...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, topN).map((x) => x[0]));
+    all = all.filter((it) => keep.has(it.manufacturer));
+  }
+  // Resume support: skip rows whose dataset id was already imported (a re-run must not create "-id" duplicates).
+  const done = new Set((await db.query<{ r: string }>(`select source_ref r from medicines where source = $1`, [DATASET_SOURCE])).map((x) => x.r));
+  const items = all.filter((it) => !done.has(it.id));
+  console.log(`[dataset] Staging ${items.length} medicines (${all.length - items.length} already present) from ${file} (catalog-only, unverified)...`);
 
   const taken = new Set((await db.query<{ slug: string }>(`select slug from medicines`)).map((r) => r.slug));
-  const BATCH = 1000;
+  const BATCH = Number(process.env.DATASET_BATCH) || 500;
+  const PAUSE_MS = Number(process.env.DATASET_PAUSE_MS) || 0;
   let inserted = 0;
   for (let i = 0; i < items.length; i += BATCH) {
+    if (PAUSE_MS) await new Promise((r) => setTimeout(r, PAUSE_MS));
     const chunk = items.slice(i, i + BATCH);
     const prepared = chunk.map((it) => {
       let slug = slugify(it.name) || `medicine-${it.id}`;
@@ -78,6 +91,18 @@ export async function loadDataset(db: Db, file: string, limit: number) {
       taken.add(slug);
       return { ...it, slug };
     });
+    // If the host flips the database to read-only (e.g. a free plan near its disk limit), wait and retry the batch.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await loadBatch();
+        break;
+      } catch (e) {
+        if (!/read-only/i.test(String(e instanceof Error ? e.message : e)) || attempt >= 30) throw e;
+        console.log(`[dataset] database is read-only; waiting 20s (retry ${attempt + 1}/30)...`);
+        await new Promise((r) => setTimeout(r, 20000));
+      }
+    }
+    async function loadBatch() {
     await db.tx(async (t) => {
       await t.query(`insert into manufacturers (name) select distinct m from unnest($1::text[]) m on conflict (lower(name)) do nothing`, [[...new Set(prepared.map((p) => p.manufacturer))]]);
       const saltNames = [...new Set(prepared.flatMap((p) => p.salts.map((s) => s.name)))];
@@ -111,7 +136,8 @@ export async function loadDataset(db: Db, file: string, limit: number) {
         );
       }
     });
-    if ((i / BATCH) % 5 === 4) console.log(`[dataset] ${Math.min(i + BATCH, items.length)} / ${items.length}`);
+    }
+    if ((i / BATCH) % 10 === 9) console.log(`[dataset] ${Math.min(i + BATCH, items.length)} / ${items.length}`);
   }
   await db.query(`analyze medicines`).catch(() => {});
   const { autoCategorise } = await import("./categorise");
